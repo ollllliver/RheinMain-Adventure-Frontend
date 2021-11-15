@@ -22,3 +22,8 @@ npm run lint
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+### Information
+Anfangs habe ich zum "Testen" wie ein Clickdummy einen User mit username: tester password: test in eine 
+JSON Datei geschmissen (siehe /public/users.json). Mit dem kann man sich erstmal einloggen. Das registrieren 
+hat noch keine Funktion.
