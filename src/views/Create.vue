@@ -9,14 +9,26 @@
       <button class="btn btn-primary" @click="$router.push('/')">
         Home
       </button>
+      <InviteCopy :link="link"/>
     </div>
 </template>
 
 <script lang="ts">
   import { defineComponent } from 'vue';
   import { Client, Message } from '@stomp/stompjs';
+  import InviteCopy  from '@/components/InviteCopy.vue';
+  
   export default defineComponent({
     name: 'Create',
+    components: { InviteCopy },
+
+       data: () => {
+        return {
+          baseURL: "localhost:",
+          port: 8080,
+        }
+    },
+    
     setup() {
       // Absolute WS-URL zusammensetzen, Host/Port wie Frontend-Anw.
       const wsurl = `ws://localhost:8080/messagebroker`;
@@ -57,7 +69,15 @@
         create
       }
 
-    }
+    },
+
+    computed: {
+      link() {
+       return this.baseURL + this.port  + "/lobbyID" //TODO baseURL + port + LobbyID
+      }
+    },
+
+    
   });
 </script>
 

@@ -18,7 +18,7 @@
     name: 'Join',
     setup() {
       function join() {
-        
+        console.log("join")
       }
 
       return {
