@@ -4,11 +4,14 @@
   </div>
   <div v-else class="text-center">
     <h2>Welcome, {{ userStore.state.username }}</h2>
-     <button class="btn btn-default" @click="$router.push('join')">
+    <button class="btn btn-default" @click="$router.push('join')">
       Join Lobby
     </button>
-     <button class="btn btn-default" @click="$router.push('create')">
+    <button class="btn btn-default" @click="$router.push('create')">
       Create Lobby
+    </button>
+    <button class="btn btn-default" @click="$router.push('environment')">
+      Game Environment
     </button>
     <button class="btn btn-default" @click="$router.push('editor')">
       Level Editor
