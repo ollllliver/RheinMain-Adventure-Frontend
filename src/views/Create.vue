@@ -38,13 +38,6 @@
       stompclient.onConnect = (frame) => {
         // Callback: erfolgreicher Verbindugsaufbau zu Broker
         console.log("Erfolgreich verbunden: " + frame);
-        stompclient.subscribe("/topic/lobby/create", (message) => {
-          // Callback: Nachricht auf DEST empfangen
-          // empfangene Nutzdaten in message.body abrufbar,
-          // ggf. mit JSON.parse(message.body) zu JS konvertieren
-          console.log("message from broker:", message.body);
-
-        });
       };
       stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
 
@@ -57,12 +50,23 @@
         // Nachrichtenversand vom Client zum Server
         try {
           stompclient.publish({ destination: "/topic/lobby/create", headers: {},
-          body: "Hier vielleicht der Username fuer das hashen der LobbyID"
+          body: "GEHASTERUSERNAME"
           // ... oder body: "irgendein String"
         });
         } catch (fehler) {
           // Problem beim Senden
         }
+
+        //TODO HASHFUNKTION EINBAUEN ZUM SUBSCRIBEN ZUR LOBBY (HashFunktion Anpassen) (Username aus Session oder Sonstiges Kriegen.)
+
+        stompclient.subscribe("/topic/lobby/"+"USERNAMEVONHOSTGEHASHED", (message) => {
+          // Callback: Nachricht auf DEST empfangen
+          // empfangene Nutzdaten in message.body abrufbar,
+          // ggf. mit JSON.parse(message.body) zu JS konvertieren
+          console.log("ANTWORT VON BROKER:", message.body);
+        });
+        
+
       }
 
       return {
