@@ -57,7 +57,26 @@
           // Problem beim Senden
         }
 
+
+
         //TODO HASHFUNKTION EINBAUEN ZUM SUBSCRIBEN ZUR LOBBY (HashFunktion Anpassen) (Username aus Session oder Sonstiges Kriegen.)
+        const USERNAME = "TESTPIPAPO"
+        let hash = ""
+
+        console.log(USERNAME)    //Keine Ahnung warum aber ohne das log geht die Loop nicht, VUe is komisch
+        for (let i = 0; i < USERNAME.length; i++){
+          console.log(USERNAME.charCodeAt(i))
+          let newAscii = USERNAME.charCodeAt(i).toString()
+          let newChar = String.fromCharCode(USERNAME.charCodeAt(i) + 1)
+          
+          hash = hash + newAscii + newChar
+
+        }
+
+        console.log("NEW HASH: " + hash)
+
+
+
 
         stompclient.subscribe("/topic/lobby/"+"USERNAMEVONHOSTGEHASHED", (message) => {
           // Callback: Nachricht auf DEST empfangen
