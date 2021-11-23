@@ -1,3 +1,5 @@
+<!-- Create View um Lobbys zu erstellen -->
+
 <template>
     <div>
       <h1> Create Lobby Page </h1>

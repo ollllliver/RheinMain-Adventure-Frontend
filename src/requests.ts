@@ -13,6 +13,8 @@ export async function login(username: string, password: string) {
     username: username,
     password: password
   }
+  const u = JSON.stringify(user);
+  console.log(u)
   await fetch('/api/benutzer/login', {
     method: 'POST',
     headers: {
@@ -29,6 +31,7 @@ export async function login(username: string, password: string) {
   });
 
   return user
+  
   /*const request = await fetch('/users.json')
   const usersJson: UserList = await request.json()
   return usersJson.find(s => s.password === password && s.username === username)*/
@@ -41,6 +44,7 @@ export async function signup(username:string, password: string) {
     password: password,
     online: false
   }
+  console.log(JSON.stringify({user}))
   await fetch('/api/benutzer/register', {
     method: 'POST',
     headers: {

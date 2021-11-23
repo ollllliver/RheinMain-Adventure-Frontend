@@ -1,3 +1,5 @@
+<!-- Join View um Lobbys beizutreten -->
+
 <template>
     <div>
       <h1> Join Lobby Page </h1>

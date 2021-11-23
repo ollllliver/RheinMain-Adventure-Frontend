@@ -1,3 +1,5 @@
+<!-- Regestrieren-Formular Komponente -->
+
 <template>
   <form @submit.prevent="onSubmit">
     <div class="form-group my-2">
