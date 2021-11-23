@@ -13,12 +13,10 @@ export async function login(username: string, password: string) {
     username: username,
     password: password
   }
-  await fetch('http://localhost:8080/login', {
+  await fetch('/api/benutzer/login', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': 'true'
+      'Content-Type': 'application/json'
     },
      body: JSON.stringify(user)
   })
@@ -43,12 +41,10 @@ export async function signup(username:string, password: string) {
     password: password,
     online: false
   }
-  await fetch('http://localhost:8080/register', {
+  await fetch('/api/benutzer/register', {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': 'true'
+      'Content-Type': 'application/json'
     },
     body: JSON.stringify(user)
   })

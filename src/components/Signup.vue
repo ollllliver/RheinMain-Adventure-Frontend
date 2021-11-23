@@ -20,8 +20,7 @@
       />
     </div>
     <div class="text-danger my-2">{{ userStore.state.error }}</div>
-    <button class="btn btn-success btn-block my-2"  @click="$router.push('/')" 
-    type="submit">Sign Up</button>
+    <button class="btn btn-success btn-block my-2" type="submit">Sign Up</button>
   </form>
 </template>
 <script lang="ts">
