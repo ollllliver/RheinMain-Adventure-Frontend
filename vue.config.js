@@ -8,6 +8,10 @@ module.exports = {
                 'api': { target: 'http://localhost:8080/', 
                 ws: true, 
                 secure: false },
+                '^/lobby': {
+                    target: 'http://localhost:8080/',
+                    ws: true,
+                    secure: false },
         }
     }
 }

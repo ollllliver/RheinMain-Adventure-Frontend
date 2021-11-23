@@ -74,9 +74,9 @@ async function updateLobby(lobby_id: string) {
 }
 
 async function joinLobby(benutzer: Benutzer): Promise<boolean> {
-    console.log("Fetch auf: /api/lobby/" + lobbystate.lobbyID + "/" + benutzer.name + "/" + benutzer.id)
-    return fetch('/api/lobby/join/' + lobbystate.lobbyID + "/" + benutzer.name + "/" + benutzer.id, {
-        method: 'POST',
+    console.log("Fetch auf: /lobby/" + lobbystate.lobbyID)
+    return fetch('/lobby/' + lobbystate.lobbyID , {
+        method: 'GET',
         headers: {
             'Content-Type': 'application/json',
         }
