@@ -4,13 +4,15 @@ import { computed, reactive } from 'vue'
 import * as Request from '@/requests'
 
 const state = reactive({
-  username: '',
-
+  benutzername: '',
+  istEingeloggt:false,
   error: ''
 })
 
 const getters = reactive({
-  isLoggedIn: computed(() => state.username !== '')
+  istEingeloggt: computed(() => {
+    return state.istEingeloggt;
+  })
 })
 
 // Aktionen die den User betreffen
@@ -18,39 +20,46 @@ const actions = {
 
   // liefert User zurück falls vorhanden
   async getUser() {
-    const user = await Request.getUser()
-    if (user == null) return
-
-    state.username = user.username
-  },
+      const user = await Request.getUser()
+      if (state.benutzername === "") {
+        state.istEingeloggt = false
+      } else {
+        state.istEingeloggt = true
+      }
+    },
 
   // versucht Login durchzuführen, falls erfolglos -> false
-  async login(username: string, password: string) {
-    const user = await Request.login(username, password)
-    if (user == null) {
-      state.error = 'Could not find user.'
-      return false
+  async login(benutzername: string, passwort: string) {
+    try {
+      const user = await Request.login(benutzername, passwort)
+      if (user == null) {
+        console.log("fehler")
+        state.error = 'Could not find user.'
+        return false
+      }
+      state.benutzername = benutzername
+      state.istEingeloggt = true
+    } catch (err) {
+      console.log(err)
     }
-
-    state.username = username
-    state.error = ''
-
     return true
   },
 
   // registriert Benutzer, falls erfolglos -> false
-  async signup(username:string, password:string) {
-    const user = await Request.signup(username,password)
+  async signup(benutzername: string, passwort: string) {
+    const user = await Request.signup(benutzername, passwort)
     if (user == null) {
-      state.error ='username already exist'
+      state.error = 'username already exist'
       return false
     }
-    
     return true
   },
+
   // loggt den Nutzer aus
   async logout() {
-    state.username = ''
+    await Request.logout(state.benutzername)
+    state.benutzername = ''
+    state.istEingeloggt = false
   }
 }
 

@@ -1,11 +1,11 @@
 <!-- Home View mit Login/Regestrieren Formular -->
 
 <template>
-  <div v-if="!userStore.getters.isLoggedIn" class="d-grid gap-2 col-6 mx-auto">
+  <div v-if="!userStore.getters.istEingeloggt" class="d-grid gap-2 col-6 mx-auto">
     <Login />
   </div>
   <div v-else class="text-center">
-    <h2>Welcome, {{ userStore.state.username }}</h2>
+    <h2>Welcome, {{ userStore.state.benutzername }}</h2>
       <!-- Wechsel zum "Join"-Fenster -->
      <button class="btn btn-default" @click="$router.push('join')">
       Join Lobby

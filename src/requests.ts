@@ -1,50 +1,60 @@
+import router from "./router"
+import user from "./stores/user"
 export type User = { username: string }
 export type UserList = Array<User & { password: string }>
 
+// GET benutzer/check -> status 200 + User falls vorhanden, 204 falls nicht vorhanden
 export async function getUser() {
-  const request = await fetch('/current.json')
-  const user: User = await request.json()
-  return user
+  await fetch('/api/benutzer/check', {
+    method: 'GET'
+  })
+    .then(async response => {
+      if (response.ok) {
+        if (response.status === 200) {
+          const u = await response.json()
+          console.log("User erkannt", u)
+          user.state.benutzername = u.benutzername
+          user.state.istEingeloggt = true;
+          return true
+        } else {
+          console.log("Kein User erkannt")
+          return false
+        }
+      }
+    })
 }
 
-// POST /login -> User wird überprüft in DB und eingeloggt falls erfolgreich 
-export async function login(username: string, password: string) {
+// POST benutzer/login -> User wird überprüft in DB und eingeloggt falls erfolgreich 
+export async function login(benutzername: string, passwort: string) {
   const user = {
-    username: username,
-    password: password
+    benutzername: benutzername,
+    passwort: passwort
   }
-  const u = JSON.stringify(user);
-  console.log(u)
   await fetch('/api/benutzer/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-     body: JSON.stringify(user)
+    body: JSON.stringify(user)
   })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Success:', data);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
-
+    .then((async response => {
+      const data = await response.json();
+      if (response.ok)
+        console.log("Erfolgreich eingeloggt: ", data)
+    }))
+    .catch(error => {
+      throw Error(error.text)
+    })
   return user
-  
-  /*const request = await fetch('/users.json')
-  const usersJson: UserList = await request.json()
-  return usersJson.find(s => s.password === password && s.username === username)*/
 }
 
 // POST /register -> User wird in der Datenbank angelegt
-export async function signup(username:string, password: string) {
+export async function signup(benutzername: string, passwort: string) {
   const user = {
-    username: username,
-    password: password,
-    online: false
+    id: 1,
+    benutzername: benutzername,
+    passwort: passwort
   }
-  console.log(JSON.stringify({user}))
   await fetch('/api/benutzer/register', {
     method: 'POST',
     headers: {
@@ -52,14 +62,39 @@ export async function signup(username:string, password: string) {
     },
     body: JSON.stringify(user)
   })
-  .then(response => response.json())
-  .then(data => {
-    console.log('Success:', data);
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  });
-  
+    .then((async response => {
+      const data = await response.json();
+      if (response.ok)
+        console.log("Erfolgreich registriert: ", data)
+      router.push('/')
+    }))
+    .catch(error => {
+      throw Error(error.text)
+    })
   return user
 }
- 
+
+export async function logout(benutzername: string) {
+  const user = {
+    id: 1,
+    benutzername: benutzername,
+    passwort: "geheim"
+  }
+  await fetch('/api/benutzer/logout', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(user)
+  })
+    .then((async response => {
+      const data = await response.json();
+      if (response.ok)
+        console.log("Erfolgreich ausgeloggt: ", data)
+      router.push('/')
+    }))
+    .catch(error => {
+      throw Error(error.text)
+    })
+}
+
