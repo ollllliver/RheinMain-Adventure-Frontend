@@ -1,3 +1,5 @@
+<!-- Editor View für den Level-Editor -->
+
 <template>
     <div>
       <h1> Level Editor </h1>
