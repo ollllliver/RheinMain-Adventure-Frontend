@@ -1,5 +1,6 @@
+import { NachrichtenCode } from "./NachrichtenCode";
+
 export interface LobbyMessage{
-    NEUER_MITSPIELER: string;
-    operation: string;
-    id: number;
+    operation: NachrichtenCode;
+    istFehler: boolean;
 }

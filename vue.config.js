@@ -11,11 +11,6 @@ module.exports = {
                 ws: true,
                 logLevel: 'debug'
             },
-            '^/lobby': {
-                target: 'http://localhost:8080/',
-                ws: true,
-                secure: false
-            },
         }
     }
 }

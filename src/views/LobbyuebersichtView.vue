@@ -1,5 +1,9 @@
 <template>
   <div>
+    <!-- Eorror Balken, wenn errormessage vorliegt-->
+    <div v-if="errormessage != ''" class="alert alert-danger" role="alert">
+      {{errormessage}}
+    </div>
     <div class="container">
       <h1>Lobbyübersicht</h1>
 
@@ -11,13 +15,14 @@
     <div class="container">
       <li :lobby="lobby" v-for="lobby in lobbies" :key="lobby.lobbyID">
         {{ lobby.lobbyID }}
+        <button v-on:click="joinLobby(lobby.lobbyID)"> beitreten</button>
       </li>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted } from "vue";
+import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyStore } from "@/services/LobbyStore";
 import router from "@/router";
 
@@ -41,6 +46,10 @@ export default defineComponent({
       router.push("/lobby/" + neueLobbyID);
     }
 
+    function joinLobby(lobbyID: string){
+      router.push("/lobby/" + lobbyID);
+    }
+
     const angezeigteLobbies = computed(() => {
       return alleLobbiesState.lobbies;
     });
@@ -48,6 +57,8 @@ export default defineComponent({
     return {
       create,
       lobbies: angezeigteLobbies,
+      errormessage: ref(alleLobbiesState.errormessage),
+      joinLobby
     };
   },
 });

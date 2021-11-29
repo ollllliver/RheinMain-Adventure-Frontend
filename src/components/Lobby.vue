@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" v-if="darfBeitreten" >
     <h1>Lobby {{ lobbystate.lobbyID }}</h1>
     <ul>
       <h3>istVoll: {{ lobbystate.istVoll }}</h3>
@@ -8,11 +8,7 @@
       <h3>host: {{lobbystate.host}}</h3>
     </ul>
     <div class="container">
-      <div
-        :teilnehmer="teilnehmer"
-        v-for="teilnehmer in teilnehemrliste"
-        :key="teilnehmer.id"
-      >
+      <div :teilnehmer="teilnehmer" v-for="teilnehmer in teilnehemrliste" :key="teilnehmer.id">
       <li>{{ teilnehmer.name }}</li>
       </div>
     </div>
@@ -38,6 +34,10 @@ export default defineComponent({
   setup(props) {
     const { lobbystate, connectToLobby, updateLobby, joinLobby } = useLobbyStore();
     const linkInput = ref("");
+    
+    const darfBeitreten = computed(() =>{
+      return lobbystate.darfBeitreten;
+    });
 
     onMounted(async() =>{
       connectToLobby(String(props.lobby_id));
@@ -75,7 +75,8 @@ export default defineComponent({
     return {
       teilnehemrliste: angezeigteteilnehmer,
       lobbystate, link,
-      joinWalter, joinMarie, joinPlayer1
+      joinWalter, joinMarie, joinPlayer1,
+      darfBeitreten
     };
   },
 });

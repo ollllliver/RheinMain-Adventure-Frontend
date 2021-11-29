@@ -3,6 +3,8 @@ import { Lobby } from './Lobby'
 import { Benutzer } from './Benutzer'
 import { LobbyMessage } from './LobbyMessage'
 import { Client } from '@stomp/stompjs';
+import router from '@/router';
+import { NachrichtenCode } from './NachrichtenCode';
 
 const lobbystate = reactive({
     lobbyID: "",
@@ -10,9 +12,15 @@ const lobbystate = reactive({
     host: "",
     istGestartet: false,
     istVoll: false,
-    spielerlimit: 0
+    spielerlimit: 0,
+    errormessage: "",
+    darfBeitreten: false
 })
 
+const alleLobbiesState = reactive({
+    lobbies: Array<Lobby>(),
+    errormessage: ""
+})
 
 async function connectToLobby(lobby_id: string) {
     console.log('jetzt connecting')
@@ -26,14 +34,53 @@ async function connectToLobby(lobby_id: string) {
     stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
-        await updateLobby(lobby_id);
         stompclient.subscribe(DEST, (message) => {
             const lobbymessage = JSON.parse(message.body) as LobbyMessage;
             console.log("message from broker:", lobbymessage);
-            updateLobby(lobby_id)
+            updateLobby(lobby_id);
         });
     };
     stompclient.activate();
+
+
+    console.log("Fetch auf: /api/lobby/join/" + lobby_id)
+    fetch('/api/lobby/join/' + lobby_id, {
+        method: 'POST'
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((jsondata) => {
+        // verarbeite jsondata
+        const lobbymessage = jsondata as LobbyMessage;
+        console.log("lobbymessage: ", lobbymessage)
+        if(lobbymessage.istFehler){
+            console.log(NachrichtenCode.LOBBY_VOLL)
+            switch (lobbymessage.operation) {
+                case NachrichtenCode.LOBBY_VOLL:
+                    alleLobbiesState.errormessage = "Sorry, die Lobby war schon voll. Versuch es doch mal mit ner anderen :)"
+                    router.push("/uebersicht")
+                    break;
+            
+                default:
+                    break;
+            }
+        }else{
+            lobbystate.darfBeitreten = true;
+            updateLobby(lobby_id);
+        }
+
+    })
+        .catch((e) => {
+            console.log(e);
+        });
+
+
 }
 // Gemeinsame State-Variable(n) auf oberster Ebene,
 // also ausserhalb der use-Funktion (dürfen nur je
@@ -94,7 +141,7 @@ async function joinLobby(benutzer: Benutzer): Promise<boolean> {
 async function neueLobby() {
     console.log("/api/lobby/neu Data fetch:")
     return fetch('/api/lobby/neu', {
-        method: 'GET'
+        method: 'POST'
         // ,headers: {
         //     'Authorization': 'Bearer ' + loginstate.jwttoken
         // }
@@ -111,10 +158,6 @@ async function neueLobby() {
             console.log(e);
         });
 }
-
-const alleLobbiesState = reactive({
-    lobbies: Array<Lobby>()
-})
 
 async function alleLobbiesladen() {
     const lobbyliste = new Array<Lobby>();
