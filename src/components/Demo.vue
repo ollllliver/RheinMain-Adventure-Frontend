@@ -4,8 +4,10 @@
 
 <script lang="ts">
 import * as Three from "three";
-import { PointerLockControls } from 'three/examples/js/controls/PointerLockControls';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { defineComponent, onMounted } from "vue";
+
 export default defineComponent({
   name: "RenderDemo",
   setup() {
@@ -17,7 +19,7 @@ export default defineComponent({
     let meshPlane: any;
     let meshCube: any;
     let raycaster: any;
-
+    let loader: any;
     let moveForward = false;
     let moveBackward = false;
     let moveLeft = false;
@@ -31,12 +33,13 @@ export default defineComponent({
     onMounted(() => {
       container = document.getElementById("container");
       initScene();
+      initLoader();
       initCamera();
       initPlane();
       initCube();
       initRaycaster();
       initRenderer();
-      // initControls();
+      initControls();
       // onKeyDown();
       // onKeyUp();
       doAnimate();
@@ -45,10 +48,34 @@ export default defineComponent({
 
     const initScene = () => {
       scene = new Three.Scene();
+
+      var ambientLight = new Three.AmbientLight( 0xcccccc );
+      scene.add( ambientLight );
+              
+      var directionalLight = new Three.DirectionalLight( 0xffffff );
+      directionalLight.position.set( 0, 1, 1 ).normalize();
+      scene.add( directionalLight );	
+    };
+
+    const initLoader = () => {
+    loader = new GLTFLoader();
+
+    loader.load('/assets/blender/example.gltf', (gltf) => {
+      var object = gltf.scene;				
+      gltf.scene.scale.set( 20, 20, 20 );			   
+      gltf.scene.position.x = 0;				   
+      gltf.scene.position.y = 0;				  
+      gltf.scene.position.z = 0;		
+      gltf.controls = controls	
+      gltf.camera = camera; 
+      console.log(gltf)
+      gltf.asset; 
+      scene.add(gltf.scene)
+    })
     };
 
     const initCamera = () => {
-      camera = new Three.PerspectiveCamera(50,window.innerWidth / window.innerHeight,0.1,window.innerHeight);
+      camera = new Three.PerspectiveCamera(50,window.innerWidth/ window.innerHeight,0.1,window.innerHeight);
       camera.position.z = 10;
     };
 
@@ -57,18 +84,21 @@ export default defineComponent({
       let material = new Three.MeshBasicMaterial();
 
       meshPlane = new Three.Mesh(plane, material);
+      meshPlane.position.z = -2
       rotateObject(meshPlane, -70, 0, 0);
       moveObject(meshPlane, 0, 1, 0);
-      scene.add(meshPlane);
+      //scene.add(meshPlane);
     };
 
+
     const initCube = () => {
+      
       let geometry = new Three.BoxGeometry(0.2, 0.2, 0.2);
       let material = new Three.MeshNormalMaterial();
 
       meshCube = new Three.Mesh(geometry, material);
       meshCube.position.z = -1;
-      scene.add(meshCube);
+      //scene.add(meshCube);
     };
 
     const initRaycaster = () => {
@@ -81,11 +111,12 @@ export default defineComponent({
       container.appendChild(renderer.domElement);
     };
 
-    // const initControls = () => {
-    //   controls = new PointerLockControls(camera, renderer.domElement);
-    //   controls.lock;
-    //   scene.add(controls.getObject());
-    // };
+     const initControls = () => {
+       controls = new OrbitControls(camera, renderer.domElement);
+      
+       camera.position.set( 0, 100, 500 );
+       controls.update();
+     };
 
     const onKeyDown = () => {
       window.addEventListener("keydown", (e) => {
@@ -173,7 +204,7 @@ export default defineComponent({
     };
 
     const doKeyMovement = () => {
-      let speed = 1;
+      let speed = 100;
       window.addEventListener("keypress", (e) => {
         switch (e.key) {
           case "w":
