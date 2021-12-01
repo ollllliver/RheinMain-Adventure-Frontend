@@ -6,4 +6,5 @@ declare module '*.vue' {
 }
 
 declare module 'three'
-declare module 'three/examples/js/controls/PointerLockControls'
+
+declare module 'three/examples/jsm/loaders/GLTFLoader';
