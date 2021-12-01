@@ -137,6 +137,27 @@ async function joinLobby(benutzer: Benutzer): Promise<boolean> {
     });
 }
 
+async function leaveLobby(spielername: string): Promise<boolean> {
+    console.log("Fetch auf: " + lobbystate.lobbyID + "/leave"  )
+    
+    return fetch('/api/lobby/' + lobbystate.lobbyID + '/leave/' , {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        console.log("RRESPONSE: " + response)
+        return response.json();
+    }).catch((e) => {
+            console.log(e);
+        });
+}
+
+
 
 async function neueLobby() {
     console.log("/api/lobby/neu Data fetch:")
@@ -201,6 +222,6 @@ export function useLobbyStore() {
         neueLobby,
         alleLobbiesladen,
         alleLobbiesState: readonly(alleLobbiesState),
-        updateLobby, joinLobby
+        updateLobby, joinLobby ,leaveLobby
     }
 }

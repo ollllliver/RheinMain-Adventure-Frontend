@@ -16,6 +16,7 @@
     <button class="btn btn-primary" v-on:click="joinWalter">als Walter joinen</button>
     <button class="btn btn-primary" v-on:click="joinMarie">als Marie joinen</button>
     <button class="btn btn-primary" v-on:click="joinPlayer1">als jemand, der schon in der Lobby ist, die Seite aufren</button>
+    <button class="btn btn-primary" v-on:click="verlassen">LEAVE LOBBY</button>
   </div>
 </template>
 
@@ -32,7 +33,7 @@ export default defineComponent({
     lobby_id: { type: String, reqired: true },
   },
   setup(props) {
-    const { lobbystate, connectToLobby, updateLobby, joinLobby } = useLobbyStore();
+    const { lobbystate, connectToLobby, updateLobby, joinLobby, leaveLobby } = useLobbyStore();
     const linkInput = ref("");
     
     const darfBeitreten = computed(() =>{
@@ -71,12 +72,18 @@ export default defineComponent({
       
     }
 
+    async function verlassen(username:string){
+      console.log("/topic/lobby/"+props.lobby_id +" - " + username);
+      leaveLobby(username)
+    }
+
 
     return {
       teilnehemrliste: angezeigteteilnehmer,
       lobbystate, link,
       joinWalter, joinMarie, joinPlayer1,
-      darfBeitreten
+      darfBeitreten, 
+      verlassen
     };
   },
 });
