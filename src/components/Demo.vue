@@ -1,12 +1,12 @@
 <template>
   <div id="container"></div>
+  
 </template>
 
 <script lang="ts">
 import * as Three from "three";
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { defineComponent, onMounted } from "vue";
+import {Loader} from './models/Loader'
 
 export default defineComponent({
   name: "RenderDemo",
@@ -24,7 +24,7 @@ export default defineComponent({
     let moveBackward = false;
     let moveLeft = false;
     let moveRight = false;
-    let canJump = false;
+    let canJump = false;                                        
 
     let prevTime = performance.now();
 		const velocity = new Three.Vector3();
@@ -39,7 +39,7 @@ export default defineComponent({
       initCube();
       initRaycaster();
       initRenderer();
-      initControls();
+      //initControls();
       // onKeyDown();
       // onKeyUp();
       doAnimate();
@@ -58,20 +58,29 @@ export default defineComponent({
     };
 
     const initLoader = () => {
-    loader = new GLTFLoader();
-
-    loader.load('/assets/blender/example.gltf', (gltf) => {
-      var object = gltf.scene;				
-      gltf.scene.scale.set( 20, 20, 20 );			   
+      loader = new Loader('/assets/blender/example.gltf');
+      //scene.add(gltf.scene)
+      console.log(loader);
+      console.log(loader.obj);
+      /*gltf.scene.scale.set( 20, 20, 20 );			   
       gltf.scene.position.x = 0;				   
       gltf.scene.position.y = 0;				  
       gltf.scene.position.z = 0;		
-      gltf.controls = controls	
-      gltf.camera = camera; 
-      console.log(gltf)
-      gltf.asset; 
-      scene.add(gltf.scene)
-    })
+      scene.add(gltf.scene);*/
+    // loader = new GLTFLoader();
+
+    // loader.load('/assets/blender/example.gltf', (gltf) => {
+    //   var object = gltf.scene;				
+    //   gltf.scene.scale.set( 20, 20, 20 );			   
+    //   gltf.scene.position.x = 0;				   
+    //   gltf.scene.position.y = 0;				  
+    //   gltf.scene.position.z = 0;		
+    //   gltf.controls = controls	
+    //   gltf.camera = camera; 
+    //   console.log(gltf)
+    //   gltf.asset; 
+    //   scene.add(gltf.scene)
+    //})
     };
 
     const initCamera = () => {
@@ -110,13 +119,13 @@ export default defineComponent({
       renderer.setSize(window.innerWidth, window.innerHeight);
       container.appendChild(renderer.domElement);
     };
-
+/*
      const initControls = () => {
        controls = new OrbitControls(camera, renderer.domElement);
       
        camera.position.set( 0, 100, 500 );
        controls.update();
-     };
+     };*/
 
     const onKeyDown = () => {
       window.addEventListener("keydown", (e) => {
