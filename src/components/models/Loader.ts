@@ -5,14 +5,14 @@ export class Loader {
     public _obj: any;
     constructor(datei: string) {
         this.loader = new GLTFLoader();
-        this.loader.load(datei, (gltf:Object) => {
+        this.loader.load(datei, (gltf:any) => {
             this._obj = gltf;
         })
     }
     
      
     public get obj() : any {
-        return this._obj;
+        return this._obj
     }
     
     
