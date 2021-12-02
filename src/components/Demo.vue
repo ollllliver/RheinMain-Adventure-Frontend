@@ -15,7 +15,6 @@ export default defineComponent({
     let camera: any;
     let scene: any;
     let renderer: any;
-    let controls: any;
     let meshPlane: any;
     let meshCube: any;
     let raycaster: any;
@@ -25,6 +24,18 @@ export default defineComponent({
     let moveLeft = false;
     let moveRight = false;
     let canJump = false;                                        
+
+    let controls = {};
+    let player = {
+      height: .5,
+      turnSpeed: .1,
+      speed: .1,
+      jumpHeight: .2,
+      gravity: .01,
+      velocity: 0,
+      
+      playerJumps: false
+    };
 
     let prevTime = performance.now();
 		const velocity = new Three.Vector3();
@@ -39,11 +50,11 @@ export default defineComponent({
       initCube();
       initRaycaster();
       initRenderer();
-      //initControls();
+      control();
       // onKeyDown();
       // onKeyUp();
       doAnimate();
-      doKeyMovement();
+      //doKeyMovement();
     });
 
     const initScene = () => {
@@ -80,8 +91,9 @@ export default defineComponent({
     };
 
     const initCamera = () => {
-      camera = new Three.PerspectiveCamera(50,window.innerWidth/ window.innerHeight,0.1,window.innerHeight);
-      camera.position.z = 10;
+      camera = new Three.PerspectiveCamera(50,window.innerWidth / window.innerHeight,0.1,window.innerHeight);
+      camera.position.set(0, player.height, -5);
+      camera.lookAt(new Three.Vector3(0, player.height, 0));
     };
 
     const initPlane = () => {
@@ -123,57 +135,59 @@ export default defineComponent({
        controls.update();
      };*/
 
-    const onKeyDown = () => {
-      window.addEventListener("keydown", (e) => {
-        switch (e.key) {
-          case "w":
-            moveForward = true;
-            console.log("Gehe nach vorne");
-            break;
-          case "a":
-            moveLeft = true;
-            console.log("Gehe nach links");
-            break;
-          case "s":
-            moveBackward = true;
-            console.log("Gehe nach hinten");
-            break;
-          case "d":
-            moveRight = true;
-            console.log("Gehe nach rechts");
-            break;
-          case "space":
-            if ( canJump === true ) velocity.y += 350;
-            canJump = false;
-            console.log("Spring hoch");
-            break;
-          default:
-            console.log(e.key + " gedrückt (keinem Befehl zugewiesen)");
-            break;
-        }
-      });
-    };
+    document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
+    document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });
 
-    const onKeyUp = () => {
-      window.addEventListener("keyup", (e) => {
-        switch (e.key) {
-          case "w":
-            moveForward = false;
-            break;
-          case "a":
-            moveLeft = false;
-            break;
-          case "s":
-            moveBackward = false;
-            break;
-          case "d":
-            moveRight = false;
-            break;
-          default:
-            break;
-        }
-      });
+    const control = () => {
+      // Controls:Engine 
+      if(controls[87]){ // w
+        camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
+        camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
+        console.log("Vorne")
+        
+      }
+      if(controls[83]){ // s
+        camera.position.x += Math.sin(camera.rotation.y) * player.speed;
+        camera.position.z += -Math.cos(camera.rotation.y) * player.speed;
+      }
+      if(controls[65]){ // a
+        camera.position.x += Math.sin(camera.rotation.y + Math.PI / 2) * player.speed;
+        camera.position.z += -Math.cos(camera.rotation.y + Math.PI / 2) * player.speed;
+      }
+      if(controls[68]){ // d
+        camera.position.x += Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
+        camera.position.z += -Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
+      }
+      if(controls[37]){ // la
+        camera.rotation.y -= player.turnSpeed;
+      }
+      if(controls[39]){ // ra
+        camera.rotation.y += player.turnSpeed;
+      }
+      if(controls[32]) { // space
+        // if(player.jumps) return false;
+        // player.jumps = true;
+        // player.velocity = -player.jumpHeight;
+      }
     }
+
+    const ixMovementUpdate = () => {
+      player.velocity += player.gravity;
+      camera.position.y -= player.velocity;
+      
+      if(camera.position.y < player.height) {
+        camera.position.y = player.height;
+       // player.jumps = false;
+      }
+    }
+
+    const update = () => {
+      control();
+      ixMovementUpdate();
+    }
+
+
+
 
     const doAnimate = () => {
       requestAnimationFrame(doAnimate);
@@ -181,6 +195,7 @@ export default defineComponent({
       meshCube.rotation.y += 0.02;
 
       const time = performance.now();
+      update();
 
       // if (controls.isLocked === true) {
       //   const time = performance.now();
