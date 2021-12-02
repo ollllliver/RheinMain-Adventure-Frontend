@@ -19,7 +19,7 @@ export default defineComponent({
     let meshPlane: any;
     let meshCube: any;
     let raycaster: any;
-    let loader: any;
+    let loader: Loader;
     let moveForward = false;
     let moveBackward = false;
     let moveLeft = false;
@@ -57,30 +57,26 @@ export default defineComponent({
       scene.add( directionalLight );	
     };
 
+    /**
+     * Initialisiert Loader Klasse
+     */
     const initLoader = () => {
-      loader = new Loader('/assets/blender/example.gltf');
-      //scene.add(gltf.scene)
-      console.log(loader);
-      console.log(loader.obj);
-      /*gltf.scene.scale.set( 20, 20, 20 );			   
-      gltf.scene.position.x = 0;				   
-      gltf.scene.position.y = 0;				  
-      gltf.scene.position.z = 0;		
-      scene.add(gltf.scene);*/
-    // loader = new GLTFLoader();
-
-    // loader.load('/assets/blender/example.gltf', (gltf) => {
-    //   var object = gltf.scene;				
-    //   gltf.scene.scale.set( 20, 20, 20 );			   
-    //   gltf.scene.position.x = 0;				   
-    //   gltf.scene.position.y = 0;				  
-    //   gltf.scene.position.z = 0;		
-    //   gltf.controls = controls	
-    //   gltf.camera = camera; 
-    //   console.log(gltf)
-    //   gltf.asset; 
-    //   scene.add(gltf.scene)
-    //})
+      loader = new Loader();
+      console.log(loader)
+      loader.ladeDatei('/assets/blender/example.gltf')
+      .then((res:any) => {
+        // TODO: 
+        // Kamera, Steuerung und scene.position der gltf.scene zuweisen (Hier oder in Loader Klasse?)
+          //   gltf.scene.scale.set( 20, 20, 20 );			   
+          //   gltf.scene.position.x = 0;				   
+          //   gltf.scene.position.y = 0;				  
+          //   gltf.scene.position.z = 0;		
+          //   gltf.controls = controls	
+          //   gltf.camera = camera; 
+        // vielleicht extra Methode konfiguriere in Loader Klasse und dann hier loader.konfiguere(res.scene)
+        console.log(res)
+        scene.add(res.scene)
+      })
     };
 
     const initCamera = () => {
