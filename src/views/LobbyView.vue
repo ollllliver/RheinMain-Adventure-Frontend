@@ -18,6 +18,8 @@
     <button class="btn btn-primary" v-on:click="joinMarie">als Marie joinen</button>
     <button class="btn btn-primary" v-on:click="joinPlayer1">als jemand, der schon in der Lobby ist, die Seite aufren</button>
     <button class="btn btn-primary" v-on:click="verlassen">LEAVE LOBBY</button>
+    <button class="btn btn-primary" v-on:click="starten">SPIEL STARTEN</button>
+
   </div>
 </template>
 
@@ -35,7 +37,7 @@ export default defineComponent({
     lobby_id: { type: String, reqired: true },
   },
   setup(props) {
-    const { lobbystate, connectToLobby, updateLobby, joinLobby, leaveLobby, sendeChatNachricht, empfangeChatNachricht } = useLobbyStore();
+    const { lobbystate, connectToLobby, updateLobby, joinLobby, leaveLobby, sendeChatNachricht, empfangeChatNachricht,starteLobby } = useLobbyStore();
     const linkInput = ref("");
     
     const darfBeitreten = computed(() =>{
@@ -65,6 +67,15 @@ export default defineComponent({
       join("Player1")
     }
 
+    function starten(){
+      starteLobby().then(response => {
+        //TODO : HIER ANSICHT WECHSELN UND VISUELLEN 10 SEKUNDEN TIMER STARTEN
+        console.log(response);
+      }).catch(err =>{
+        console.log(err);
+      });
+    }
+
     async function join(username:string) {
       // Das join sollte eigendlich bei onMount aufgerufen werden, Testweise aber manuell über Buttons
       console.log("/topic/lobby/"+props.lobby_id +" - " + username);
@@ -85,7 +96,7 @@ export default defineComponent({
       joinWalter, joinMarie, joinPlayer1,
       darfBeitreten,
       sendeChatNachricht, empfangeChatNachricht,
-      verlassen
+      verlassen,starten
     };
   },
 });
