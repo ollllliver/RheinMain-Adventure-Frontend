@@ -34,7 +34,7 @@ export default defineComponent({
   },
   
   setup(props) {
-    const { neueLobby, alleLobbiesladen, alleLobbiesState } = useLobbyStore();
+    const { neueLobby, alleLobbiesladen, alleLobbiesState,joinRandomLobby } = useLobbyStore();
 
     onMounted(async () => {
       await alleLobbiesladen();
@@ -49,6 +49,13 @@ export default defineComponent({
     function joinLobby(lobbyID: string){
       router.push("/lobby/" + lobbyID);
     }
+    function joinrandom(){
+      joinRandomLobby().then((lobbyID) =>{
+        router.push("/lobby/" + lobbyID);
+      }).catch(err => {
+        console.log(err);
+      });
+    }
 
     const angezeigteLobbies = computed(() => {
       return alleLobbiesState.lobbies;
@@ -58,7 +65,7 @@ export default defineComponent({
       create,
       lobbies: angezeigteLobbies,
       errormessage: ref(alleLobbiesState.errormessage),
-      joinLobby
+      joinLobby,joinrandom
     };
   },
 });
