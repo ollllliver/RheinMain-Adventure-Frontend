@@ -175,6 +175,61 @@ async function joinLobby(benutzer: Benutzer): Promise<boolean> {
     });
 }
 
+
+
+
+async function joinRandomLobby() {
+    console.log("Fetch auf: /api/lobby/joinRandom")
+    return fetch('/api/lobby/joinRandom', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((jsondata) => {
+        const lobbyMsg = jsondata as LobbyMessage;
+        console.log(lobbyMsg);
+        return lobbyMsg.payload;
+
+    })
+        .catch((e) => {
+            console.log(e);
+        });
+
+}
+
+async function starteLobby() {
+    console.log("Fetch auf: /api/lobby/{lobbyId}/start")
+    return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((jsondata) => {
+        const lobbyMsg = jsondata as LobbyMessage;
+        console.log(lobbyMsg);
+        return lobbyMsg.payload;
+
+    })
+        .catch((e) => {
+            console.log(e);
+        });
+
+}
+
+
+
 async function leaveLobby(spielername: string): Promise<boolean> {
     console.log("Fetch auf: " + lobbystate.lobbyID + "/leave"  )
     
@@ -260,7 +315,7 @@ export function useLobbyStore() {
         neueLobby,
         alleLobbiesladen,
         alleLobbiesState: readonly(alleLobbiesState),
-        updateLobby, joinLobby, leaveLobby,
-        sendeChatNachricht, empfangeChatNachricht
+        joinRandomLobby,updateLobby, joinLobby, leaveLobby,
+        sendeChatNachricht, empfangeChatNachricht,starteLobby
     }
 }
