@@ -6,11 +6,15 @@
 <script lang="ts">
 import * as Three from "three";
 import { defineComponent, onMounted } from "vue";
-import {Loader} from './models/Loader'
+import { Loader } from './models/Loader';
+import { MyMouseControls } from '@/components/models/MyMouseControls';
+import { MyKeyboardControls } from '@/components/models/MyKeyboardControls';
+
 
 export default defineComponent({
   name: "RenderDemo",
   setup() {
+
     let container: any;
     let camera: any;
     let scene: any;
@@ -23,9 +27,12 @@ export default defineComponent({
     let moveBackward = false;
     let moveLeft = false;
     let moveRight = false;
-    let canJump = false;                                        
+    let moveUp = false;
+    let moveDown = false;
 
-    let controls = {};
+    let mouseControls: MyMouseControls;
+    let keyControls: MyKeyboardControls;
+
     let player = {
       height: .5,
       turnSpeed: .1,
@@ -33,12 +40,12 @@ export default defineComponent({
       jumpHeight: .2,
       gravity: .01,
       velocity: 0,
-      
-      playerJumps: false
+      jumps: false,
+      ducks: false,
     };
 
     let prevTime = performance.now();
-		const velocity = new Three.Vector3();
+		let velocity = new Three.Vector3();
 		const direction = new Three.Vector3();
 
     onMounted(() => {
@@ -46,15 +53,13 @@ export default defineComponent({
       initScene();
       initLoader();
       initCamera();
-      initPlane();
+      //initPlane();
       initCube();
       initRaycaster();
       initRenderer();
-      control();
-      // onKeyDown();
-      // onKeyUp();
+      initControls();
       doAnimate();
-      //doKeyMovement();
+      
     });
 
     const initScene = () => {
@@ -96,17 +101,23 @@ export default defineComponent({
       camera.lookAt(new Three.Vector3(0, player.height, 0));
     };
 
-    const initPlane = () => {
-      let plane = new Three.PlaneGeometry(5, 5, 1, 1);
-      let material = new Three.MeshBasicMaterial();
+    const initControls = () => {
+      mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
+      keyControls = new MyKeyboardControls(document); //init Keyboardsteuerung
 
-      meshPlane = new Three.Mesh(plane, material);
-      meshPlane.position.z = -2
-      rotateObject(meshPlane, -70, 0, 0);
-      moveObject(meshPlane, 0, 1, 0);
-      //scene.add(meshPlane);
-    };
+      window.addEventListener( 'click', function () { mouseControls.lock(); } ); //locked die Maus
+    }
 
+    // const initPlane = () => {
+    //   let plane = new Three.PlaneGeometry(5, 5, 1, 1);
+    //   let material = new Three.MeshBasicMaterial();
+
+    //   meshPlane = new Three.Mesh(plane, material);
+    //   meshPlane.position.z = -2
+    //   rotateObject(meshPlane, -70, 0, 0);
+    //   moveObject(meshPlane, 0, 1, 0);
+    //   //scene.add(meshPlane);
+    // };
 
     const initCube = () => {
       
@@ -127,150 +138,118 @@ export default defineComponent({
       renderer.setSize(window.innerWidth, window.innerHeight);
       container.appendChild(renderer.domElement);
     };
-/*
-     const initControls = () => {
-       controls = new OrbitControls(camera, renderer.domElement);
-      
-       camera.position.set( 0, 100, 500 );
-       controls.update();
-     };*/
-
-    document.addEventListener('keydown', ({ keyCode }) => { controls[keyCode] = true });
-    document.addEventListener('keyup', ({ keyCode }) => { controls[keyCode] = false });
-
-    const control = () => {
-      // Controls:Engine 
-      if(controls[87]){ // w
-        camera.position.x -= Math.sin(camera.rotation.y) * player.speed;
-        camera.position.z -= -Math.cos(camera.rotation.y) * player.speed;
-        console.log("Vorne")
-        
-      }
-      if(controls[83]){ // s
-        camera.position.x += Math.sin(camera.rotation.y) * player.speed;
-        camera.position.z += -Math.cos(camera.rotation.y) * player.speed;
-      }
-      if(controls[65]){ // a
-        camera.position.x += Math.sin(camera.rotation.y + Math.PI / 2) * player.speed;
-        camera.position.z += -Math.cos(camera.rotation.y + Math.PI / 2) * player.speed;
-      }
-      if(controls[68]){ // d
-        camera.position.x += Math.sin(camera.rotation.y - Math.PI / 2) * player.speed;
-        camera.position.z += -Math.cos(camera.rotation.y - Math.PI / 2) * player.speed;
-      }
-      if(controls[37]){ // la
-        camera.rotation.y -= player.turnSpeed;
-      }
-      if(controls[39]){ // ra
-        camera.rotation.y += player.turnSpeed;
-      }
-      if(controls[32]) { // space
-        // if(player.jumps) return false;
-        // player.jumps = true;
-        // player.velocity = -player.jumpHeight;
-      }
-    }
-
-    const ixMovementUpdate = () => {
-      player.velocity += player.gravity;
-      camera.position.y -= player.velocity;
-      
-      if(camera.position.y < player.height) {
-        camera.position.y = player.height;
-       // player.jumps = false;
-      }
-    }
-
-    const update = () => {
-      control();
-      ixMovementUpdate();
-    }
-
-
-
 
     const doAnimate = () => {
       requestAnimationFrame(doAnimate);
-      meshCube.rotation.x += 0.01;
-      meshCube.rotation.y += 0.02;
+      // meshCube.rotation.x += 0.01;
+      // meshCube.rotation.y += 0.02;
+      //update();
+      
+      // const time = performance.now();
+      // const delta = ( time - prevTime ) / 1000;
+      // keyControls.update()(delta);
 
+
+      
       const time = performance.now();
-      update();
+      const delta=(time-prevTime)/1000;
+      //entweder hier oder in MyKeyboardControl
+      velocity.x-=velocity.x*10.0*delta;
+      velocity.z-=velocity.z*10.0*delta;
+      velocity.y-=velocity.y*10.0*delta;
 
-      // if (controls.isLocked === true) {
-      //   const time = performance.now();
-      //   raycaster.ray.origin.copy( controls.getObject().position );
-      //   raycaster.ray.origin.y -= 10;
+      
+      mouseControls.update(velocity, delta); //Maus Steuerung
+      keyControls.update(velocity, delta) //Tastatur Steuerung
+			prevTime = time;
 
-      //   const delta = ( time - prevTime ) / 1000;
-      //   velocity.x -= velocity.x * 10.0 * delta;
-			// 	velocity.z -= velocity.z * 10.0 * delta;
-
-      //   direction.z = Number( moveForward ) - Number( moveBackward );
-      //   direction.x = Number( moveRight ) - Number( moveLeft );
-      //   direction.normalize();
-
-      //   if ( moveForward || moveBackward ) velocity.z -= direction.z * 400.0 * delta;
-			// 	if ( moveLeft || moveRight ) velocity.x -= direction.x * 400.0 * delta;
-
-      //   controls.moveRight( - velocity.x * delta );
-			// 	controls.moveForward( - velocity.z * delta );
-
-      //   prevTime = time;
-			// 	renderer.render( scene, camera );
-      // }
-
-      renderer.render(scene, camera);
-    };
-
-    const doKeyMovement = () => {
-      let speed = 100;
-      window.addEventListener("keypress", (e) => {
-        switch (e.key) {
-          case "w":
-            camera.position.z -= degInRad(speed);
-            console.log("Gehe nach vorne");
-            break;
-          case "a":
-            camera.position.x -= degInRad(speed);
-            console.log("Gehe nach links");
-            break;
-          case "s":
-            camera.position.z += degInRad(speed);
-            console.log("Gehe nach hinten");
-            break;
-          case "d":
-            camera.position.x += degInRad(speed);
-            console.log("Gehe nach rechts");
-            break;
-          case "e":
-            camera.rotation.y -= degInRad(speed);
-            console.log("Drehe nach links");
-            break;
-          case "q":
-            camera.rotation.y += degInRad(speed);
-            console.log("Drehe nach rechts");
-            break;
-          case "Enter":
-            console.log(e.key + " gedrückt");
-            break;
-          case "Esc":
-          case "Escape":
-            console.log(e.key + " gedrückt");
-            break;
-          case " ":
-            console.log(e.key + " gedrückt");
-            break;
-          default:
-            console.log(e.key + " gedrückt (keinem Befehl zugewiesen)");
-        }
-      });
+			renderer.render( scene, camera );
+     
     };
 
     function degInRad(deg: number) {
       return (deg * Math.PI) / 90;
     }
 
+    const onKeyDown = function ( event:KeyboardEvent ) {
+
+					switch ( event.code ) {
+
+						case 'ArrowUp':
+						case 'KeyW':
+							moveForward = true;
+							break;
+
+						case 'ArrowLeft':
+						case 'KeyA':
+							moveLeft = true;
+							break;
+
+						case 'ArrowDown':
+						case 'KeyS':
+							moveBackward = true;
+							break;
+
+						case 'ArrowRight':
+						case 'KeyD':
+							moveRight = true;
+							break;
+
+						case 'Space':
+              moveUp=true;
+							// if ( canJump === true ) velocity.y += 350;
+							// canJump = false;
+							break;
+            
+            case 'ShiftLeft':
+							moveDown = true;
+							break;
+
+					}
+
+				};
+
+    const onKeyUp = function ( event:KeyboardEvent ) {
+
+      switch ( event.code ) {
+
+        case 'ArrowUp':
+        case 'KeyW':
+          moveForward = false;
+          break;
+
+        case 'ArrowLeft':
+        case 'KeyA':
+          moveLeft = false;
+          break;
+
+        case 'ArrowDown':
+        case 'KeyS':
+          moveBackward = false;
+          break;
+
+        case 'ArrowRight':
+        case 'KeyD':
+          moveRight = false;
+          break;
+        case 'Space':
+            moveUp = false;
+							// if ( canJump === true ) velocity.y += 350;
+							// canJump = false;
+						break;
+            
+        case 'ShiftLeft':
+						moveDown = false;
+						break;
+
+      }
+
+    };
+
+    document.addEventListener( 'keydown', onKeyDown),
+    document.addEventListener( 'keyup', onKeyUp),
+
+  
     function rotateObject(mesh: any, degreeX = 0, degreeY = 0, degreeZ = 0) {
       mesh.rotateX(Three.Math.degToRad(degreeX));
       mesh.rotateY(Three.Math.degToRad(degreeY));
