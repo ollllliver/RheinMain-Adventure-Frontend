@@ -5,6 +5,11 @@ import { LobbyMessage } from './LobbyMessage'
 import { Client } from '@stomp/stompjs';
 import router from '@/router';
 import { NachrichtenCode } from './NachrichtenCode';
+import { NachrichtenTyp } from './NachrichtenTyp';
+import { ChatNachricht } from './ChatNachricht';
+
+const wsurl = `ws://localhost:8080/messagebroker`;
+const stompclient = new Client({ brokerURL: wsurl })
 
 const lobbystate = reactive({
     lobbyID: "",
@@ -24,10 +29,8 @@ const alleLobbiesState = reactive({
 
 async function connectToLobby(lobby_id: string) {
     console.log('jetzt connecting')
-    const wsurl = `ws://localhost:8080/messagebroker`;
     const DEST = "/topic/lobby/" + lobby_id;
-    const stompclient = new Client({ brokerURL: wsurl })
-
+    const DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
 
     stompclient.onWebSocketError = (event) => { /* WS-Fehler */ }
     stompclient.onStompError = (frame) => { /* STOMP-Fehler */ }
@@ -38,6 +41,10 @@ async function connectToLobby(lobby_id: string) {
             const lobbymessage = JSON.parse(message.body) as LobbyMessage;
             console.log("message from broker:", lobbymessage);
             updateLobby(lobby_id);
+        });
+        stompclient.subscribe(DEST_CHAT, (message) => {
+            const chatmessage = JSON.parse(message.body) as ChatNachricht;
+            empfangeChatNachricht(chatmessage);
         });
     };
     stompclient.activate();
@@ -82,6 +89,23 @@ async function connectToLobby(lobby_id: string) {
 
 
 }
+
+
+// TODO: Chatfunktionen auslagern in seperates ChatStore.ts
+async function sendeChatNachricht(inhalt: string, sender: string) {
+
+    const DEST_CHAT = "/topic/lobby/" + lobbystate.lobbyID + "/chat";
+    const nachricht: ChatNachricht =  { typ: NachrichtenTyp.CHAT, inhalt: inhalt, sender: sender };
+    stompclient.publish({destination: DEST_CHAT, body: JSON.stringify(nachricht)});
+    console.log("Gesendete Nachricht: ", nachricht);
+}
+
+async function empfangeChatNachricht(nachricht: ChatNachricht) {
+
+    console.log("Empfangene Nachricht: ", nachricht);
+    
+}
+
 // Gemeinsame State-Variable(n) auf oberster Ebene,
 // also ausserhalb der use-Funktion (dürfen nur je
 // einmal und nicht nicht je use-Aufruf angelegt werden)
@@ -252,6 +276,7 @@ export function useLobbyStore() {
         neueLobby,
         alleLobbiesladen,
         alleLobbiesState: readonly(alleLobbiesState),
-        updateLobby, joinLobby ,leaveLobby,joinRandomLobby
+        joinRandomLobby,updateLobby, joinLobby, leaveLobby,
+        sendeChatNachricht, empfangeChatNachricht
     }
 }
