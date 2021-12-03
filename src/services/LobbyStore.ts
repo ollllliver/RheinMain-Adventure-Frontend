@@ -231,10 +231,10 @@ async function starteLobby() {
 
 
 async function leaveLobby(spielername: string): Promise<boolean> {
-    console.log("Fetch auf: " + lobbystate.lobbyID + "/leave"  )
+    console.log("Fetch auf: /leave/" + lobbystate.lobbyID  )
     
-    return fetch('/api/lobby/' + lobbystate.lobbyID + '/leave/' , {
-        method: 'POST',
+    return fetch('/api/lobby/leave/' + lobbystate.lobbyID , {
+        method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
         },
