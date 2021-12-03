@@ -103,7 +103,21 @@ async function sendeChatNachricht(inhalt: string, sender: string) {
 async function empfangeChatNachricht(nachricht: ChatNachricht) {
 
     console.log("Empfangene Nachricht: ", nachricht);
-    
+    const messageArea = document.getElementById("messageArea");
+    const messageElement = document.createElement("li");
+
+    if(nachricht.typ == 'JOIN') {
+        messageElement.classList.add('event-message');
+        messageElement.textContent = nachricht.sender + ' ist gejoined!';
+    } else if (nachricht.typ == 'LEAVE') {
+        messageElement.classList.add('event-message');
+        messageElement.textContent = nachricht.sender + ' ist geleaved!';
+    } else {
+        messageElement.classList.add('chat-message');
+        messageElement.textContent = nachricht.sender + ": " + nachricht.inhalt;
+    }
+
+    messageArea?.appendChild(messageElement);
 }
 
 // Gemeinsame State-Variable(n) auf oberster Ebene,
