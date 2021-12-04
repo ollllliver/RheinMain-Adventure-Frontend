@@ -7,6 +7,8 @@
       <h3>istGestartet: {{lobbystate.istGestartet}}</h3>
       <h3>host: {{lobbystate.host}}</h3>
     </ul>
+    <Einstellungen />
+    <Teilnehmerliste />
     <div class="container">
       <div :teilnehmer="teilnehmer" v-for="teilnehmer in teilnehemrliste" :key="teilnehmer.id">
       <li>{{ teilnehmer.name }}</li>
@@ -14,9 +16,6 @@
     </div>
     <InviteCopy :link="link" />
     <Chat :sendeNachricht="sendeChatNachricht" />
-    <button class="btn btn-primary" v-on:click="joinWalter">als Walter joinen</button>
-    <button class="btn btn-primary" v-on:click="joinMarie">als Marie joinen</button>
-    <button class="btn btn-primary" v-on:click="joinPlayer1">als jemand, der schon in der Lobby ist, die Seite aufren</button>
     <button class="btn btn-primary" v-on:click="verlassen">LEAVE LOBBY</button>
     <button class="btn btn-primary" v-on:click="starten">SPIEL STARTEN</button>
 
@@ -27,12 +26,14 @@
 import { computed, defineComponent, onMounted, ref } from "vue";
 import { useLobbyStore } from "@/services/LobbyStore";
 import { Benutzer } from "@/services/Benutzer";
-import InviteCopy  from '@/components/InviteCopy.vue';
-import Chat  from '@/components/Chat.vue';
+import InviteCopy  from '@/components/lobby/InviteCopy.vue';
+import Chat  from '@/components/lobby/Chat.vue';
+import Einstellungen from '@/components/lobby/Einstellungen.vue';
+import Teilnehmerliste from '@/components/lobby/Teilnehmerliste.vue';
 
 export default defineComponent({
   name: "Lobby",
-  components: {InviteCopy, Chat},
+  components: {InviteCopy, Chat, Einstellungen, Teilnehmerliste},
   props: {
     lobby_id: { type: String, reqired: true },
   },
@@ -56,16 +57,6 @@ export default defineComponent({
       return "http://localhost:3000/lobby/" + props.lobby_id; //TODO baseURL + port + LobbyID
     });
 
-
-    function joinWalter(){
-      join("Walter");
-    }
-    function joinMarie(){
-      join("Marie")
-    }
-    function joinPlayer1(){
-      join("Player1")
-    }
 
     function starten(){
       starteLobby().then(response => {
@@ -93,7 +84,6 @@ export default defineComponent({
     return {
       teilnehemrliste: angezeigteteilnehmer,
       lobbystate, link,
-      joinWalter, joinMarie, joinPlayer1,
       darfBeitreten,
       sendeChatNachricht, empfangeChatNachricht,
       verlassen,starten
