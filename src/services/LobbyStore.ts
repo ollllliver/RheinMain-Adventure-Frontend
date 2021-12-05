@@ -19,7 +19,8 @@ const lobbystate = reactive({
     istVoll: false,
     spielerlimit: 0,
     errormessage: "",
-    darfBeitreten: false
+    darfBeitreten: false,
+    istPrivat: false,
 })
 
 const alleLobbiesState = reactive({
@@ -28,7 +29,6 @@ const alleLobbiesState = reactive({
 })
 
 async function connectToLobby(lobby_id: string) {
-    console.log('jetzt connecting')
     const DEST = "/topic/lobby/" + lobby_id;
     const DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
 
@@ -65,7 +65,6 @@ async function connectToLobby(lobby_id: string) {
     }).then((jsondata) => {
         // verarbeite jsondata
         const lobbymessage = jsondata as LobbyMessage;
-        console.log("lobbymessage: ", lobbymessage)
         if(lobbymessage.istFehler){
             console.log(NachrichtenCode.LOBBY_VOLL)
             switch (lobbymessage.operation) {
@@ -73,7 +72,11 @@ async function connectToLobby(lobby_id: string) {
                     alleLobbiesState.errormessage = "Sorry, die Lobby war schon voll. Versuch es doch mal mit ner anderen :)"
                     router.push("/uebersicht")
                     break;
-            
+                case NachrichtenCode.BEITRETEN_FEHLGESCHLAGEN:
+                    alleLobbiesState.errormessage = "Es ist leider etwas schiefgelaufen."
+                    router.push("/uebersicht")
+                    break;
+                
                 default:
                     break;
             }
@@ -150,6 +153,7 @@ async function updateLobby(lobby_id: string) {
         lobbystate.lobbyID = jsondata.lobbyID;
         lobbystate.spielerlimit = jsondata.spielerlimit;
         lobbystate.host = jsondata.host;
+        lobbystate.istPrivat = jsondata.istPrivat;
 
     })
         .catch((e) => {
@@ -232,7 +236,7 @@ async function starteLobby() {
 
 async function leaveLobby(spielername: string): Promise<boolean> {
     console.log("Fetch auf: /leave/" + lobbystate.lobbyID  )
-    
+    router.push("/uebersicht");
     return fetch('/api/lobby/leave/' + lobbystate.lobbyID , {
         method: 'DELETE',
         headers: {
