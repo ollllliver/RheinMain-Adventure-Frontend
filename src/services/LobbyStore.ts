@@ -67,7 +67,7 @@ async function connectToLobby(lobby_id: string) {
         const lobbymessage = jsondata as LobbyMessage;
         if(lobbymessage.istFehler){
             console.log(NachrichtenCode.LOBBY_VOLL)
-            switch (lobbymessage.operation) {
+            switch (lobbymessage.typ) {
                 case NachrichtenCode.LOBBY_VOLL:
                     alleLobbiesState.errormessage = "Sorry, die Lobby war schon voll. Versuch es doch mal mit ner anderen :)"
                     router.push("/uebersicht")
