@@ -31,9 +31,8 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted, ref } from "vue";
+import { computed, defineComponent, onMounted} from "vue";
 import { useLobbyStore } from "@/services/LobbyStore";
-import { Benutzer } from "@/services/Benutzer";
 import InviteCopy from "@/components/lobby/InviteCopy.vue";
 import Chat from "@/components/lobby/Chat.vue";
 import Einstellungen from "@/components/lobby/Einstellungen.vue";
@@ -46,8 +45,7 @@ export default defineComponent({
     lobby_id: { type: String, reqired: true },
   },
   setup(props) {
-    const { lobbystate, connectToLobby, joinLobby, leaveLobby, sendeChatNachricht, empfangeChatNachricht} = useLobbyStore();
-    const linkInput = ref("");
+    const { lobbystate, connectToLobby, leaveLobby, sendeChatNachricht, empfangeChatNachricht} = useLobbyStore();
 
     const darfBeitreten = computed(() => {
       return lobbystate.darfBeitreten;
@@ -57,18 +55,14 @@ export default defineComponent({
       connectToLobby(String(props.lobby_id));
     });
 
-    const link = computed(() => {
-      return "http://localhost:3000/lobby/" + props.lobby_id; //TODO baseURL + port + LobbyID
-    });
-
-    async function verlassen(username: string) {
-      console.log("/topic/lobby/" + props.lobby_id + " - " + username);
-      leaveLobby(username);
+    async function verlassen() {
+      console.log("/topic/lobby/" + props.lobby_id);
+      leaveLobby();
     }
 
     return {
       lobbystate,
-      link,
+      link: "http://localhost:3000/lobby/" + props.lobby_id,
       darfBeitreten,
       sendeChatNachricht,
       empfangeChatNachricht,

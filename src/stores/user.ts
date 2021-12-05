@@ -20,7 +20,7 @@ const actions = {
 
   // liefert User zurück falls vorhanden
   async getUser() {
-      const user = await Request.getUser()
+      await Request.getUser()
       if (state.benutzername === "") {
         state.istEingeloggt = false
       } else {

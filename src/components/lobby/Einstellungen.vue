@@ -13,15 +13,12 @@
 
 
 <script lang="ts">
-import { defineComponent, onMounted, reactive } from 'vue';
+import { defineComponent } from 'vue';
 import { useLobbyStore } from "@/services/LobbyStore";
 
 export default defineComponent({
     name: "Einstellungen",
-    
-    props: {
-    },
-    setup(props){
+    setup(){
         const { lobbystate, starteLobby } = useLobbyStore();
 
         function starten(){

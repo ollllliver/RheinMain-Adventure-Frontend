@@ -32,8 +32,8 @@ async function connectToLobby(lobby_id: string) {
     const DEST = "/topic/lobby/" + lobby_id;
     const DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
 
-    stompclient.onWebSocketError = (event) => { /* WS-Fehler */ }
-    stompclient.onStompError = (frame) => { /* STOMP-Fehler */ }
+    stompclient.onWebSocketError = () => { /* WS-Fehler */ }
+    stompclient.onStompError = () => { /* STOMP-Fehler */ }
     stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
@@ -162,26 +162,6 @@ async function updateLobby(lobby_id: string) {
 
 }
 
-async function joinLobby(benutzer: Benutzer): Promise<boolean> {
-    console.log("Fetch auf: /lobby/" + lobbystate.lobbyID)
-    return fetch('/lobby/' + lobbystate.lobbyID , {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    }).then((response) => response.text()
-    ).then((res) =>{
-        console.log(res);
-        return true;
-    }).catch((e) => {
-        console.log("error:", e);
-        return false;
-    });
-}
-
-
-
-
 async function joinRandomLobby() {
     console.log("Fetch auf: /api/lobby/joinRandom")
     return fetch('/api/lobby/joinRandom', {
@@ -234,7 +214,7 @@ async function starteLobby() {
 
 
 
-async function leaveLobby(spielername: string): Promise<boolean> {
+async function leaveLobby(): Promise<boolean> {
     console.log("Fetch auf: /leave/" + lobbystate.lobbyID  )
     router.push("/uebersicht");
     return fetch('/api/lobby/leave/' + lobbystate.lobbyID , {
@@ -319,7 +299,7 @@ export function useLobbyStore() {
         neueLobby,
         alleLobbiesladen,
         alleLobbiesState: readonly(alleLobbiesState),
-        joinRandomLobby,updateLobby, joinLobby, leaveLobby,
+        joinRandomLobby,updateLobby, leaveLobby,
         sendeChatNachricht, empfangeChatNachricht,starteLobby
     }
 }

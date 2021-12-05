@@ -16,7 +16,7 @@ export default defineComponent({
   name: "Teilnehmerliste",
 
   props: {},
-  setup(props) {
+  setup() {
     const { lobbystate } = useLobbyStore();
     const angezeigteteilnehmer = computed(() => {
       return lobbystate.teilnehmerliste;
