@@ -1,7 +1,7 @@
 import { NachrichtenCode } from "./NachrichtenCode";
 
 export interface LobbyMessage{
-    operation: NachrichtenCode;
+    typ: NachrichtenCode;
     istFehler: boolean;
-    payload: String;
+    payload: string;
 }

@@ -29,11 +29,8 @@ import router from "@/router";
 export default defineComponent({
   name: "LobbyView",
   components: {},
-  props: {
-    lobby_id: { type: String, reqired: true },
-  },
   
-  setup(props) {
+  setup() {
     const { neueLobby, alleLobbiesladen, alleLobbiesState,joinRandomLobby } = useLobbyStore();
 
     onMounted(async () => {

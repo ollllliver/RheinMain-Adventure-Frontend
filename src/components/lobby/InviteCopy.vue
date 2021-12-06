@@ -1,13 +1,11 @@
 <template>
     <div v-cloak>
         <h4 class="center">Lade deine Freunde ein!</h4>
-        <div class=container>
-            <div class="row">
+        <div class="row">
             <div class="form-control">
                 <span class="title">{{link}}</span>
                 <button class="btn btn-info text-white" v-on:click="copyInviteLink">Link kopieren</button>
                 <input type="hidden" id="link-copy" :value="link">
-            </div>
             </div>
         </div>
     </div>
