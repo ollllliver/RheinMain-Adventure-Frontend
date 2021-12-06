@@ -43,7 +43,7 @@ export default defineComponent({
 
         function senden(nachricht:string){
             if(nachricht){
-                props.sendeNachricht(nachricht, userStore.state.benutzername)
+                props.sendeNachricht("CHAT", nachricht, userStore.state.benutzername)
             }
         }
 

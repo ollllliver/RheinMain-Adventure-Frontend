@@ -92,10 +92,10 @@ async function connectToLobby(lobby_id: string) {
 
 
 // TODO: Chatfunktionen auslagern in seperates ChatStore.ts
-async function sendeChatNachricht(inhalt: string, sender: string) {
+async function sendeChatNachricht(typ: NachrichtenTyp, inhalt: string, sender: string) {
 
     const DEST_CHAT = "/topic/lobby/" + lobbystate.lobbyID + "/chat";
-    const nachricht: ChatNachricht =  { typ: NachrichtenTyp.CHAT, inhalt: inhalt, sender: sender };
+    const nachricht: ChatNachricht =  { typ: typ, inhalt: inhalt, sender: sender };
     stompclient.publish({destination: DEST_CHAT, body: JSON.stringify(nachricht)});
     console.log("Gesendete Nachricht: ", nachricht);
 }
