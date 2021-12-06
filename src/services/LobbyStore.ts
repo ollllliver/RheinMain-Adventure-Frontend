@@ -213,8 +213,24 @@ async function starteLobby() {
 }
 
 
+function resetLobbyState(){
+    lobbystate.lobbyID = "";
+    lobbystate.teilnehmerliste = Array<Benutzer>();
+    lobbystate.host = "";
+    lobbystate.istGestartet = false;
+    lobbystate.istVoll = false;
+    lobbystate.spielerlimit = 0;
+    lobbystate.errormessage = "";
+    lobbystate.darfBeitreten = false;
+    lobbystate.istPrivat = false;
+}
+
+
 
 async function leaveLobby(): Promise<boolean> {
+    stompclient.unsubscribe("topic/lobby/" + lobbystate.lobbyID);
+    stompclient.unsubscribe("topic/lobby/" + lobbystate.lobbyID + "/chat");
+
     console.log("Fetch auf: /leave/" + lobbystate.lobbyID  )
     router.push("/uebersicht");
     return fetch('/api/lobby/leave/' + lobbystate.lobbyID , {
@@ -228,6 +244,7 @@ async function leaveLobby(): Promise<boolean> {
             return;
         }
         console.log("RRESPONSE: " + response)
+        resetLobbyState();
         return response.json();
     }).catch((e) => {
             console.log(e);
