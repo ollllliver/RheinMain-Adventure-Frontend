@@ -1,19 +1,20 @@
+<!-- Home View mit Login/Regestrieren Formular -->
+
 <template>
-  <div v-if="!userStore.getters.isLoggedIn" class="d-grid gap-2 col-6 mx-auto">
+  <div v-if="!userStore.getters.istEingeloggt" class="d-grid gap-2 col-6 mx-auto">
     <Login />
   </div>
   <div v-else class="text-center">
-    <h2>Welcome, {{ userStore.state.username }}</h2>
-     <button class="btn btn-default" @click="$router.push('join')">
-      Join Lobby
+    <h2>Welcome, {{ userStore.state.benutzername }}</h2>
+     <button class="btn btn-default" @click="$router.push('uebersicht')">
+      Lobbyübersicht
     </button>
-     <button class="btn btn-default" @click="$router.push('create')">
-      Create Lobby
-    </button>
+    <!-- Wechsel zum "Editor"-Fenster -->
     <button class="btn btn-default" @click="$router.push('editor')">
       Level Editor
     </button>
     <br>
+    <!-- Logout Button - Wechsel zum "Home"-Fenster -->
     <button class="btn btn-danger" @click="userStore.logout()">
       Logout
     </button>

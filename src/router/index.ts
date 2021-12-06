@@ -1,5 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router'
 import Home from '../views/Home.vue'
+import LobbyView from '@/views/LobbyView.vue'
+
+// Routen der Anwendung
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -13,14 +16,15 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Register.vue')
   },
   {
-    path: '/create',
-    name: 'Create',
-    component: () => import('../views/Create.vue')
+    path: '/uebersicht',
+    name: 'Lobbyuebersicht',
+    component: () => import('../views/LobbyuebersichtView.vue')
   },
   {
-    path: '/join',
-    name: 'Join',
-    component: () => import('../views/Join.vue')
+    path: '/lobby/:lobby_id',
+    name: 'LobbyView',
+    component: LobbyView,
+    props:true
   },
   {
     path: '/editor',

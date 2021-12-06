@@ -1,27 +1,28 @@
+<!-- Regestrieren-Formular Komponente -->
+
 <template>
   <form @submit.prevent="onSubmit">
     <div class="form-group my-2">
-      <label>Username</label>
+      <label>Benutzername</label>
       <input
-        v-model="form.username"
+        v-model="form.benutzername"
         class="form-control"
-        placeholder="Username"
+        placeholder="Benutzername"
         required
       />
     </div>
     <div class="form-group my-2">
-      <label>Password</label>
+      <label>Passwort</label>
       <input
-        v-model="form.password"
+        v-model="form.passwort"
         class="form-control"
-        type="password"
-        placeholder="Password"
+        type="passwort"
+        placeholder="Passwort"
         required
       />
     </div>
     <div class="text-danger my-2">{{ userStore.state.error }}</div>
-    <button class="btn btn-success btn-block my-2"  @click="$router.push('/')" 
-    type="submit">Sign Up</button>
+    <button class="btn btn-success btn-block my-2" type="submit">Sign Up</button>
   </form>
 </template>
 <script lang="ts">
@@ -30,13 +31,13 @@ import userStore from '@/stores/user'
 export default defineComponent({
   setup() {
     const form = reactive({
-      username: '',
-      password: ''
+      benutzername: '',
+      passwort: ''
     })
     const onSubmit = () => {
-      userStore.signup(form.username, form.password)
-      form.username = ''
-      form.password = ''
+      userStore.signup(form.benutzername, form.passwort)
+      form.benutzername = ''
+      form.passwort = ''
     }
     return { form, userStore, onSubmit }
   }

@@ -1,3 +1,5 @@
+<!-- Editor View für den Level-Editor -->
+
 <template>
     <div>
       <h1> Level Editor </h1>
@@ -8,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'Editor'
 });
