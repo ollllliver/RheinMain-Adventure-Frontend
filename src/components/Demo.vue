@@ -79,7 +79,7 @@ export default defineComponent({
     const initLoader = () => {
       loader = new Loader();
       console.log(loader)
-      loader.ladeDatei('/assets/blender/example.gltf')
+      loader.ladeDatei('/assets/blender/room.gltf')
       .then((res:any) => {
         // TODO: 
         // Kamera, Steuerung und scene.position der gltf.scene zuweisen (Hier oder in Loader Klasse?)
