@@ -13,6 +13,10 @@
     <button class="btn btn-default" @click="$router.push('editor')">
       Level Editor
     </button>
+    <!-- Wechsel zum "Anleitungs"-Fenster -->
+     <button class="btn btn-default" @click="$router.push('instructions')">
+      Anleitung
+    </button>
     <br>
     <!-- Logout Button - Wechsel zum "Home"-Fenster -->
     <button class="btn btn-danger" @click="userStore.logout()">
