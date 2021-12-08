@@ -76,6 +76,9 @@ class MyMouseControls extends EventDispatcher {
 			console.error('THREE.PointerLockControls: Unable to use Pointer Lock API');
 		}
 
+		/**
+		 * Achtet auf Änderungen Maus
+		 */
 		this.connect = function () {
 			this.domElement.ownerDocument.addEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.addEventListener('pointerlockchange', onPointerlockChange);
@@ -83,6 +86,9 @@ class MyMouseControls extends EventDispatcher {
 
 		};
 
+		/**
+		 * Achtet nicht mehr auf Änderungen Maus
+		 */
 		this.disconnect = function () {
 			this.domElement.ownerDocument.removeEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.removeEventListener('pointerlockchange', onPointerlockChange);
@@ -114,6 +120,11 @@ class MyMouseControls extends EventDispatcher {
 
 		}();
 
+
+		/**
+		 * Beweget die Kamera nach vorne
+		 * @param distance Wert wie weit die Kamera sich nach vorne bewegt
+		 */
 		this.moveForward = function (distance:any) {
 
 			// bewegt  parallel zur xz-achse
@@ -126,6 +137,10 @@ class MyMouseControls extends EventDispatcher {
 
 		};
 
+		/**
+		 * Beweget die Kamera nach rechts
+		 * @param distance Wert wie weit die Kamera sich nach rechts bewegt
+		 */
 		this.moveRight = function (distance:any) {
 
 			_vector.setFromMatrixColumn(camera.matrix, 0);
@@ -134,18 +149,27 @@ class MyMouseControls extends EventDispatcher {
 
 		};
 
+		/**
+		 * "Lockt" die Maus 
+		 */
 		this.lock = function () {
 
 			this.domElement.requestPointerLock();
 
 		};
 
+		/**
+		 * Lässt die Maus wieder frei 
+		 */
 		this.unlock = function () {
 
 			this.domElement.ownerDocument.exitPointerLock();
 
 		};
 
+		/**
+		 * Aktualisiert die Bewegungen
+		 */
 		this.update = (velocity: any, delta: number) => {
 			this.moveRight(-velocity.x * delta);
 			this.moveForward(-velocity.z * delta);

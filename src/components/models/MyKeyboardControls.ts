@@ -30,6 +30,10 @@ export class MyKeyboardControls {
         this.moveDown = false;
         this.canJump = false;
 
+        /**
+		 * Wird ausgelöst wenn eine Taste gedrückt wird
+         * @param event Taste die gedrückt wurde
+		 */
         const onKeyDown = (event: KeyboardEvent) => {
 
             switch (event.code) {
@@ -68,6 +72,10 @@ export class MyKeyboardControls {
 
         };
 
+        /**
+		 * Wird ausgelöst wenn eine Taste losgelassen wird
+         * @param event Taste die losgelassen wurde
+		 */
         const onKeyUp = (event: KeyboardEvent) => {
 
             switch (event.code) {
@@ -113,6 +121,9 @@ export class MyKeyboardControls {
                 this.domElement.removeEventListener('keyup', onKeyUp)
         };
 
+        /**
+         * Aktualisiert die Kameraposition
+         */
         this.update = (velocity: any, delta: number) => {
 
             direction.z = Number(this.moveForward) - Number(this.moveBackward);

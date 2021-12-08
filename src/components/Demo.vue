@@ -95,12 +95,18 @@ export default defineComponent({
       })
     };
 
+    /**
+     * Initialisiert Kamera
+     */
     const initCamera = () => {
       camera = new Three.PerspectiveCamera(50,window.innerWidth / window.innerHeight,0.1,window.innerHeight);
       camera.position.set(0, player.height, -5);
       camera.lookAt(new Three.Vector3(0, player.height, 0));
     };
 
+    /**
+     * Initialisiert die Steuerung
+     */
     const initControls = () => {
       mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
       keyControls = new MyKeyboardControls(document); //init Keyboardsteuerung
