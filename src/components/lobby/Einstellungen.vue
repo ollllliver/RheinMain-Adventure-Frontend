@@ -16,7 +16,6 @@
 <script lang="ts">
 import { defineComponent, onMounted, watchEffect, watch } from "vue";
 import { useLobbyStore } from "@/services/LobbyStore";
-import { Timer } from "@/components/models/Timer";
 import router from "@/router";
 export default defineComponent({
   name: "Einstellungen",
