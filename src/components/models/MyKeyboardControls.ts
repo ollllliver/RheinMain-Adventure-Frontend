@@ -17,7 +17,6 @@ export class MyKeyboardControls {
     canJump: boolean;
     update: (velocity: any, delta: number) => void;
 
-
     constructor(domElement: Document) {
 
         const velocity = new Vector3();
@@ -30,7 +29,6 @@ export class MyKeyboardControls {
         this.moveUp = false;
         this.moveDown = false;
         this.canJump = false;
-
 
         const onKeyDown = (event: KeyboardEvent) => {
 
@@ -105,7 +103,6 @@ export class MyKeyboardControls {
             }
         }
 
-
         const connect = () => {
             this.domElement.addEventListener('keydown', onKeyDown),
                 this.domElement.addEventListener('keyup', onKeyUp)
@@ -133,12 +130,6 @@ export class MyKeyboardControls {
                 velocity.y -= direction.y * speed * delta;
 
         };
-
-
-
         connect();
-
     }
-
-
 }

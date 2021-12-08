@@ -1,17 +1,15 @@
 import { Euler, Vector3, EventDispatcher } from 'three';
-import { Camera } from 'three/src/cameras/Camera';
+import { Camera } from "three/src/cameras/Camera";
 import * as Three from "three";
 
 const _euler = new Euler(0, 0, 0, 'YXZ');
 const _vector = new Vector3();
-
 
 const _changeEvent = { type: 'change' };
 const _lockEvent = { type: 'lock' };
 const _unlockEvent = { type: 'unlock' };
 
 const _PI_2 = Math.PI / 2;
-
 
 /**
  * Verwertet Mauseingaben 
