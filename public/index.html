@@ -7,7 +7,7 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
-  <body onmousedown="document.getElementById('audio').play()">
+  <body onmousedown="document.getElementById('audio').play(); document.getElementById('audio').volume = 0.02;">
     <audio autoplay id="audio"><source src="<%= BASE_URL %>O_Tannenbaum_8_Bit.mp3" type="audio/mpeg"></audio>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
