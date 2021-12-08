@@ -1,5 +1,6 @@
 import router from "./router"
 import user from "./stores/user"
+
 export type User = { username: string }
 export type UserList = Array<User & { password: string }>
 
@@ -47,6 +48,7 @@ export async function login(benutzername: string, passwort: string) {
     })
   return user
 }
+
 
 // POST /register -> User wird in der Datenbank angelegt
 export async function signup(benutzername: string, passwort: string) {
