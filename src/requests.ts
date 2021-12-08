@@ -99,4 +99,3 @@ export async function logout(benutzername: string) {
       throw Error(error.text)
     })
 }
-
