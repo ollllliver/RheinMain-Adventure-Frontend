@@ -33,6 +33,11 @@ const routes: Array<RouteRecordRaw> = [
     props:true
   },
   {
+    path: '/environment',
+    name: 'Environment',
+    component: () => import('../views/Environment.vue')
+  },
+  {
     path: '/editor',
     name: 'Editor',
     component: () => import('../views/Editor.vue')
