@@ -83,6 +83,8 @@ class MyMouseControls extends EventDispatcher {
 			this.domElement.ownerDocument.addEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.addEventListener('pointerlockchange', onPointerlockChange);
 			this.domElement.ownerDocument.addEventListener('pointerlockerror', onPointerlockError);
+			console.log("mouse controls connected")
+
 
 		};
 
@@ -93,6 +95,9 @@ class MyMouseControls extends EventDispatcher {
 			this.domElement.ownerDocument.removeEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.removeEventListener('pointerlockchange', onPointerlockChange);
 			this.domElement.ownerDocument.removeEventListener('pointerlockerror', onPointerlockError);
+			this.unlock();
+			console.log("mouse controls disconnect")
+
 
 		};
 
@@ -152,18 +157,21 @@ class MyMouseControls extends EventDispatcher {
 		/**
 		 * "Lockt" die Maus 
 		 */
-		this.lock = function () {
+		this.lock = () => {
 
 			this.domElement.requestPointerLock();
+			console.log("mouse controls: lock")
+
 
 		};
 
 		/**
 		 * Lässt die Maus wieder frei 
 		 */
-		this.unlock = function () {
+		this.unlock = () => {
 
 			this.domElement.ownerDocument.exitPointerLock();
+			console.log("mouse controls: unlock")
 
 		};
 

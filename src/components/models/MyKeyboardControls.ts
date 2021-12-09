@@ -16,6 +16,7 @@ export class MyKeyboardControls {
     moveDown: boolean;
     canJump: boolean;
     update: (velocity: any, delta: number) => void;
+    disconnect: () => void;
 
     constructor(domElement: Document) {
 
@@ -113,12 +114,14 @@ export class MyKeyboardControls {
 
         const connect = () => {
             this.domElement.addEventListener('keydown', onKeyDown),
-                this.domElement.addEventListener('keyup', onKeyUp)
+            this.domElement.addEventListener('keyup', onKeyUp)
+            console.log("keyboard controls connected")
         };
 
-        const disconnect = () => {
+        this.disconnect = () => {
             this.domElement.removeEventListener('keydown', onKeyDown),
-                this.domElement.removeEventListener('keyup', onKeyUp)
+            this.domElement.removeEventListener('keyup', onKeyUp)
+            console.log("keyboard controls disconnected")
         };
 
         /**
