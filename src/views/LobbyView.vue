@@ -62,7 +62,7 @@ export default defineComponent({
 
     return {
       lobbystate,
-      link: "http://localhost:3000/lobby/" + props.lobby_id,
+      link: window.location.href, //aktueller Link der Seite
       darfBeitreten,
       sendeChatNachricht,
       empfangeChatNachricht,
