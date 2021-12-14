@@ -15,6 +15,7 @@
 
       <!-- Editorfenster -->  
       <div class="col" id="karte">
+        <Editorfenster />
       </div>
       
       <!-- Aktionstasten -->  
@@ -46,9 +47,11 @@
 import { defineComponent, onMounted } from 'vue';
 import Aktionstasten from '../components/EditorKomponente/Aktionstasten.vue'
 import Bausteine from '../components/EditorKomponente/Bausteine.vue'
+import Editorfenster from '../components/EditorKomponente/EditorFenster.vue'
+
 export default defineComponent({
   name: 'Editor',
-  components: { Aktionstasten, Bausteine }
+  components: { Aktionstasten, Bausteine, Editorfenster }
 });
 </script>
 
