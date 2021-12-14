@@ -1,22 +1,96 @@
 <!-- Editor View für den Level-Editor -->
 
 <template>
-    <div>
-      <h1> Level Editor </h1>
-      <button class="btn btn-primary" @click="$router.push('/')">
-        Home
-      </button>
+  
+  <div class="container">
+
+    <!-- leerer Header -->
+    <div class="row justify-content-md-center" id="top">
+      <div class="col-md-auto">
+      </div>
     </div>
+
+    
+    <div class="row">
+
+      <!-- Editorfenster -->  
+      <div class="col" id="karte">
+      </div>
+      
+      <!-- Aktionstasten -->  
+      <div class="col-col-lg-2" id="aktionstasten">
+        <Aktionstasten/>
+      </div>
+
+    </div>
+
+    <div class="row">
+
+      <!-- Level Bausteine --> 
+      <div class="col" id ="bausteine">
+        <Bausteine/>
+      </div>
+
+      <!-- Info Fenster -->
+      <div class="col col-lg-2" id="infofenster">
+
+      </div>
+
+    </div>
+
+  </div>
+  
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
+import Aktionstasten from '../components/EditorKomponente/Aktionstasten.vue'
+import Bausteine from '../components/EditorKomponente/Bausteine.vue'
 export default defineComponent({
-  name: 'Editor'
+  name: 'Editor',
+  components: { Aktionstasten, Bausteine }
 });
 </script>
 
 
 <style scoped>
+  html, body {
+    height: 100%;
+  }
+  
+  #top {
+    height: 40px;
+  }
+  #karte {
+    height: 500px;
+    border: 2px black solid;
+  }
+ 
+  #aktionstasten {
+      margin-left: 60px;
+      margin-right: -60px;
+      height: 300px;
+      width: 30%;
+  }
+ 
+  #infofenster {
+    width: 30%;
+    margin-left: 10px;
+    margin-right: -60px;
+    margin-top: -140px;
+    margin-bottom: 90px;
+    border: 1px solid black;
+  }
+
+  #bausteine {
+    width: 70%;
+    margin-top: 20px;
+    margin-right: 50px;
+    height: 70px;
+    border: 1px black solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
 </style>
