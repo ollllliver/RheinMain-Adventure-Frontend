@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn btn-outline-secondary" >
+        <button class="btn btn-outline-secondary" @click="doSomething()">
             zur Prüfung einreichen
         </button>
         <button class="btn btn-outline-secondary" >
@@ -15,10 +15,10 @@
         <button class="btn btn-outline-secondary" >
             löschen: An/Aus
         </button>
-        <button class="btn btn-outline-secondary" >
+        <button class="btn btn-outline-secondary" @click="undo()">
             letzten Schritt rückgängig
         </button>
-        <button class="btn btn-outline-secondary" >
+        <button class="btn btn-outline-secondary" @clock="redo()">
             letzten Schritt wiederherstellen
         </button>
     </div>
@@ -26,9 +26,32 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import {CommandStack} from '../../commands/CommandManager'
+import {ConcreteCommandTest} from '../../commands/Command'
 
 export default defineComponent({
-    name: "Aktionstasten"
+    name: "Aktionstasten",
+    methods: {
+        doSomething() {
+            CommandStack.getInstance().execAndPush(new ConcreteCommandTest(this.wand))
+            
+            console.log(CommandStack.getInstance().toString())
+        },
+        undo() {
+            CommandStack.getInstance().undo();
+            console.log(CommandStack.getInstance().toString())
+        },
+        redo() {
+            CommandStack.getInstance().redo();
+            console.log(CommandStack.getInstance().toString())
+        }
+    },
+    setup() {
+        return {
+            wand: {x:0}
+        }
+    }
+
 })
 </script>
 

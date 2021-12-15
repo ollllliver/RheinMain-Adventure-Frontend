@@ -48,7 +48,6 @@ import { defineComponent, onMounted } from 'vue';
 import Aktionstasten from '../components/EditorKomponente/Aktionstasten.vue'
 import Bausteine from '../components/EditorKomponente/Bausteine.vue'
 import Editorfenster from '../components/EditorKomponente/EditorFenster.vue'
-
 export default defineComponent({
   name: 'Editor',
   components: { Aktionstasten, Bausteine, Editorfenster }
@@ -66,7 +65,11 @@ export default defineComponent({
   }
   #karte {
     height: 500px;
+    width: 800px;
     border: 2px black solid;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
   }
  
   #aktionstasten {
