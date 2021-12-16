@@ -1,27 +1,43 @@
 <template>
-    <button class="btn btn-outline-secondary" v-for="item in items" :key="item.id" draggable="true" @dragstart="startDrag($event, item)">
-    </button>
+    
+    <!--
+        Bausteine
+        Weg-/Start-/Zielbutton + draggable Raum-Bausteine
+    -->
+
+    <button class="btn btn-outline-secondary" :class="weg" @click="waehle($event, weg)" > W </button>
+    <button class="btn btn-outline-secondary" :class="start" @click="waehle($event, start)"> S </button>
+    <button class="btn btn-outline-secondary" :class="ziel" @click="waehle($event,ziel)"> Z </button>
+    <button class="btn btn-outline-secondary" v-for="raum in raeume" :key="raum.id" draggable="true" 
+    @dragstart="startDrag($event, raum)"/>
+
 </template>
 
 <script lang="ts">
 import { defineComponent, ref } from 'vue';
+import editorStore from '../../stores/editor'
 
 export default defineComponent({
     name: "Bausteine",
     setup() {
-        const items = ref(
+        
+        // Wegbeschreibung Weg/Start/Ziel
+        const weg = 1
+        const start = 2
+        const ziel = 3
+
+        // Räume
+        const raeume = ref(
             [
-                {id:0, title:'0'},
                 {id:1, title:'1'},
                 {id:2, title:'2'},
                 {id:3, title:'3'},
                 {id:4, title:'4'},
                 {id:5, title:'5'},
-                {id:6, title:'6'},
-                {id:7, title:'7'},
             ]
         )
 
+        // bei drag (Drag-and-Drop) Baustein kopieren und platzierbar machen
         const startDrag = (event: any, item: any) => {
             console.log(item)
             event.dataTransfer.dropEffect = 'move'
@@ -29,10 +45,13 @@ export default defineComponent({
             event.dataTransfer.setData('itemID',item.id) 
         }
 
-        
+        // element waehlen das platziert werden soll (W = 0, S = 1, Z = 2)
+        const waehle = (event: any, item: any) => {
+            editorStore.setze(item)
+        }
 
         return {
-            items, startDrag
+                raeume, startDrag, waehle, weg, start, ziel
         }
     },
     

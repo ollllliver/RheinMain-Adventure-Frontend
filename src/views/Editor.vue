@@ -29,12 +29,12 @@
 
       <!-- Level Bausteine --> 
       <div class="col" id ="bausteine">
-        <Bausteine/>
+        <Bausteine />
       </div>
 
       <!-- Info Fenster -->
       <div class="col col-lg-2" id="infofenster">
-
+        {{editorStore.getters.getInfo}}
       </div>
 
     </div>
@@ -47,10 +47,15 @@
 import { defineComponent, onMounted } from 'vue';
 import Aktionstasten from '../components/EditorKomponente/Aktionstasten.vue'
 import Bausteine from '../components/EditorKomponente/Bausteine.vue'
-import Editorfenster from '../components/EditorKomponente/EditorFenster.vue'
+import Editorfenster from '../components/EditorFenster.vue'
+import editorStore from '@/stores/editor'
+
 export default defineComponent({
   name: 'Editor',
-  components: { Aktionstasten, Bausteine, Editorfenster }
+  components: { Aktionstasten, Bausteine, Editorfenster },
+  setup() {
+    return { editorStore }
+  }
 });
 </script>
 
