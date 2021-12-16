@@ -33,21 +33,20 @@ export default defineComponent({
     name: "Aktionstasten",
     methods: {
         doSomething() {
-            //CommandStack.getInstance().execAndPush(new ConcreteCommandTest(this.wand))
-            console.log(CommandStack.getInstance().toString())
+            // CommandStack.getInstance().execAndPush(new ConcreteCommandTest(this.wand))
+            // console.log(CommandStack.getInstance().toString())
         },
         undo() {
             CommandStack.getInstance().undo();
-            console.log(CommandStack.getInstance().toString())
+            // console.log(CommandStack.getInstance().toString())
         },
         redo() {
             CommandStack.getInstance().redo();
-            console.log(CommandStack.getInstance().toString())
+            // console.log(CommandStack.getInstance().toString())
         }
     },
     setup() {
         return {
-            wand: {x:0}
         }
     }
 

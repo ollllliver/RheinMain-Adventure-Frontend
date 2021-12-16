@@ -54,6 +54,7 @@ class CommandStack{
             this.index--;
             const cmd: ICommand = this.stack[this.index];
             cmd.undo();
+            // this.stack.pop()
             console.log(cmd.describe() + " rückgängig gemacht.");
         } else {
             //vielleicht Exception werfen

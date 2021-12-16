@@ -90,7 +90,7 @@ export class ElementHinzufuegen implements ICommand {
         this._karte.setElement(this._element.posX, this._element.posY, this._element.e);
 
         // Hintergrund des Divs auf Farbe des Elements ändern
-        switch (editorStore.getters.getElement) {
+        switch (this._element.e) {
             case 1: {
                 this._event.target.style = "background-color: rgba(155, 70, 14, 1);"
                 break;
