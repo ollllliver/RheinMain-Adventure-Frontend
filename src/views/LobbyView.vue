@@ -42,11 +42,10 @@ export default defineComponent({
   name: "Lobby",
   components: { InviteCopy, Chat, Einstellungen, Teilnehmerliste },
   props: {
-    lobby_id: { type: String, reqired: true },
+    lobby_id: { type: String, required: true },
   },
   setup(props) {
     const { lobbystate, connectToLobby, leaveLobby, sendeChatNachricht, empfangeChatNachricht} = useLobbyStore();
-
     const darfBeitreten = computed(() => {
       return lobbystate.darfBeitreten;
     });

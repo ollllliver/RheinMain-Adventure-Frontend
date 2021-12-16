@@ -3,13 +3,15 @@ import { Lobby } from './Lobby'
 import { Benutzer } from './Benutzer'
 import { LobbyMessage } from './LobbyMessage'
 import { Client } from '@stomp/stompjs';
+import { Timer } from '@/components/models/Timer';
 import router from '@/router';
 import { NachrichtenCode } from './NachrichtenCode';
 import { NachrichtenTyp } from './NachrichtenTyp';
 import { ChatNachricht } from './ChatNachricht';
 
 const wsurl = `ws://localhost:8080/messagebroker`;
-const stompclient = new Client({ brokerURL: wsurl })
+const stompclient = new Client({ brokerURL: wsurl });
+const timer = new Timer(10);
 
 const lobbystate = reactive({
     lobbyID: "",
@@ -40,6 +42,7 @@ async function connectToLobby(lobby_id: string) {
         stompclient.subscribe(DEST, (message) => {
             const lobbymessage = JSON.parse(message.body) as LobbyMessage;
             console.log("message from broker:", lobbymessage);
+            // checkCountdown(lobbymessage);
             updateLobby(lobby_id);
         });
         stompclient.subscribe(DEST_CHAT, (message) => {
@@ -65,7 +68,7 @@ async function connectToLobby(lobby_id: string) {
     }).then((jsondata) => {
         // verarbeite jsondata
         const lobbymessage = jsondata as LobbyMessage;
-        if(lobbymessage.istFehler){
+        if (lobbymessage.istFehler) {
             console.log(NachrichtenCode.LOBBY_VOLL)
             switch (lobbymessage.typ) {
                 case NachrichtenCode.LOBBY_VOLL:
@@ -76,30 +79,33 @@ async function connectToLobby(lobby_id: string) {
                     alleLobbiesState.errormessage = "Es ist leider etwas schiefgelaufen."
                     router.push("/uebersicht")
                     break;
-                
+
                 default:
                     break;
             }
-        }else{
+        } else {
             lobbystate.darfBeitreten = true;
             updateLobby(lobby_id);
         }
-
-    })
-        .catch((e) => {
-            console.log(e);
-        });
-
-
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
+/*
+function checkCountdown(lobbymessage: LobbyMessage) {
+    if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET) {
+        lobbystate.countdownGestartet = true;
+    }
+}
+*/
 
 // TODO: Chatfunktionen auslagern in seperates ChatStore.ts
 async function sendeChatNachricht(typ: NachrichtenTyp, inhalt: string, sender: string) {
 
     const DEST_CHAT = "/topic/lobby/" + lobbystate.lobbyID + "/chat";
-    const nachricht: ChatNachricht =  { typ: typ, inhalt: inhalt, sender: sender };
-    stompclient.publish({destination: DEST_CHAT, body: JSON.stringify(nachricht)});
+    const nachricht: ChatNachricht = { typ: typ, inhalt: inhalt, sender: sender };
+    stompclient.publish({ destination: DEST_CHAT, body: JSON.stringify(nachricht) });
     console.log("Gesendete Nachricht: ", nachricht);
 }
 
@@ -109,7 +115,7 @@ async function empfangeChatNachricht(nachricht: ChatNachricht) {
     const messageArea = document.getElementById("messageArea");
     const messageElement = document.createElement("li");
 
-    if(nachricht.typ == 'JOIN') {
+    if (nachricht.typ == 'JOIN') {
         messageElement.classList.add('event-message');
         messageElement.textContent = nachricht.sender + ' ist gejoined!';
     } else if (nachricht.typ == 'LEAVE') {
@@ -155,11 +161,9 @@ async function updateLobby(lobby_id: string) {
         lobbystate.host = jsondata.host;
         lobbystate.istPrivat = jsondata.istPrivat;
 
-    })
-        .catch((e) => {
-            console.log(e);
-        });
-
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 async function joinRandomLobby() {
@@ -180,16 +184,14 @@ async function joinRandomLobby() {
         console.log(lobbyMsg);
         return lobbyMsg.payload;
 
-    })
-        .catch((e) => {
-            console.log(e);
-        });
-
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 async function starteLobby() {
     console.log("Fetch auf: /api/lobby/{lobbyId}/start")
-    return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
+    return fetch('/api/lobby/' + lobbystate.lobbyID + '/start', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -200,20 +202,31 @@ async function starteLobby() {
             return;
         }
         return response.json();
-    }).then((jsondata) => {
+    }).then(async (jsondata) => {
+        let timer = 10;
         const lobbyMsg = jsondata as LobbyMessage;
+        if (lobbyMsg.typ == NachrichtenCode.COUNTDOWN_GESTARTET) {
+            for (let i = 0; i < timer; i++) {
+                let interval = timer - i;
+                console.log(interval);
+                await timerInterval(1000);
+            }
+            router.push("/environment");
+        }
         console.log(lobbyMsg);
         return lobbyMsg.payload;
-
-    })
-        .catch((e) => {
-            console.log(e);
-        });
-
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
+function timerInterval(delay: number) {
+    return new Promise(resolve => {
+        setTimeout(resolve, delay);
+    })
+}
 
-function resetLobbyState(){
+function resetLobbyState() {
     lobbystate.lobbyID = "";
     lobbystate.teilnehmerliste = Array<Benutzer>();
     lobbystate.host = "";
@@ -225,15 +238,13 @@ function resetLobbyState(){
     lobbystate.istPrivat = false;
 }
 
-
-
 async function leaveLobby(): Promise<boolean> {
     stompclient.unsubscribe("topic/lobby/" + lobbystate.lobbyID);
     stompclient.unsubscribe("topic/lobby/" + lobbystate.lobbyID + "/chat");
 
-    console.log("Fetch auf: /leave/" + lobbystate.lobbyID  )
+    console.log("Fetch auf: /leave/" + lobbystate.lobbyID)
     router.push("/uebersicht");
-    return fetch('/api/lobby/leave/' + lobbystate.lobbyID , {
+    return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -247,11 +258,9 @@ async function leaveLobby(): Promise<boolean> {
         resetLobbyState();
         return response.json();
     }).catch((e) => {
-            console.log(e);
-        });
+        console.log(e);
+    });
 }
-
-
 
 async function neueLobby() {
     console.log("/api/lobby/neu Data fetch:")
@@ -268,10 +277,9 @@ async function neueLobby() {
         return response.json();
     }).then((jsondata) => {
         return jsondata.lobbyID
-    })
-        .catch((e) => {
-            console.log(e);
-        });
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 async function alleLobbiesladen() {
@@ -297,10 +305,9 @@ async function alleLobbiesladen() {
         alleLobbiesState.lobbies = lobbyliste;
 
         return lobbyliste
-    })
-        .catch((e) => {
-            console.log(e);
-        });
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 export function useLobbyStore() {
@@ -316,7 +323,7 @@ export function useLobbyStore() {
         neueLobby,
         alleLobbiesladen,
         alleLobbiesState: readonly(alleLobbiesState),
-        joinRandomLobby,updateLobby, leaveLobby,
-        sendeChatNachricht, empfangeChatNachricht,starteLobby
+        joinRandomLobby, updateLobby, leaveLobby,
+        sendeChatNachricht, empfangeChatNachricht, starteLobby,
     }
 }
