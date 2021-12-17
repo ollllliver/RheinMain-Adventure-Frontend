@@ -1,4 +1,10 @@
 <template>
+
+    <!--
+        Aktionstasten
+        Buttons zum Auslösen verschiedener Aktionen (speichern/löschen/redo/undo/...)
+    -->
+
     <div>
         <button class="btn btn-outline-secondary">
             zur Prüfung einreichen

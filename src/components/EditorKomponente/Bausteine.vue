@@ -9,7 +9,7 @@
     <button class="btn btn-outline-secondary" :class="start" @click="waehle($event, start)"> S </button>
     <button class="btn btn-outline-secondary" :class="ziel" @click="waehle($event,ziel)"> Z </button>
     <button class="btn btn-outline-secondary" v-for="raum in raeume" :key="raum.id" draggable="true" 
-    @dragstart="startDrag($event, raum)"/>
+    @dragstart="startDrag($event, raum)"> R{{raum.id}} </button>
 
 </template>
 
