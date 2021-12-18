@@ -45,8 +45,8 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
-import Aktionstasten from '../components/EditorKomponente/Aktionstasten.vue'
-import Bausteine from '../components/EditorKomponente/Bausteine.vue'
+import Aktionstasten from '../components/EditorKomponenten/Aktionstasten.vue'
+import Bausteine from '../components/EditorKomponenten/Bausteine.vue'
 import Editorfenster from '../components/EditorFenster.vue'
 import editorStore from '@/stores/editor'
 

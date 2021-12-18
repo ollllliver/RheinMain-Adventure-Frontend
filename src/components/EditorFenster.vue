@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, onUpdated, ref } from 'vue'
-import { Karte } from './EditorKomponente/Karte'
+import { Karte } from './EditorKomponenten/Karte'
 import { CommandStack } from '../commands/CommandManager'
 import {ElementHinzufuegen} from '../commands/Command'
 import editorStore from '@/stores/editor'
@@ -60,9 +60,10 @@ export default defineComponent({
 
         /**
          * Wegpunkt markieren:
-         * wenn eine Wegbeschreibung (Weg/Start/Ziel) gesetzt ist 
+         * wenn seine Wegbeschreibung (Weg/Start/Ziel) gesetzt ist 
          * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
          */
+         
         const wegPunkt = (event: any) => {
             
             if (editorStore.getters.istAktiv) {
@@ -70,13 +71,7 @@ export default defineComponent({
             } else {
                 editorStore.info("Bitte wähle erst ein Baustein aus!")
             }
-
-            //test
-            //console.log(event)
-            // console.log(CommandStack.getInstance().toString())
-            // console.log(liste)
         }
-
         return {
             elemente, onDrop, liste, wegPunkt
         }

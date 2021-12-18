@@ -1,3 +1,5 @@
+import editorStore from '@/stores/editor'
+
 /**
  * Das Command interface deklariert eine Methode für das Ausführen eines Befehls (Command)
  */
@@ -18,15 +20,12 @@ class CommandStack{
 
    //constructor(){}
 
-
-
     public static getInstance() {
         if(!this.commandstack){
             this.commandstack = new CommandStack();
         }
         return this.commandstack;
     }
-
 
     /**
      * Befehl auf den Stack legen
@@ -55,10 +54,13 @@ class CommandStack{
             const cmd: ICommand = this.stack[this.index];
             cmd.undo();
             // this.stack.pop()
+
+            editorStore.info(cmd.describe() + " rückgängig gemacht.")
             console.log(cmd.describe() + " rückgängig gemacht.");
         } else {
             //vielleicht Exception werfen
             console.log("Hier gibts nichts rückgängig zu machen  ¯\\_(ツ)_/¯");
+            editorStore.info("Hier gibts nichts rückgängig zu machen  ¯\\_(ツ)_/¯")
         }
     }
 
@@ -69,12 +71,15 @@ class CommandStack{
         if (this.index < this.stack.length) {
             const cmd: ICommand = this.stack[this.index];
             cmd.execute();
+
+            editorStore.info(cmd.describe() + " wiederhergestellt.")
             this.index++;
         } else {
             console.log("Nichts zu wiederholen  ¯\\_(ツ)_/¯");
+
+            editorStore.info("Hier gibts nichts zu wiederholen  ¯\\_(ツ)_/¯")
         }
     }
-
 
     /**
      * Führt mitgegebenen Befehl aus und legt ihn auf den Stack

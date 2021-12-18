@@ -25,5 +25,6 @@ export class Karte {
     // setzt übergebenes Element an übergebener Position in der Liste
     public setElement(positionX: number, positionY: number, element: number) {
         this._liste[positionX][positionY] = {x: positionX, y: positionY, e: element}
+        return true;
     }
 }
