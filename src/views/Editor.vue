@@ -47,7 +47,7 @@
 import { defineComponent, onMounted } from 'vue';
 import Aktionstasten from '../components/EditorKomponenten/Aktionstasten.vue'
 import Bausteine from '../components/EditorKomponenten/Bausteine.vue'
-import Editorfenster from '../components/EditorFenster.vue'
+import Editorfenster from '../components/EditorKomponenten/EditorFenster.vue'
 import editorStore from '@/stores/editor'
 
 export default defineComponent({

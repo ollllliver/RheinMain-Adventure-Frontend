@@ -73,6 +73,7 @@ class CommandStack{
             cmd.execute();
 
             editorStore.info(cmd.describe() + " wiederhergestellt.")
+            console.log(cmd.describe() + " wiederhergestellt.");
             this.index++;
         } else {
             console.log("Nichts zu wiederholen  ¯\\_(ツ)_/¯");

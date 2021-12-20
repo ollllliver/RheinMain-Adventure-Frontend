@@ -16,9 +16,9 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, onUpdated, ref } from 'vue'
-import { Karte } from './EditorKomponenten/Karte'
-import { CommandStack } from '../commands/CommandManager'
-import {ElementHinzufuegen} from '../commands/Command'
+import { Karte } from './Karte'
+import { CommandStack } from '../../commands/CommandManager'
+import {ElementHinzufuegen} from '../../commands/Command'
 import editorStore from '@/stores/editor'
 
 export default defineComponent({
