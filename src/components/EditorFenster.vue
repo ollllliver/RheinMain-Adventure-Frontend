@@ -61,13 +61,18 @@ export default defineComponent({
         /**
          * Wegpunkt markieren:
          * wenn seine Wegbeschreibung (Weg/Start/Ziel) gesetzt ist 
+         * wenn an dieser Stelle noch kein Element platziert wurder
          * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
          */
          
         const wegPunkt = (event: any) => {
-            
             if (editorStore.getters.istAktiv) {
-                CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte,editorStore.getters.getElement,event))
+                if (liste[event.target.__vnode.key.x][event.target.__vnode.key.y].e === 0) {
+                    CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte,editorStore.getters.getElement,event))
+                }
+                else {
+                    editorStore.info("Stelle bereits belegt. Bitte vorher löschen oder an anderer Position belegen!")
+                }
             } else {
                 editorStore.info("Bitte wähle erst ein Baustein aus!")
             }

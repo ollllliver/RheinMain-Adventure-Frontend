@@ -98,14 +98,17 @@ export class ElementHinzufuegen implements ICommand {
             switch (this._element.e) {
                 case 1: {
                     this._event.target.style = "background-color: rgba(155, 70, 14, 1);"
+                    editorStore.info("Wegpunkt platziert.")
                     break;
                 }
                 case 2: {
                     this._event.target.style = "background-color:rgba(37, 187, 31, 0.658);"
+                    editorStore.info("Start platziert.")
                     break;
                 }
                 case 3: {
                     this._event.target.style = "background-color:rgba(19, 30, 196, 0.658);"
+                    editorStore.info("Ziel platziert.")
                     break;
                 }
             }
