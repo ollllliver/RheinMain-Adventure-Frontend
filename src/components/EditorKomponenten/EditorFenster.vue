@@ -37,8 +37,8 @@ export default defineComponent({
             const itemID = parseInt(event.dataTransfer.getData('itemID'));
             if (liste[event.target.__vnode.key.x][event.target.__vnode.key.y].e === 0) {
                 // Wenn gültiger Bereich (Raum passt auf Karte)
-                    if (event.target.__vnode.key.x - 1 >= 0 && event.target.__vnode.key.y - 1 >= 0 && 
-                        event.target.__vnode.key.x + 1 <= 14 && event.target.__vnode.key.y + 1 <= 22) {    
+                    if (event.target.__vnode.key.x - 1 >= 0 && event.target.__vnode.key.x + 1 < 14 && 
+                        event.target.__vnode.key.y - 1 >= 0 && event.target.__vnode.key.y + 1 < 22) {    
                         CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte,itemID,event))
                     } else {
                         editorStore.info("Raum passt nicht auf diese Position. Ein Raum besteht 2 x 3 Felder. Bitte wähle einen passenden Ort aus.")
