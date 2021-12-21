@@ -9,7 +9,7 @@
     <button class="btn btn-outline-secondary" :class="start" @click="waehle($event, start)"> S </button>
     <button class="btn btn-outline-secondary" :class="ziel" @click="waehle($event,ziel)"> Z </button>
     <button class="btn btn-outline-secondary" v-for="raum in raeume" :key="raum.id" draggable="true" 
-    @dragstart="startDrag($event, raum)"> R{{raum.id}} </button>
+    @dragstart="startDrag($event, raum)"> R{{raum.title}} </button>
 
 </template>
 
@@ -29,11 +29,11 @@ export default defineComponent({
         // Räume
         const raeume = ref(
             [
-                {id:1, title:'1'},
-                {id:2, title:'2'},
-                {id:3, title:'3'},
-                {id:4, title:'4'},
-                {id:5, title:'5'},
+                {id:4, title:'1'},
+                {id:5, title:'2'},
+                {id:6, title:'3'},
+                {id:7, title:'4'},
+                {id:8, title:'5'},
             ]
         )
 
@@ -42,7 +42,8 @@ export default defineComponent({
             console.log(item)
             event.dataTransfer.dropEffect = 'move'
             event.dataTransfer.effectAllowed = 'copy'
-            event.dataTransfer.setData('itemID',item.id) 
+            event.dataTransfer.setData('itemID',item.id)
+            editorStore.setze(9) 
         }
 
         // element waehlen das platziert werden soll (W = 0, S = 1, Z = 2)

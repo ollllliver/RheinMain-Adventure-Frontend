@@ -3,7 +3,9 @@ import { computed, reactive } from 'vue'
 const state = reactive({
     wegbeschreibung: 0,
     aktiv: false,
-    info: ''
+    info: '',
+    start: false,
+    ziel: false
 })
 
 const getters = reactive({
@@ -15,7 +17,13 @@ const getters = reactive({
     }),
     getInfo: computed(() => {
         return state.info;
-    })
+    }),
+    getStart: computed(() => {
+        return state.start;
+    }),
+    getZiel: computed(() => {
+        return state.ziel;
+    }),
 })
 
 const actions = {
@@ -63,12 +71,21 @@ const actions = {
                 }
                 break;
             }
+            case 9: {
+                state.aktiv = false
+            }
         }
     },
     async info(info: string) {
         state.info = info
-
+    },
+    async start(gesetzt: boolean) {
+        state.start = gesetzt
+    },
+    async ziel(gesetzt: boolean) {
+        state.ziel = gesetzt
     }
+
 }
 
 export default { state, getters, ...actions }

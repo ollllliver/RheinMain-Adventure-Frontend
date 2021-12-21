@@ -10,7 +10,6 @@
       </div>
     </div>
 
-    
     <div class="row">
 
       <!-- Editorfenster -->  
@@ -78,10 +77,10 @@ export default defineComponent({
   }
  
   #aktionstasten {
-      margin-left: 60px;
-      margin-right: -60px;
-      height: 300px;
-      width: 30%;
+    margin-left: 60px;
+    margin-right: -60px;
+    height: 300px;
+    width: 30%;
   }
  
   #infofenster {

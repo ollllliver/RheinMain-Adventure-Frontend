@@ -24,31 +24,29 @@ import editorStore from '@/stores/editor'
 export default defineComponent({
     name: "Editorfenster",
     setup() {
-        // test
-        let elemente : any = ref([])
         // Kartenklasse mit liste als Array
         const karte = new Karte();
         const liste = karte.liste
 
         /**
-         * bei drop (Drag-and-Drop) Baustein auf der Karte platzieren
-         * noch nicht fertig implementiert, nur zum testen
+         * bei drop (Drag-and-Drop) Raum auf der Karte platzieren
+         * wenn Raum auf platzierte Stelle passt
+         * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
          */
-
         const onDrop = (event: any) => {
-            console.log(event.target.__vnode.key)
-            const itemID = event.dataTransfer.getData('itemID')
-            console.log(itemID)
-            console.log(event)
-            karte.setElement(event.target.__vnode.key.x, event.target.__vnode.key.y, itemID)
-            karte.setElement(event.target.__vnode.key.x, event.target.__vnode.key.y-1, itemID)
-            karte.setElement(event.target.__vnode.key.x, event.target.__vnode.key.y+1, itemID)
-            karte.setElement(event.target.__vnode.key.x-1, event.target.__vnode.key.y, itemID)
-            karte.setElement(event.target.__vnode.key.x+1, event.target.__vnode.key.y, itemID)
-            karte.setElement(event.target.__vnode.key.x+1, event.target.__vnode.key.y+1, itemID)
-            karte.setElement(event.target.__vnode.key.x-1, event.target.__vnode.key.y-1, itemID)
-            event.target.style = "background-color: rgba(155, 70, 14, 1);"
-            elemente.value.push(itemID)
+            const itemID = parseInt(event.dataTransfer.getData('itemID'));
+            if (liste[event.target.__vnode.key.x][event.target.__vnode.key.y].e === 0) {
+                // Wenn gültiger Bereich (Raum passt auf Karte)
+                    if (event.target.__vnode.key.x - 1 >= 0 && event.target.__vnode.key.y - 1 >= 0 && 
+                        event.target.__vnode.key.x + 1 <= 14 && event.target.__vnode.key.y + 1 <= 22) {    
+                        CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte,itemID,event))
+                    } else {
+                        editorStore.info("Raum passt nicht auf diese Position. Ein Raum besteht 2 x 3 Felder. Bitte wähle einen passenden Ort aus.")
+                    }
+            }
+            else {
+                editorStore.info("Stelle bereits belegt. Bitte vorher löschen oder an anderer Position belegen!")
+            }
             console.log(liste)
         }   
         onUpdated(() => {
@@ -64,9 +62,20 @@ export default defineComponent({
          * wenn an dieser Stelle noch kein Element platziert wurder
          * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
          */
-         
         const wegPunkt = (event: any) => {
             if (editorStore.getters.istAktiv) {
+                if (editorStore.getters.getElement === 2) {
+                    if (editorStore.getters.getStart) {
+                        editorStore.info("Start bereits gesetzt. Es gibt nur einen Startpunkt")
+                        return;
+                    }
+                } 
+                if (editorStore.getters.getElement === 3) {
+                    if (editorStore.getters.getZiel) {
+                        editorStore.info("Ziel bereits gesetzt. Es gibt nur ein Ziel")
+                        return;
+                    }
+                }
                 if (liste[event.target.__vnode.key.x][event.target.__vnode.key.y].e === 0) {
                     CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte,editorStore.getters.getElement,event))
                 }
@@ -78,7 +87,7 @@ export default defineComponent({
             }
         }
         return {
-            elemente, onDrop, liste, wegPunkt
+            onDrop, liste, wegPunkt
         }
     },
 })

@@ -91,24 +91,55 @@ export class ElementHinzufuegen implements ICommand {
     execute = () => {
         // Braucht man für CommandManager ?
         this._state += 1;
-        // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
         if (this._karte.liste[this._element.posX][this._element.posY].e !== this._element.e) {
-            this._karte.setElement(this._element.posX, this._element.posY, this._element.e);
-            // Hintergrund des Divs auf Farbe des Elements ändern
             switch (this._element.e) {
                 case 1: {
-                    this._event.target.style = "background-color: rgba(155, 70, 14, 1);"
+                    // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posX, this._element.posY, this._element.e);  
+                    // Hintergrund des Divs auf Farbe des Elements ändern
+                    this._event.target.style = "background-color: rgba(255,211,155, 0.75);"  
                     editorStore.info("Wegpunkt platziert.")
                     break;
                 }
                 case 2: {
+                    // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posX, this._element.posY, this._element.e);  
+                    // Hintergrund des Divs auf Farbe des Elements ändern
                     this._event.target.style = "background-color:rgba(37, 187, 31, 0.658);"
                     editorStore.info("Start platziert.")
+                    editorStore.start(true)
                     break;
                 }
                 case 3: {
+                    // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posX, this._element.posY, this._element.e);  
+                    // Hintergrund des Divs auf Farbe des Elements ändern
                     this._event.target.style = "background-color:rgba(19, 30, 196, 0.658);"
                     editorStore.info("Ziel platziert.")
+                    editorStore.ziel(true)
+                    break;
+                }
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8: {
+                    // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posX, this._element.posY, this._element.e)
+                    this._karte.setElement(this._element.posX, this._element.posY-1, this._element.e)
+                    this._karte.setElement(this._element.posX, this._element.posY+1, this._element.e)
+                    this._karte.setElement(this._element.posX-1, this._element.posY, this._element.e)
+                    this._karte.setElement(this._element.posX-1, this._element.posY-1, this._element.e)
+                    this._karte.setElement(this._element.posX-1, this._element.posY+1, this._element.e)
+                    // Hintergrund des Divs auf Farbe des Elements ändern
+                    console.log(this._event.target)
+                    this._event.target.style = "background-color: rgba(238,59,59, 0.75);"
+                    this._event.path[1].__vnode.children[0].children[this._element.posY+1].el.style = "background-color: rgba(238,59,59, 0.75);"
+                    this._event.path[1].__vnode.children[0].children[this._element.posY-1].el.style = "background-color: rgba(238,59,59, 0.75);"
+                    this._event.path[2].children[this._element.posX-1].children[this._element.posY].style = "background-color: rgba(238,59,59, 0.75);"
+                    this._event.path[2].children[this._element.posX-1].children[this._element.posY-1].style = "background-color: rgba(238,59,59, 0.75);"
+                    this._event.path[2].children[this._element.posX-1].children[this._element.posY+1].style = "background-color: rgba(238,59,59, 0.75);"
+                    editorStore.info("Raum platziert.")
                     break;
                 }
             }
@@ -124,11 +155,46 @@ export class ElementHinzufuegen implements ICommand {
      */
     undo = () => {
         this._state -= 1;
+
         // Element aus der Karte wieder auf 0 setzten (0 = Wand)
-        this._karte.setElement(this._element.posX, this._element.posY, 0)
-        editorStore.info("letzten Schritt rückgängig gemacht")
         // Hintergrund des divs auf Wand setzen
-        this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+        switch (this._element.e) {
+            case 1: {
+                this._karte.setElement(this._element.posX, this._element.posY, 0);  
+                this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+                break;
+            }
+            case 2: {
+                this._karte.setElement(this._element.posX, this._element.posY, 0);  
+                this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+                break;
+            }
+            case 3: {
+                this._karte.setElement(this._element.posX, this._element.posY, 0);  
+                this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+                break;
+            }
+            case 4:
+            case 5:
+            case 6:
+            case 7:
+            case 8: {
+                this._karte.setElement(this._element.posX, this._element.posY, 0)
+                this._karte.setElement(this._element.posX, this._element.posY-1, 0)
+                this._karte.setElement(this._element.posX, this._element.posY+1, 0)
+                this._karte.setElement(this._element.posX-1, this._element.posY, 0)
+                this._karte.setElement(this._element.posX-1, this._element.posY-1, 0)
+                this._karte.setElement(this._element.posX-1, this._element.posY+1, 0)
+                this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+                this._event.path[1].__vnode.children[0].children[this._element.posY+1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
+                this._event.path[1].__vnode.children[0].children[this._element.posY-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
+                this._event.path[2].children[this._element.posX-1].children[this._element.posY].style = "background-color: rgba(92, 92, 92, 0.658);"
+                this._event.path[2].children[this._element.posX-1].children[this._element.posY-1].style = "background-color: rgba(92, 92, 92, 0.658);"
+                this._event.path[2].children[this._element.posX-1].children[this._element.posY+1].style = "background-color: rgba(92, 92, 92, 0.658);"
+                break;
+            }
+        }
+        editorStore.info("letzten Schritt rückgängig gemacht")
     }
 
     /**
