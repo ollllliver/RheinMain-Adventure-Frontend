@@ -167,11 +167,13 @@ export class ElementHinzufuegen implements ICommand {
             case 2: {
                 this._karte.setElement(this._element.posX, this._element.posY, 0);  
                 this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+                editorStore.start(false)
                 break;
             }
             case 3: {
                 this._karte.setElement(this._element.posX, this._element.posY, 0);  
                 this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+                editorStore.ziel(false)
                 break;
             }
             case 4:
