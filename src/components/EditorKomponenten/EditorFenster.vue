@@ -6,7 +6,7 @@
     --> 
 
     <div class="drop-zone" @drop="onDrop($event)" @dragenter.prevent @dragover.prevent>
-        <div v-for="row in liste" :key="row.value" class="reihe">
+        <div v-for="row in liste" :key="row.value" class="reihe" draggable="false">
             <div v-for ="col in row" :key="col" v-bind="col.id" class="element" v-on:click="wegPunkt" draggable="false">
                 
             </div>

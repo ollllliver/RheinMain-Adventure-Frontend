@@ -9,7 +9,7 @@
     <button class="btn btn-outline-secondary" :class="start" @click="waehle($event, start)"> S </button>
     <button class="btn btn-outline-secondary" :class="ziel" @click="waehle($event,ziel)"> Z </button>
     <button class="btn btn-outline-secondary" v-for="raum in raeume" :key="raum.id" draggable="true" 
-    @dragstart="startDrag($event, raum)"> R{{raum.title}} </button>
+    @dragstart="startDrag($event, raum)" @click="setzeInfo(raum)"> R{{raum.title}} </button>
 
 </template>
 
@@ -29,11 +29,21 @@ export default defineComponent({
         // Räume
         const raeume = ref(
             [
-                {id:4, title:'1'},
-                {id:5, title:'2'},
-                {id:6, title:'3'},
-                {id:7, title:'4'},
-                {id:8, title:'5'},
+                {id:4, title:'1', rauminfo: 'In Raum 1 ist das Ziel einen versteckten Schlüssel zu finden.'+
+                'Dieser ist hinter oder unter zufälligen Gegenständen im Raum versteckt.'+
+                'Ist der Schlüssel gefunden kann damit eine Tür geöffnet werden und das Rätsel ist abgeschlossen'},
+                {id:5, title:'2', rauminfo: 'In Raum 2 ist das Ziel, verschiedene Schalter zu aktivieren.'+
+                'Die Schalter können verschiedene Formen und Farben haben. Sind alle Schalter gedrückt'+
+                'öffnet sich die Tür.'},
+                {id:6, title:'3', rauminfo: 'In Raum 3 ist das Ziel einen versteckten Schlüssel zu finden.'+
+                'Dieser ist hinter oder unter zufälligen Gegenständen im Raum versteckt.'+
+                'Ist der Schlüssel gefunden kann damit eine Tür geöffnet werden und das Rätsel ist abgeschlossen'},
+                {id:7, title:'4', rauminfo: 'In Raum 4 ist das Ziel, verschiedene Schalter zu aktivieren.'+
+                'Die Schalter können verschiedene Formen und Farben haben. Sind alle Schalter gedrückt'+
+                'öffnet sich die Tür.'},
+                {id:8, title:'5', rauminfo: 'In Raum 5 ist das Ziel, verschiedene Schalter zu aktivieren.'+
+                'Die Schalter können verschiedene Formen und Farben haben. Sind alle Schalter gedrückt'+
+                'öffnet sich die Tür.'},
             ]
         )
 
@@ -51,8 +61,12 @@ export default defineComponent({
             editorStore.setze(item)
         }
 
+        const setzeInfo = (item: any) => {
+            editorStore.info(item.rauminfo)
+        }
+
         return {
-                raeume, startDrag, waehle, weg, start, ziel
+                raeume, startDrag, waehle, setzeInfo, weg, start, ziel
         }
     },
     
