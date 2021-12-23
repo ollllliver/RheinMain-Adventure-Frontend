@@ -1,5 +1,13 @@
 import { computed, reactive } from 'vue'
 
+/**
+ * State des Editors
+ * wegbeschreibung = Element (0: Wand, 1: Weg, 2: Start, 3: Ziel)
+ * aktiv = wenn Baustein gewählt true
+ * info = Text für das Infofenster
+ * start = wenn Start platziert true
+ * ziel = wenn Ziel platziert ture
+ */
 const state = reactive({
     wegbeschreibung: 0,
     aktiv: false,
@@ -8,6 +16,9 @@ const state = reactive({
     ziel: false
 })
 
+/**
+ * Getters für den State
+ */
 const getters = reactive({
     istAktiv: computed(() => {
         return state.aktiv;
@@ -26,9 +37,21 @@ const getters = reactive({
     }),
 })
 
+/**
+ * Methoden zum verändern des States
+ * setze = setzt je nach gewähltem Baustein aktiv auf true und wegbeschreibung mit gewünschtem Element
+ * info = setzt Infotext
+ * start = setzt start
+ * ziel = setzt ziel
+ */
 const actions = {
     async setze(wb: number) {
         switch(wb) {
+            case 0: {
+                state.wegbeschreibung = 0;
+                state.aktiv = false;
+                break;
+            }
             case 1: {
                 if (state.wegbeschreibung == wb) {
                     if (state.aktiv) {

@@ -40,6 +40,7 @@ export default defineComponent({
                     if (event.target.__vnode.key.x - 1 >= 0 && event.target.__vnode.key.x + 1 < 14 && 
                         event.target.__vnode.key.y - 1 >= 0 && event.target.__vnode.key.y + 1 < 22) {    
                         CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte,itemID,event))
+                        editorStore.setze(0);
                     } else {
                         editorStore.info("Raum passt nicht auf diese Position. Ein Raum besteht 2 x 3 Felder. Bitte wähle einen passenden Ort aus.")
                     }
