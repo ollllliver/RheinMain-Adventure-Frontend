@@ -79,7 +79,7 @@ export default defineComponent({
     const initLoader = () => {
       loader = new Loader();
       console.log(loader)
-      loader.ladeDatei('/assets/blender/example.gltf')
+      loader.ladeDatei('/assets/blender/room.gltf')
       .then((res:any) => {
         // TODO: 
         // Kamera, Steuerung und scene.position der gltf.scene zuweisen (Hier oder in Loader Klasse?)
@@ -95,19 +95,36 @@ export default defineComponent({
       })
     };
 
+    /**
+     * Initialisiert Kamera
+     */
     const initCamera = () => {
       camera = new Three.PerspectiveCamera(50,window.innerWidth / window.innerHeight,0.1,window.innerHeight);
       camera.position.set(0, player.height, -5);
       camera.lookAt(new Three.Vector3(0, player.height, 0));
     };
 
+    /**
+     * Initialisiert die Steuerung
+     */
     const initControls = () => {
       mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
       keyControls = new MyKeyboardControls(document); //init Keyboardsteuerung
 
-      window.addEventListener( 'click', function () { mouseControls.lock(); } ); //locked die Maus
+      connect();
     }
 
+    const connect = () => {
+      window.addEventListener( 'click', mouseControls.lock ); //locked die Maus
+    }
+
+    const disconnect = () => {
+      mouseControls.dispose();
+      keyControls.disconnect();
+      window.removeEventListener('click', mouseControls.lock );
+      console.log("Müsste disconnected sein")
+    }
+    
     // const initPlane = () => {
     //   let plane = new Three.PlaneGeometry(5, 5, 1, 1);
     //   let material = new Three.MeshBasicMaterial();
@@ -170,85 +187,6 @@ export default defineComponent({
     function degInRad(deg: number) {
       return (deg * Math.PI) / 90;
     }
-
-    const onKeyDown = function ( event:KeyboardEvent ) {
-
-					switch ( event.code ) {
-
-						case 'ArrowUp':
-						case 'KeyW':
-							moveForward = true;
-							break;
-
-						case 'ArrowLeft':
-						case 'KeyA':
-							moveLeft = true;
-							break;
-
-						case 'ArrowDown':
-						case 'KeyS':
-							moveBackward = true;
-							break;
-
-						case 'ArrowRight':
-						case 'KeyD':
-							moveRight = true;
-							break;
-
-						case 'Space':
-              moveUp=true;
-							// if ( canJump === true ) velocity.y += 350;
-							// canJump = false;
-							break;
-            
-            case 'ShiftLeft':
-							moveDown = true;
-							break;
-
-					}
-
-				};
-
-    const onKeyUp = function ( event:KeyboardEvent ) {
-
-      switch ( event.code ) {
-
-        case 'ArrowUp':
-        case 'KeyW':
-          moveForward = false;
-          break;
-
-        case 'ArrowLeft':
-        case 'KeyA':
-          moveLeft = false;
-          break;
-
-        case 'ArrowDown':
-        case 'KeyS':
-          moveBackward = false;
-          break;
-
-        case 'ArrowRight':
-        case 'KeyD':
-          moveRight = false;
-          break;
-        case 'Space':
-            moveUp = false;
-							// if ( canJump === true ) velocity.y += 350;
-							// canJump = false;
-						break;
-            
-        case 'ShiftLeft':
-						moveDown = false;
-						break;
-
-      }
-
-    };
-
-    document.addEventListener( 'keydown', onKeyDown),
-    document.addEventListener( 'keyup', onKeyUp),
-
   
     function rotateObject(mesh: any, degreeX = 0, degreeY = 0, degreeZ = 0) {
       mesh.rotateX(Three.Math.degToRad(degreeX));
@@ -260,9 +198,19 @@ export default defineComponent({
       mesh.position.x -= Math.min(moveX);
       mesh.position.y -= Math.min(moveY);
       mesh.position.z -= Math.min(moveZ);
-    }
+    } 
+    
+    return {connect, disconnect}
+
+  },
+  beforeUnmount() {
+
+    this.disconnect();
+    console.log("unmounted")
   },
 });
+
+
 </script>
 
 <style scoped>

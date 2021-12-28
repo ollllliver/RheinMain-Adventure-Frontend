@@ -1,5 +1,24 @@
 .center {
-    margin: auto;
-    width: 50%;
-    padding: 10px;
-  }
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+#messageArea{
+  list-style:none;
+  max-height:200px;
+  margin:10px;
+  overflow:auto;
+  padding:0;
+  text-indent:10px;
+}
+
+.event-message {
+  width: 100%;
+  text-align: center;
+  clear: both;
+}
+
+.chat-message {
+  position: relative;
+}

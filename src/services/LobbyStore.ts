@@ -115,16 +115,30 @@ async function empfangeChatNachricht(nachricht: ChatNachricht) {
 
     if (nachricht.typ == 'JOIN') {
         messageElement.classList.add('event-message');
-        messageElement.textContent = nachricht.sender + ' ist gejoined!';
+        messageElement.innerHTML = nachricht.sender.bold() + ' ist gejoined!';
     } else if (nachricht.typ == 'LEAVE') {
         messageElement.classList.add('event-message');
-        messageElement.textContent = nachricht.sender + ' ist geleaved!';
+        messageElement.innerHTML = nachricht.sender.bold() + ' ist geleaved!';
     } else {
         messageElement.classList.add('chat-message');
-        messageElement.textContent = nachricht.sender + ": " + nachricht.inhalt;
+        messageElement.innerHTML = nachricht.sender.bold() + ": " + nachricht.inhalt;
     }
 
-    messageArea?.appendChild(messageElement);
+    let nachUntenGescrollt;
+
+    if(messageArea){
+        if ((messageArea.offsetHeight + messageArea.scrollTop) >= messageArea.scrollHeight - 20) {
+            nachUntenGescrollt = true;
+        }else{
+            nachUntenGescrollt = false;
+        }
+        
+        messageArea.appendChild(messageElement);
+    }
+
+    if(nachUntenGescrollt){
+        messageElement.scrollIntoView({behavior: 'smooth'});
+    }
 }
 
 // Gemeinsame State-Variable(n) auf oberster Ebene,
