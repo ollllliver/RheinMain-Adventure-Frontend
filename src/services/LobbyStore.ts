@@ -3,7 +3,6 @@ import { Lobby } from './Lobby'
 import { Benutzer } from './Benutzer'
 import { LobbyMessage } from './LobbyMessage'
 import { Client } from '@stomp/stompjs';
-import { Timer } from '@/components/models/Timer';
 import router from '@/router';
 import { NachrichtenCode } from './NachrichtenCode';
 import { NachrichtenTyp } from './NachrichtenTyp';
@@ -11,7 +10,6 @@ import { ChatNachricht } from './ChatNachricht';
 
 const wsurl = `ws://localhost:8080/messagebroker`;
 const stompclient = new Client({ brokerURL: wsurl });
-const timer = new Timer(10);
 
 const lobbystate = reactive({
     lobbyID: "",
@@ -203,27 +201,12 @@ async function starteLobby() {
         }
         return response.json();
     }).then(async (jsondata) => {
-        let timer = 10;
         const lobbyMsg = jsondata as LobbyMessage;
-        if (lobbyMsg.typ == NachrichtenCode.COUNTDOWN_GESTARTET) {
-            for (let i = 0; i < timer; i++) {
-                let interval = timer - i;
-                console.log(interval);
-                await timerInterval(1000);
-            }
-            router.push("/environment");
-        }
         console.log(lobbyMsg);
         return lobbyMsg.payload;
     }).catch((e) => {
         console.log(e);
     });
-}
-
-function timerInterval(delay: number) {
-    return new Promise(resolve => {
-        setTimeout(resolve, delay);
-    })
 }
 
 function resetLobbyState() {

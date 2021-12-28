@@ -9,23 +9,27 @@
     <button class="row btn btn-primary" v-on:click="starten">
       SPIEL STARTEN
     </button>
+    <h1 class="row">{{ timer.time }}</h1>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, reactive } from "vue";
 import { useLobbyStore } from "@/services/LobbyStore";
-import { Timer } from "@/components/models/Timer";
 import router from "@/router";
 export default defineComponent({
   name: "Einstellungen",
   setup() {
-    const countdown = 10;
     const { lobbystate, starteLobby } = useLobbyStore();
+    const timer = reactive({
+      time: 10,
+      color: "green"
+    });
 
     async function starten() {
       starteLobby()
         .then((response) => {
+          starteTimer();
           console.log(response);
         })
         .catch((err) => {
@@ -33,9 +37,23 @@ export default defineComponent({
         });
     }
 
+    function starteTimer(delay = 1000) {
+      if (timer.time > 0) {
+        setTimeout(() => {
+          timer.time -= 1;
+          starteTimer();
+        }, delay);
+      }
+      else {
+        router.push("/environment");
+      }
+    }
+
     return {
       starten,
       lobbystate,
+      starteTimer,
+      timer
     };
   },
 });
