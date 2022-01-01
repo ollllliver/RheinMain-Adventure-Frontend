@@ -6,12 +6,10 @@
 
       <!-- INFOS -->
       <h3>Teilnehmer: {{lobbystate.teilnehmerliste.length}} \ {{lobbystate.spielerlimit}}</h3>
-      <h3>istVoll: {{ lobbystate.istVoll }}</h3>
-      <h3>istGestartet: {{ lobbystate.istGestartet }}</h3>
 
       <!-- AUSWAHL - Spielerlimit -->
       <div>
-        <label class="h3">spielerlimit:&nbsp;</label>
+        <label class="h3">Spielerlimit:&nbsp;</label>
         <select class="h4" v-model="spielerlimit" @change="changeLimit">
           <option :text="zahl" :value="zahl" v-for="zahl in limitArray" :key="zahl"></option>
         </select>
@@ -63,7 +61,7 @@ export default defineComponent({
   name: "Einstellungen",
   setup() {
 
-    const { lobbystate, starteLobby } = useLobbyStore();
+    const { lobbystate, starteLobby, einstellungsfunktionen } = useLobbyStore();
 
     // DEFAULT max spielerlimit aktuell = 10
     const limitArray = ref(Array.from({length: 10}, (_, i) => i + 1));
@@ -83,16 +81,13 @@ export default defineComponent({
 
     // 3 FUNKTIONEN zum ändern der änderbare Einstellungen:
     function changeLimit(){
-      console.log('change limit:', spielerlimit.value);
-      // todo: spielerlimit ändern
+      einstellungsfunktionen['changeLimit'](spielerlimit.value)
     }
     function changePrivacy(){
-      console.log('change privacy:', istPrivat.value, host.value);
-      // todo: privatsphäre ändern
+      einstellungsfunktionen['changePrivacy'](istPrivat.value)
     }
     function changeHost(){
-      console.log('change host:', host.value);
-      // todo: privatsphäre ändern
+      einstellungsfunktionen['changeHost'](host.value)
     }
 
     function starten() {
@@ -121,7 +116,7 @@ export default defineComponent({
     return {
       lobbystate, userStore,
       starten,
-      
+
       spielerlimit, changeLimit, limitArray,
       istPrivat, changePrivacy,
       host, changeHost

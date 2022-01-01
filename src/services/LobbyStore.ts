@@ -49,7 +49,6 @@ async function connectToLobby(lobby_id: string) {
     };
     stompclient.activate();
 
-
     console.log("Fetch auf: /api/lobby/join/" + lobby_id)
     fetch('/api/lobby/join/' + lobby_id, {
         method: 'POST'
@@ -65,7 +64,7 @@ async function connectToLobby(lobby_id: string) {
     }).then((jsondata) => {
         // verarbeite jsondata
         const lobbymessage = jsondata as LobbyMessage;
-        if(lobbymessage.istFehler){
+        if (lobbymessage.istFehler) {
             console.log(NachrichtenCode.LOBBY_VOLL)
             switch (lobbymessage.typ) {
                 case NachrichtenCode.LOBBY_VOLL:
@@ -76,11 +75,11 @@ async function connectToLobby(lobby_id: string) {
                     alleLobbiesState.errormessage = "Es ist leider etwas schiefgelaufen."
                     router.push("/uebersicht")
                     break;
-                
+
                 default:
                     break;
             }
-        }else{
+        } else {
             lobbystate.darfBeitreten = true;
             updateLobby(lobby_id);
         }
@@ -89,17 +88,14 @@ async function connectToLobby(lobby_id: string) {
         .catch((e) => {
             console.log(e);
         });
-
-
 }
-
 
 // TODO: Chatfunktionen auslagern in seperates ChatStore.ts
 async function sendeChatNachricht(typ: NachrichtenTyp, inhalt: string, sender: string) {
 
     const DEST_CHAT = "/topic/lobby/" + lobbystate.lobbyID + "/chat";
-    const nachricht: ChatNachricht =  { typ: typ, inhalt: inhalt, sender: sender };
-    stompclient.publish({destination: DEST_CHAT, body: JSON.stringify(nachricht)});
+    const nachricht: ChatNachricht = { typ: typ, inhalt: inhalt, sender: sender };
+    stompclient.publish({ destination: DEST_CHAT, body: JSON.stringify(nachricht) });
     console.log("Gesendete Nachricht: ", nachricht);
 }
 
@@ -109,7 +105,7 @@ async function empfangeChatNachricht(nachricht: ChatNachricht) {
     const messageArea = document.getElementById("messageArea");
     const messageElement = document.createElement("li");
 
-    if(nachricht.typ == 'JOIN') {
+    if (nachricht.typ == 'JOIN') {
         messageElement.classList.add('event-message');
         messageElement.innerHTML = nachricht.sender.bold() + ' ist gejoined!';
     } else if (nachricht.typ == 'LEAVE') {
@@ -122,28 +118,20 @@ async function empfangeChatNachricht(nachricht: ChatNachricht) {
 
     let nachUntenGescrollt;
 
-    if(messageArea){
+    if (messageArea) {
         if ((messageArea.offsetHeight + messageArea.scrollTop) >= messageArea.scrollHeight - 20) {
             nachUntenGescrollt = true;
-        }else{
+        } else {
             nachUntenGescrollt = false;
         }
-        
+
         messageArea.appendChild(messageElement);
     }
 
-    if(nachUntenGescrollt){
-        messageElement.scrollIntoView({behavior: 'smooth'});
+    if (nachUntenGescrollt) {
+        messageElement.scrollIntoView({ behavior: 'smooth' });
     }
 }
-
-// Gemeinsame State-Variable(n) auf oberster Ebene,
-// also ausserhalb der use-Funktion (dürfen nur je
-// einmal und nicht nicht je use-Aufruf angelegt werden)
-// Oft auch mit einem reactive()-Objekt gelöst
-
-// Composition-Function zur Bereitstellung
-// von State-Abfrage- und Bearbeitungsmoeglichkeiten
 
 async function updateLobby(lobby_id: string) {
     console.log("Fetch auf: /api/lobby/" + lobby_id)
@@ -203,7 +191,7 @@ async function joinRandomLobby() {
 
 async function starteLobby() {
     console.log("Fetch auf: /api/lobby/{lobbyId}/start")
-    return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
+    return fetch('/api/lobby/' + lobbystate.lobbyID + '/start', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -223,11 +211,9 @@ async function starteLobby() {
         .catch((e) => {
             console.log(e);
         });
-
 }
 
-
-function resetLobbyState(){
+function resetLobbyState() {
     lobbystate.lobbyID = "";
     lobbystate.teilnehmerliste = Array<Benutzer>();
     lobbystate.host = {} as Benutzer;
@@ -245,9 +231,9 @@ async function leaveLobby(): Promise<boolean> {
     stompclient.unsubscribe("topic/lobby/" + lobbystate.lobbyID);
     stompclient.unsubscribe("topic/lobby/" + lobbystate.lobbyID + "/chat");
 
-    console.log("Fetch auf: /leave/" + lobbystate.lobbyID  )
+    console.log("Fetch auf: /leave/" + lobbystate.lobbyID)
     router.push("/uebersicht");
-    return fetch('/api/lobby/leave/' + lobbystate.lobbyID , {
+    return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
         method: 'DELETE',
         headers: {
             'Content-Type': 'application/json',
@@ -261,8 +247,8 @@ async function leaveLobby(): Promise<boolean> {
         resetLobbyState();
         return response.json();
     }).catch((e) => {
-            console.log(e);
-        });
+        console.log(e);
+    });
 }
 
 
@@ -317,6 +303,21 @@ async function alleLobbiesladen() {
         });
 }
 
+function changeLimit(neuesLimit){
+    console.log('change limit:', neuesLimit);
+    // TODO: über die API Limit setzen
+}
+
+function changePrivacy(istPrivat){
+    console.log('change privacy:', istPrivat);
+    // TODO: über die API Privacy setzen
+}
+
+function changeHost(neuerHost){
+    console.log('change host:', neuerHost);
+    // TODO: über die API Host setzen
+}
+
 export function useLobbyStore() {
     // auch hier könnten ref() und reactive() Objekte
     // angelegt werden, die dann nicht ueber mehrere
@@ -325,12 +326,20 @@ export function useLobbyStore() {
 
     // nur diese Auswahl nach aussen geben
     return {
-        lobbystate: readonly(lobbystate),
-        connectToLobby,
-        neueLobby,
-        alleLobbiesladen,
+        // State-Variablen:
         alleLobbiesState: readonly(alleLobbiesState),
-        joinRandomLobby,updateLobby, leaveLobby,
-        sendeChatNachricht, empfangeChatNachricht,starteLobby
+        lobbystate: readonly(lobbystate),
+
+        // Lobby Funktionen zum Informieren
+        alleLobbiesladen, connectToLobby, updateLobby,
+
+        // Lobby Funktionen zum Ändern
+        neueLobby, joinRandomLobby, leaveLobby, starteLobby,
+
+        // Funktionen zum ändern der Lobby Einstellungen:
+        einstellungsfunktionen: {changeLimit, changePrivacy, changeHost},
+
+        // Chat Funktionen:
+        sendeChatNachricht, empfangeChatNachricht,
     }
 }
