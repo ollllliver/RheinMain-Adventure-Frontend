@@ -14,7 +14,7 @@ const stompclient = new Client({ brokerURL: wsurl })
 const lobbystate = reactive({
     lobbyID: "",
     teilnehmerliste: Array<Benutzer>(),
-    host: "",
+    host: {} as Benutzer,
     istGestartet: false,
     istVoll: false,
     spielerlimit: 0,
@@ -230,7 +230,7 @@ async function starteLobby() {
 function resetLobbyState(){
     lobbystate.lobbyID = "";
     lobbystate.teilnehmerliste = Array<Benutzer>();
-    lobbystate.host = "";
+    lobbystate.host = {} as Benutzer;
     lobbystate.istGestartet = false;
     lobbystate.istVoll = false;
     lobbystate.spielerlimit = 0;
