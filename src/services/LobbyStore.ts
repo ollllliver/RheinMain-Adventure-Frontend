@@ -305,18 +305,73 @@ async function alleLobbiesladen() {
 
 function changeLimit(neuesLimit){
     console.log('change limit:', neuesLimit);
-    // TODO: über die API Limit setzen
+    fetch('/api/lobby/'+ lobbystate.lobbyID + '/spielerlimit', {
+        method: 'PATCH',
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(neuesLimit)
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((json) => {
+        console.log("JSON:", json);
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 function changePrivacy(istPrivat){
     console.log('change privacy:', istPrivat);
-    // TODO: über die API Privacy setzen
-}
+    fetch('/api/lobby/'+ lobbystate.lobbyID + '/privacy', {
+        method: 'PATCH',
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(istPrivat)
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((json) => {
+        console.log("JSON:", json);
+    }).catch((e) => {
+        console.log(e);
+    });}
 
 function changeHost(neuerHost){
     console.log('change host:', neuerHost);
-    // TODO: über die API Host setzen
-}
+    fetch('/api/lobby/'+ lobbystate.lobbyID + '/host', {
+        method: 'PATCH',
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(neuerHost)
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((json) => {
+        console.log("JSON:", json);
+    }).catch((e) => {
+        console.log(e);
+    });}
 
 export function useLobbyStore() {
     // auch hier könnten ref() und reactive() Objekte
