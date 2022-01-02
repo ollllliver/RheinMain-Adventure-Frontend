@@ -11,12 +11,13 @@ import { ChatNachricht } from './ChatNachricht';
 const wsurl = `ws://localhost:8080/messagebroker`;
 const stompclient = new Client({ brokerURL: wsurl })
 
+// verwendete StompSubscriptions:
 let lobbySubscription: StompSubscription;
 let lobbyChatSubscription: StompSubscription;
 let uebersichtSubscription: StompSubscription;
 
 /**
- * 
+ * lobbystate ist ein reactive, das zu einer Lobby essentielle Infos hält + errormessage
  */
 const lobbystate = reactive({
     lobbyID: "",
@@ -31,7 +32,7 @@ const lobbystate = reactive({
 })
 
 /**
- * 
+ * alleLobbiesState ist ein reactive, das die Liste von Lobbys hält + errormessage
  */
 const alleLobbiesState = reactive({
     lobbies: Array<Lobby>(),
@@ -86,8 +87,10 @@ function connectToUebersicht(){
 
 
 /**
+ * connectToLobby subscribt sich mit zu Not selbst connectetem Stompclient mit der Function subscribeToLobby()
+ * und lädt die Daten der Lobby in das lobbyState reactive.
  * 
- * @param lobby_id 
+ * @param lobby_id ist die ID der Lobby, mit der sich verbunden werden soll und dessen Daten geladen werden sollen
  */
 async function connectToLobby(lobby_id: string) {
     // erst versuchen, zu joinen
@@ -143,8 +146,7 @@ async function connectToLobby(lobby_id: string) {
 }
 
 /**
- * 
- * subscribeToLobby schreibt sich für die nötigen topics für die mitgegebene Lobby per stompclient ein
+ * subscribeToLobby schreibt sich für die nötigen Topics für die mitgegebene Lobby per stompclient ein.
  * 
  * @param lobby_id ist die Lobby ID, für die sich eingeschrieben werden soll.
  */
@@ -205,6 +207,11 @@ async function empfangeChatNachricht(nachricht: ChatNachricht) {
     }
 }
 
+/**
+ * lädt die Lobby Daten der mitgegebenen Lobby neu in das lobbyState reactive.
+ * 
+ * @param lobby_id ist die ID der neu zu ladenden Lobby
+ */
 async function updateLobby(lobby_id: string) {
     console.log("Fetch auf: /api/lobby/" + lobby_id)
     fetch('/api/lobby/' + lobby_id, {
@@ -285,6 +292,9 @@ async function starteLobby() {
         });
 }
 
+/**
+ * resettet das reactive lobbyState.
+ */
 function resetLobbyState() {
     lobbystate.lobbyID = "";
     lobbystate.teilnehmerliste = Array<Benutzer>();
@@ -298,7 +308,11 @@ function resetLobbyState() {
 }
 
 
-
+/**
+ * Fragt im Backend per fetch das verlassen der Lobby an.
+ * 
+ * @returns bei erfolgreichem Fetch die response als json.
+ */
 async function leaveLobby(): Promise<boolean> {
     lobbySubscription.unsubscribe()
     lobbyChatSubscription.unsubscribe()
@@ -322,8 +336,11 @@ async function leaveLobby(): Promise<boolean> {
     });
 }
 
-
-
+/**
+ * Fragt im Backend per fetch das erstellen einer neuen Lobby an.
+ * 
+ * @returns bei erfolgreichem Fetch die LobbyID der im Backend neu erstellten Lobby
+ */
 async function neueLobby() {
     console.log("Fetch auf: /api/lobby/neu")
     return fetch('/api/lobby/neu', {
@@ -346,6 +363,11 @@ async function neueLobby() {
         });
 }
 
+/**
+ * updated das reaktive alleLobbiesState.
+ * 
+ * @returns eine Liste der lobbys
+ */
 async function alleLobbiesladen() {
     const lobbyliste = new Array<Lobby>();
     console.log("Fetch auf: /api/lobby/alle")
@@ -375,6 +397,11 @@ async function alleLobbiesladen() {
         });
 }
 
+/**
+ * Fragt im Backend per fetch das Ändern des spielerlimits für die Lobby aus dem aktuellen lobbystate an.
+ * 
+ * @param neuesLimit 
+ */
 function changeLimit(neuesLimit){
     console.log('change limit:', neuesLimit);
     fetch('/api/lobby/'+ lobbystate.lobbyID + '/spielerlimit', {
@@ -399,6 +426,11 @@ function changeLimit(neuesLimit){
     });
 }
 
+/**
+ * Fragt im Backend per fetch das Ändern der istPrivat Variable für die Lobby aus dem aktuellen lobbystate an.
+ * 
+ * @param istPrivat 
+ */
 function changePrivacy(istPrivat){
     console.log('change privacy:', istPrivat);
     fetch('/api/lobby/'+ lobbystate.lobbyID + '/privacy', {
@@ -420,8 +452,14 @@ function changePrivacy(istPrivat){
         console.log(json);
     }).catch((e) => {
         console.log(e);
-    });}
+    });
+}
 
+/**
+ * Fragt im Backend per fetch das Ändern des Host für die Lobby aus dem aktuellen lobbystate an.
+ * 
+ * @param neuerHost 
+ */
 function changeHost(neuerHost){
     console.log('change host:', neuerHost);
     fetch('/api/lobby/'+ lobbystate.lobbyID + '/host', {
@@ -443,8 +481,14 @@ function changeHost(neuerHost){
         console.log(json);
     }).catch((e) => {
         console.log(e);
-    });}
+    });
+}
 
+/**
+ * stellt mit dem returnobjekt gewisse objekte und functionen für die Views und Componenten zur Verfügung
+ * 
+ * @returns Return-Objekt mit den zur verfügung zu stellenden Objekten.
+ */
 export function useLobbyStore() {
     // auch hier könnten ref() und reactive() Objekte
     // angelegt werden, die dann nicht ueber mehrere
