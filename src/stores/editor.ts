@@ -1,4 +1,5 @@
 import { computed, reactive } from 'vue'
+import { Karte } from '@/components/EditorKomponenten/Karte';
 
 /**
  * State des Editors
@@ -8,12 +9,17 @@ import { computed, reactive } from 'vue'
  * start = wenn Start platziert true
  * ziel = wenn Ziel platziert ture
  */
+
+const karte = new Karte();
+
 const state = reactive({
+    grid: karte,
     wegbeschreibung: 0,
     aktiv: false,
     info: '',
     start: false,
-    ziel: false
+    ziel: false,
+    ausrichtung: 0
 })
 
 /**
@@ -35,6 +41,12 @@ const getters = reactive({
     getZiel: computed(() => {
         return state.ziel;
     }),
+    getAusrichtung: computed(() => {
+        return state.ausrichtung;
+    }),
+    getGrid: computed(() => {
+        return karte;
+    })
 })
 
 /**
@@ -107,6 +119,9 @@ const actions = {
     },
     async ziel(gesetzt: boolean) {
         state.ziel = gesetzt
+    },
+    async ausrichten(richtung: number) {
+        state.ausrichtung = richtung
     }
 
 }

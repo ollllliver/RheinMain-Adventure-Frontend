@@ -10,6 +10,14 @@
     <button class="btn btn-outline-secondary" :class="ziel" @click="waehle($event,ziel)"> Z </button>
     <button class="btn btn-outline-secondary" v-for="raum in raeume" :key="raum.id" draggable="true" 
     @dragstart="startDrag($event, raum)" @click="setzeInfo(raum)"> R{{raum.title}} </button>
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        <label class="btn">
+            <input type="radio" name="options" autocomplete="off" checked @click="ausrichten(0)"> horizontal
+        </label>
+        <label class="btn">
+            <input type="radio" name="options" autocomplete="off" @click="ausrichten(1)"> vertikal
+        </label>
+    </div>
 
 </template>
 
@@ -49,24 +57,40 @@ export default defineComponent({
 
         // bei drag (Drag-and-Drop) Baustein kopieren und platzierbar machen
         const startDrag = (event: any, item: any) => {
-            console.log(item)
+            //console.log(item)
             event.dataTransfer.dropEffect = 'move'
             event.dataTransfer.effectAllowed = 'copy'
             event.dataTransfer.setData('itemID',item.id)
             editorStore.setze(9) 
         }
 
-        // element waehlen das platziert werden soll (W = 0, S = 1, Z = 2)
+        // Element waehlen das platziert werden soll (W = 0, S = 1, Z = 2)
         const waehle = (event: any, item: any) => {
             editorStore.setze(item)
         }
 
+        // Infobox füllen
         const setzeInfo = (item: any) => {
             editorStore.info(item.rauminfo)
         }
 
+        // Ausrichtung des Raums bestimmen
+        const ausrichten = (richtung: number) => {
+            editorStore.ausrichten(richtung)
+            switch (richtung) {
+                case 0:{
+                    editorStore.info("Räume werden jetzt horizontal platziert")
+                    break;
+                }
+                case 1: {
+                    editorStore.info("Räume werden jetzt vertikal platziert")
+                    break;
+                }
+            }
+        }
+
         return {
-                raeume, startDrag, waehle, setzeInfo, weg, start, ziel
+                raeume, startDrag, waehle, setzeInfo, ausrichten, weg, start, ziel
         }
     },
     
@@ -77,5 +101,9 @@ export default defineComponent({
         margin: 10px;
         width: 40px;
         height: 30px;
+    }
+    .räume {
+        border: 1px dotted black;
+        padding-right: 13px;
     }
 </style>

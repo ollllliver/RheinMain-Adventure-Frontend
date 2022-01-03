@@ -6,7 +6,7 @@
     -->
 
     <div>
-        <button class="btn btn-outline-secondary">
+        <button class="btn btn-outline-secondary " @click="zurPruefung()">
             zur Prüfung einreichen
         </button>
         <button class="btn btn-outline-secondary" >
@@ -33,6 +33,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import {CommandStack} from '../../commands/CommandManager'
+import editorStore from "@/stores/editor";
 //import {ConcreteCommandTest} from '../../commands/Command'
 
 export default defineComponent({
@@ -49,10 +50,15 @@ export default defineComponent({
         redo() {
             CommandStack.getInstance().redo();
             // console.log(CommandStack.getInstance().toString())
-        }
+        },
+
     },
     setup() {
+        const zurPruefung = () => {
+            console.log(editorStore.getters.getGrid)
+        }
         return {
+            zurPruefung
         }
     }
 

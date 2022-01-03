@@ -6,6 +6,7 @@ import editorStore from '@/stores/editor'
  interface ICommand {
     execute(): any; //Befehl ausführen
     undo(): any; //Befehl rückgängig machen
+    //redo(): any; //Befehl wiederholen
     describe(): string;
 }
 
@@ -58,8 +59,6 @@ class CommandStack{
             editorStore.info(cmd.describe() + " rückgängig gemacht.")
             console.log(cmd.describe() + " rückgängig gemacht.");
         } else {
-            //vielleicht Exception werfen
-            console.log("Hier gibts nichts rückgängig zu machen  ¯\\_(ツ)_/¯");
             editorStore.info("Hier gibts nichts rückgängig zu machen  ¯\\_(ツ)_/¯")
         }
     }
@@ -68,16 +67,15 @@ class CommandStack{
      * Wiederholen des zuletzt rückgängig gemachten Befehls
      */
     redo = () => {
+        
         if (this.index < this.stack.length) {
             const cmd: ICommand = this.stack[this.index];
+            cmd.describe();
             cmd.execute();
-
             editorStore.info(cmd.describe() + " wiederhergestellt.")
             console.log(cmd.describe() + " wiederhergestellt.");
             this.index++;
         } else {
-            console.log("Nichts zu wiederholen  ¯\\_(ツ)_/¯");
-
             editorStore.info("Hier gibts nichts zu wiederholen  ¯\\_(ツ)_/¯")
         }
     }
@@ -100,6 +98,10 @@ class CommandStack{
             res += "\t" + cmd.describe() + "\n";
         });
         return res;
+    }
+
+    getStack = () => {
+        return this.stack
     }
       
 }
