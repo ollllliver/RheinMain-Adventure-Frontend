@@ -27,19 +27,19 @@ import { useLobbyStore } from "@/services/LobbyStore";
 import router from "@/router";
 
 export default defineComponent({
-  name: "LobbyView",
+  name: "LobbyuebersichtView",
   components: {},
   
   setup() {
-    const { neueLobby, alleLobbiesladen, alleLobbiesState,joinRandomLobby } = useLobbyStore();
+    const { neueLobby, alleLobbiesladen, alleLobbiesState,joinRandomLobby, connectToUebersicht } = useLobbyStore();
 
     onMounted(async () => {
+      connectToUebersicht();
       await alleLobbiesladen();
     });
 
     async function create() {
       const neueLobbyID = await neueLobby();
-      console.log("neueLobbyID", neueLobbyID);
       router.push("/lobby/" + neueLobbyID);
     }
 
