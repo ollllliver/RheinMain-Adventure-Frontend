@@ -9,14 +9,17 @@ import { defineComponent, onMounted } from "vue";
 import { Loader } from './models/Loader';
 import { MyMouseControls } from '@/components/models/MyMouseControls';
 import { MyKeyboardControls } from '@/components/models/MyKeyboardControls';
+//import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 
 
 export default defineComponent({
   name: "RenderDemo",
   setup() {
 
+
     let container: any;
     let camera: any;
+    let cameraCollidable: any;
     let scene: any;
     let renderer: any;
     let meshPlane: any;
@@ -29,6 +32,10 @@ export default defineComponent({
     let moveRight = false;
     let moveUp = false;
     let moveDown = false;
+    let collidableList: Array<any> = [];
+    let developer = true;
+    let developerCamera: any;
+    let controls: any;
 
     let mouseControls: MyMouseControls;
     let keyControls: MyKeyboardControls;
@@ -65,10 +72,10 @@ export default defineComponent({
     const initScene = () => {
       scene = new Three.Scene();
 
-      var ambientLight = new Three.AmbientLight( 0xcccccc );
+      let ambientLight = new Three.AmbientLight( 0xcccccc );
       scene.add( ambientLight );
               
-      var directionalLight = new Three.DirectionalLight( 0xffffff );
+      let directionalLight = new Three.DirectionalLight( 0xffffff );
       directionalLight.position.set( 0, 1, 1 ).normalize();
       scene.add( directionalLight );	
     };
@@ -79,7 +86,7 @@ export default defineComponent({
     const initLoader = () => {
       loader = new Loader();
       console.log(loader)
-      loader.ladeDatei('/assets/blender/example.gltf')
+      loader.ladeDatei('/assets/blender/room.gltf')
       .then((res:any) => {
         // TODO: 
         // Kamera, Steuerung und scene.position der gltf.scene zuweisen (Hier oder in Loader Klasse?)
@@ -92,18 +99,52 @@ export default defineComponent({
         // vielleicht extra Methode konfiguriere in Loader Klasse und dann hier loader.konfiguere(res.scene)
         console.log(res)
         scene.add(res.scene)
+        // TODO: Mehrere Dateien handlen koennen fuer Collision Detection
+        collidableList.push(res.scene)
       })
     };
 
     const initCamera = () => {
+
+      
+
+      // First Person View inset (camera)
       camera = new Three.PerspectiveCamera(50,window.innerWidth / window.innerHeight,0.1,window.innerHeight);
-      camera.position.set(0, player.height, -5);
-      camera.lookAt(new Three.Vector3(0, player.height, 0));
+      //camera.position.set(0, player.height, -5);
+      camera.position.set(-2, player.height*3, -5);
+      camera.lookAt(new Three.Vector3(-2, player.height*3, 0));
+
+      // Developer Kamera Main (camera2)
+      if (developer){
+        developerCamera = new Three.PerspectiveCamera(30,window.innerWidth / window.innerHeight,0.1,window.innerHeight);
+        developerCamera.position.set(-50, 50, -50);
+        developerCamera.lookAt(new Three.Vector3(0, player.height, 0));
+
+        // Axes Helper (x,y,z)
+        const axesHelper = new Three.AxesHelper(30);
+        scene.add(axesHelper)
+        
+      }
+      
+
+      
+
+      // Kamera Collision objekt init
+      
+      let cubeGeometry = new Three.BoxGeometry(1,1,1);
+      let wireMaterial = new Three.MeshBasicMaterial( {color: 0xff0000, wireframe: true});
+      cameraCollidable = new Three.Mesh(cubeGeometry, wireMaterial);
+      // TODO: lookAt implementieren damit Cube selbe Ausrichtung hat ?
+      // collidable Position auf halbe hoehe der Kamera setzen damit nicht ueber Sachen schweben (noch verbesserbar)
+      cameraCollidable.position.set(0, player.height/2, 0);
+      cameraCollidable.lookAt(new Three.Vector3(0, player.height, 0))
+      
+
     };
 
     const initControls = () => {
       mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
-      keyControls = new MyKeyboardControls(document); //init Keyboardsteuerung
+      keyControls = new MyKeyboardControls(collidableList, cameraCollidable, document); //init Keyboardsteuerung
 
       window.addEventListener( 'click', function () { mouseControls.lock(); } ); //locked die Maus
     }
@@ -134,9 +175,26 @@ export default defineComponent({
     }
 
     const initRenderer = () => {
+
+      
+      
+      
+
+      // main scene (oben ansicht)
       renderer = new Three.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
+      renderer.setViewport(0,0,window.innerWidth,window.innerHeight);
       container.appendChild(renderer.domElement);
+
+      // Fuer automatische Verfolgung des Blocks im Level in Developersicht, funktioniert noch nicht ganz
+      // (auskommentierter Code auch in doAnimate controls.target...)
+      // controls = new OrbitControls(developerCamera, renderer.domElement);
+      // controls.minDistance = 50;
+      // controls.maxDistance = 300;
+
+      
+        
+      
     };
 
     const doAnimate = () => {
@@ -160,10 +218,48 @@ export default defineComponent({
 
       
       mouseControls.update(velocity, delta); //Maus Steuerung
-      keyControls.update(velocity, delta) //Tastatur Steuerung
+      keyControls.update(camera, velocity, delta) //Tastatur Steuerung
 			prevTime = time;
 
-			renderer.render( scene, camera );
+      // developer sicht
+      if (developer){
+        // Developer Kamera (Uebersicht)
+        renderer.setClearColor( 0x000000, 0 );
+        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+        renderer.render( scene, developerCamera );
+        scene.add(cameraCollidable);
+
+        // Blick helper (muellt alles voll, performancekiller nach kurzer zeit weil tausende pfeile)
+        // const blickRichtung = new Three.Vector3(0,0,-1).applyQuaternion(camera.quaternion)//.add(camera.position)
+        // const origin = camera.position;
+        // const length = 1;
+        // const hex = 0xffff00;
+        // const arrowHelper = new Three.ArrowHelper( blickRichtung, origin, 100, hex );
+        // scene.add( arrowHelper );        
+
+
+        // BoxHelper (geladene Objekte, erstmal nur IntroLevel)
+        const boxHelper = new Three.BoxHelper(collidableList[0], new Three.MeshBasicMaterial( 0xff0000 ))
+        scene.add(boxHelper)
+
+        // Hauptkamera (POV)
+        renderer.clearDepth();
+        renderer.setScissorTest(true);
+        renderer.setScissor(30, 30, window.innerWidth/4, window.innerHeight/4);
+        renderer.setViewport(30, 30, window.innerWidth/4, window.innerHeight/4);
+        renderer.setClearColor( 0x222222, 1 );
+
+
+        //controls.target.copy(camera.position);
+      
+        renderer.render(scene, camera);
+
+        renderer.setScissorTest(false);
+      }else{ // standard pov sicht
+        renderer.render( scene, camera );
+      }
+
+      
      
     };
 
