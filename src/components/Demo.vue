@@ -134,8 +134,6 @@ export default defineComponent({
       let cubeGeometry = new Three.BoxGeometry(1,1,1);
       let wireMaterial = new Three.MeshBasicMaterial( {color: 0xff0000, wireframe: true});
       cameraCollidable = new Three.Mesh(cubeGeometry, wireMaterial);
-      // TODO: lookAt implementieren damit Cube selbe Ausrichtung hat ?
-      // collidable Position auf halbe hoehe der Kamera setzen damit nicht ueber Sachen schweben (noch verbesserbar)
       cameraCollidable.position.set(0, player.height/2, 0);
       cameraCollidable.lookAt(new Three.Vector3(0, player.height, 0))
       
@@ -227,16 +225,7 @@ export default defineComponent({
         renderer.setClearColor( 0x000000, 0 );
         renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.render( scene, developerCamera );
-        scene.add(cameraCollidable);
-
-        // Blick helper (muellt alles voll, performancekiller nach kurzer zeit weil tausende pfeile)
-        // const blickRichtung = new Three.Vector3(0,0,-1).applyQuaternion(camera.quaternion)//.add(camera.position)
-        // const origin = camera.position;
-        // const length = 1;
-        // const hex = 0xffff00;
-        // const arrowHelper = new Three.ArrowHelper( blickRichtung, origin, 100, hex );
-        // scene.add( arrowHelper );        
-
+        scene.add(cameraCollidable);     
 
         // BoxHelper (geladene Objekte, erstmal nur IntroLevel)
         const boxHelper = new Three.BoxHelper(collidableList[0], new Three.MeshBasicMaterial( 0xff0000 ))
@@ -248,7 +237,6 @@ export default defineComponent({
         renderer.setScissor(30, 30, window.innerWidth/4, window.innerHeight/4);
         renderer.setViewport(30, 30, window.innerWidth/4, window.innerHeight/4);
         renderer.setClearColor( 0x222222, 1 );
-
 
         //controls.target.copy(camera.position);
       
