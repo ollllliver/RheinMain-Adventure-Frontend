@@ -6,15 +6,14 @@
     <h3 class="row">istGestartet: {{ lobbystate.istGestartet }}</h3>
     <h3 class="row">private Lobby: {{ lobbystate.istPrivat }}</h3>
     <h3 class="row">host: {{ lobbystate.host }}</h3>
-    <button class="row btn btn-primary" v-on:click="starten">
-      SPIEL STARTEN
-    </button>
-    <h1 class="row">{{ timer.time }}</h1>
+    <button id="start" class="row btn btn-primary" v-on:click="starten" onClick=disabled>SPIEL STARTEN</button>
+    <h1>{{ timer.time }}</h1>
+    <audio autoplay id="ticking"><source src="../../assets/sounds/ticking.mp3" type="audio/mpeg"></audio>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive } from "vue";
+import { defineComponent, onMounted, reactive } from "vue";
 import { useLobbyStore } from "@/services/LobbyStore";
 import router from "@/router";
 export default defineComponent({
@@ -29,8 +28,8 @@ export default defineComponent({
     async function starten() {
       starteLobby()
         .then((response) => {
-          starteTimer();
           console.log(response);
+          starteTimer();
         })
         .catch((err) => {
           console.log(err);
@@ -58,3 +57,7 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+
+</style>
