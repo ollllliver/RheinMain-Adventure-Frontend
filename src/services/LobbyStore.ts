@@ -50,7 +50,7 @@ const alleLobbiesState = reactive({
  *              Scheinbar muss die in callb mitgegebene Function aber keinen Parameter erwarten.
  *              Nicht gerade so, wie man es von typescript kennt. Klingt mehr nach javascript. aber gut...
  */
-async function connectToStomp(callb, param){
+async function connectToStomp(callb, param) {
     // stompclient.onWebSocketError = () => { /* WS-Fehler */ }
     // stompclient.onStompError = () => { /* STOMP-Fehler */ }
     // stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
@@ -65,11 +65,11 @@ async function connectToStomp(callb, param){
 /**
  * connectToUebersicht subscribt sich mit zu Not selbst connectetem Stompclient mit der Function subscribeToUebersicht()
  */
-function connectToUebersicht(){
-    if(!stompclient.connected){
+function connectToUebersicht() {
+    if (!stompclient.connected) {
         connectToStomp(subscribeToUebersicht, null);
     }
-    else{
+    else {
         console.log(subscribeToUebersicht.name + "()");
         subscribeToUebersicht();
     }
@@ -78,7 +78,7 @@ function connectToUebersicht(){
 /**
  * subscribeToUebersicht schreibt sich für die nötigen topics die Lobbyübersicht per stompclient ein.
  */
- function subscribeToUebersicht() {
+function subscribeToUebersicht() {
     const DEST_UEB = "/topic/lobby/uebersicht";
     uebersichtSubscription = stompclient.subscribe(DEST_UEB, (message) => {
         empfangeLobbyMessageUebersicht(JSON.parse(message.body) as LobbyMessage);
@@ -92,7 +92,8 @@ function connectToUebersicht(){
  * Der Code kann auch unabhänig von der anderen Function verwendet werden.
  * 
  * @param lobby_id 
- * @returns die LobbyMessage, des fetchens auf join. Bei Misserfolg, steht in der Lobbymessage das istFehler Flag auf true.
+ * @returns den Nachrichtencode der LobbyMessage, des fetchens auf join.
+ * Bei Misserfolg, steht in der Lobbymessage das istFehler Flag auf true.
  */
 async function tryJoin(lobby_id: string) {
     console.log("Fetch auf: /api/lobby/join/" + lobby_id);
@@ -120,7 +121,7 @@ async function tryJoin(lobby_id: string) {
         .catch((e) => {
             console.log(e);
         });
-    }
+}
 
 
 /**
@@ -134,7 +135,7 @@ async function tryJoin(lobby_id: string) {
  */
 async function connectToLobby(lobby_id: string) {
     // erst versuchen, zu joinen
-    
+
     tryJoin(lobby_id).then((res) => {
         switch (res) {
             case NachrichtenCode.LOBBY_VOLL:
@@ -146,16 +147,20 @@ async function connectToLobby(lobby_id: string) {
                 alleLobbiesState.errormessage = "Es ist leider etwas schiefgelaufen.";
                 router.push("/uebersicht");
                 break;
-            
+            case NachrichtenCode.LOBBY_NICHT_GEFUNDEN:
+                alleLobbiesState.errormessage = "Wir haben die Lobby leider nicht mehr gefunden.";
+                router.push("/uebersicht");
+                break;
+
             case NachrichtenCode.SCHON_BEIGETRETEN:
             case NachrichtenCode.ERFOLGREICH_BEIGETRETEN:
                 lobbystate.darfBeitreten = true;
                 // Nach erfolgreichem joinen können wir die Ansicht wechseln und uns subscriben:
                 router.push("/lobby/" + lobby_id);
-                if(!stompclient.connected){
+                if (!stompclient.connected) {
                     connectToStomp(subscribeToLobby, lobby_id);
                 }
-                else{
+                else {
                     console.log('unsubscribe von uebersicht');
                     uebersichtSubscription.unsubscribe();
                     console.log(subscribeToLobby.name + "()");
@@ -168,7 +173,7 @@ async function connectToLobby(lobby_id: string) {
                 break;
 
             default:
-                alleLobbiesState.errormessage = "Fehler noch nicht abgefangen.\nBITTE BEI OLLI MELDEN!!!" + res;
+                alleLobbiesState.errormessage = "Fehler noch nicht abgefangen. BITTE TICKET zu Item #109 öffnen und OLLI zuweisen!!! FEHLERCODE:" + res;
                 router.push("/uebersicht");
                 break;
         }
@@ -180,7 +185,7 @@ async function connectToLobby(lobby_id: string) {
  * 
  * @param lobby_id ist die Lobby ID, für die sich eingeschrieben werden soll.
  */
-function subscribeToLobby(lobby_id: string){
+function subscribeToLobby(lobby_id: string) {
     const DEST = "/topic/lobby/" + lobby_id;
     const DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
     lobbySubscription = stompclient.subscribe(DEST, (message) => {
@@ -199,12 +204,12 @@ function subscribeToLobby(lobby_id: string){
  * @param lobbymessage empfangene Lobbymessage
  * @param lobby_id zugehörige Lobby ID
  */
-function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string){
+function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string) {
     console.log("message from broker:", lobbymessage);
-    if (lobbymessage.istFehler){
+    if (lobbymessage.istFehler) {
         lobbystate.errormessage = lobbymessage.typ;
     }
-    else{
+    else {
         updateLobby(lobby_id);
         lobbystate.errormessage = '';
     }
@@ -215,7 +220,7 @@ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string)
  * 
  * @param lobbymessage empfangene Lobbymessage
  */
-function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage){
+function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
     console.log("message from broker:", lobbymessage);
     // Es gibt keine errormessages, die über diesen Kanal geteilt werden.
     alleLobbiesladen();
@@ -315,10 +320,10 @@ async function joinRandomLobby() {
         return response.json();
     }).then((jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
-        if (lobbyMsg.istFehler){
+        if (lobbyMsg.istFehler) {
             alleLobbiesState.errormessage = "Keine passende Lobby gefunden. Erstell doch einfach selber eine.";
         }
-        else{
+        else {
             router.push("/lobby/" + lobbyMsg.payload);
         }
     })
@@ -463,9 +468,9 @@ async function alleLobbiesladen() {
  * 
  * @param neuesLimit 
  */
-function changeLimit(neuesLimit){
+function changeLimit(neuesLimit) {
     console.log('change limit:', neuesLimit);
-    fetch('/api/lobby/'+ lobbystate.lobbyID + '/spielerlimit', {
+    fetch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', {
         method: 'PATCH',
         // ,headers: {
         //     'Authorization': 'Bearer ' + loginstate.jwttoken
@@ -492,9 +497,9 @@ function changeLimit(neuesLimit){
  * 
  * @param istPrivat 
  */
-function changePrivacy(istPrivat){
+function changePrivacy(istPrivat) {
     console.log('change privacy:', istPrivat);
-    fetch('/api/lobby/'+ lobbystate.lobbyID + '/privacy', {
+    fetch('/api/lobby/' + lobbystate.lobbyID + '/privacy', {
         method: 'PATCH',
         // ,headers: {
         //     'Authorization': 'Bearer ' + loginstate.jwttoken
@@ -521,9 +526,9 @@ function changePrivacy(istPrivat){
  * 
  * @param neuerHost 
  */
-function changeHost(neuerHost){
+function changeHost(neuerHost) {
     console.log('change host:', neuerHost);
-    fetch('/api/lobby/'+ lobbystate.lobbyID + '/host', {
+    fetch('/api/lobby/' + lobbystate.lobbyID + '/host', {
         method: 'PATCH',
         // ,headers: {
         //     'Authorization': 'Bearer ' + loginstate.jwttoken
@@ -569,7 +574,7 @@ export function useLobbyStore() {
         neueLobby, joinRandomLobby, leaveLobby, starteLobby,
 
         // Funktionen zum ändern der Lobby Einstellungen:
-        einstellungsfunktionen: {changeLimit, changePrivacy, changeHost},
+        einstellungsfunktionen: { changeLimit, changePrivacy, changeHost },
 
         // Chat Funktionen:
         sendeChatNachricht, empfangeChatNachricht,
