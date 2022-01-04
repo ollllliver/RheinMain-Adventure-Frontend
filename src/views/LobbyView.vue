@@ -33,7 +33,7 @@
 </template>
 
 <script lang="ts">
-import { computed, defineComponent, onMounted} from "vue";
+import { defineComponent, onMounted} from "vue";
 import { useLobbyStore } from "@/services/LobbyStore";
 import InviteCopy from "@/components/lobby/InviteCopy.vue";
 import Chat from "@/components/lobby/Chat.vue";
@@ -44,7 +44,7 @@ export default defineComponent({
   name: "Lobby",
   components: { InviteCopy, Chat, Einstellungen, Teilnehmerliste },
   props: {
-    lobby_id: { type: String, reqired: true },
+    lobby_id: { type: String, required: true },
   },
   setup(props) {
     const { lobbystate, connectToLobby, leaveLobby, sendeChatNachricht, empfangeChatNachricht} = useLobbyStore();

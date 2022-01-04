@@ -6,7 +6,7 @@
 <script lang="ts">
 import * as Three from "three";
 import { defineComponent, onMounted } from "vue";
-import { Loader } from './models/Loader';
+import { GraphicLoader } from './models/GraphicLoader';
 import { MyMouseControls } from '@/components/models/MyMouseControls';
 import { MyKeyboardControls } from '@/components/models/MyKeyboardControls';
 
@@ -22,7 +22,7 @@ export default defineComponent({
     let meshPlane: any;
     let meshCube: any;
     let raycaster: any;
-    let loader: Loader;
+    let loader: GraphicLoader;
     let moveForward = false;
     let moveBackward = false;
     let moveLeft = false;
@@ -77,7 +77,7 @@ export default defineComponent({
      * Initialisiert Loader Klasse
      */
     const initLoader = () => {
-      loader = new Loader();
+      loader = new GraphicLoader();
       console.log(loader)
       loader.ladeDatei('/assets/blender/room.gltf')
       .then((res:any) => {

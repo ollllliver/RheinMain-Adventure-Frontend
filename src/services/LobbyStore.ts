@@ -9,7 +9,7 @@ import { NachrichtenTyp } from './NachrichtenTyp';
 import { ChatNachricht } from './ChatNachricht';
 
 const wsurl = `ws://localhost:8080/messagebroker`;
-const stompclient = new Client({ brokerURL: wsurl })
+const stompclient = new Client({ brokerURL: wsurl });
 
 // verwendete StompSubscriptions:
 let lobbySubscription: StompSubscription;
@@ -56,7 +56,7 @@ async function connectToStomp(callb, param) {
     // stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
-        callb(param);
+        callb(param)
         console.log(callb.name + "()");
     };
     stompclient.activate();
@@ -116,13 +116,18 @@ async function tryJoin(lobby_id: string) {
         } else {
             return lobbymessage.typ;
         }
-
-    })
-        .catch((e) => {
-            console.log(e);
-        });
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
+/*
+function checkCountdown(lobbymessage: LobbyMessage) {
+    if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET) {
+        lobbystate.countdownGestartet = true;
+    }
+}
+*/
 
 /**
  * Versucht, der mitgegebenen Lobby zu joinen und subscribt sich bei Erfolg
@@ -298,11 +303,9 @@ async function updateLobby(lobby_id: string) {
         lobbystate.host = jsondata.host;
         lobbystate.istPrivat = jsondata.istPrivat;
 
-    })
-        .catch((e) => {
-            console.log(e);
-        });
-
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 async function joinRandomLobby() {
@@ -346,7 +349,7 @@ async function starteLobby() {
             return;
         }
         return response.json();
-    }).then((jsondata) => {
+    }).then(async (jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
         console.log(lobbyMsg);
         return lobbyMsg.payload;
@@ -423,10 +426,9 @@ async function neueLobby() {
         console.log(jsondata)
         router.push("/lobby/" + jsondata.lobbyID);
         return jsondata.lobbyID
-    })
-        .catch((e) => {
-            console.log(e);
-        });
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 /**
@@ -457,10 +459,9 @@ async function alleLobbiesladen() {
         alleLobbiesState.lobbies = lobbyliste;
 
         return lobbyliste
-    })
-        .catch((e) => {
-            console.log(e);
-        });
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 /**
