@@ -12,7 +12,7 @@ export class Karte {
         for(let i = 0; i < 14; i++) {
             this._liste[i] = [];
             for(let j = 0; j< 22; j++) {
-                this._liste[i][j] = {y:i, x:j, e:0};
+                this._liste[i][j] = {y:i, x:j, e:0, a:9};
             }
         }
     }
@@ -23,8 +23,12 @@ export class Karte {
     }
 
     // setzt übergebenes Element an übergebener Position in der Liste
-    public setElement(positionY: number, positionX: number, element: number) {
-        this._liste[positionY][positionX] = {y: positionY, x: positionX, e: element}
+    public setElement(positionY: number, positionX: number, element: number, ausrichtung?: number) {
+        if(ausrichtung !== undefined) {
+            this._liste[positionY][positionX] = {y: positionY, x: positionX, e: element, a: ausrichtung}
+        } else {
+            this._liste[positionY][positionX] = {y: positionY, x: positionX, e: element}
+        }
         return true;
     }
 }

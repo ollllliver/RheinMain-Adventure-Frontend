@@ -4,12 +4,7 @@
         klickbare divs für Wegeinzeichnung und Start/Ziel Platzierung + drag-and-drop der Bausteine
     -->
 
-  <div
-    class="drop-zone"
-    @drop="onDrop($event)"
-    @dragenter.prevent
-    @dragover.prevent
-  >
+  <div class="drop-zone" @drop="onDrop($event)" @dragenter.prevent @dragover.prevent>
     <div v-for="row in liste" :key="row.value" class="reihe" draggable="false">
       <div
         v-for="col in row"
@@ -24,8 +19,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, onUpdated, ref } from "vue";
-import { Karte } from "./Karte";
+import { defineComponent, onMounted } from "vue";
 import { CommandStack } from "../../commands/CommandManager";
 import { ElementHinzufuegen } from "../../commands/Command";
 import editorStore from "@/stores/editor";
@@ -33,8 +27,8 @@ import editorStore from "@/stores/editor";
 export default defineComponent({
   name: "Editorfenster",
   setup() {
-    // Kartenklasse mit liste als Array
-    let karte = editorStore.getters.getGrid
+    // Kartenklasse mit liste als Array aus editorStore
+    var karte = editorStore.getters.getGrid
     const liste = karte.liste
 
     /**
@@ -44,9 +38,9 @@ export default defineComponent({
      */
     const onDrop = (event: any) => {
         const itemID = parseInt(event.dataTransfer.getData("itemID"));
-            // Wenn gültiger Bereich (Raum passt auf Karte und überschneidet nicht mit anderen Elementen)
+        // wenn horizontaler Raum   
         if (editorStore.getters.getAusrichtung === 0) {
-            console.log("horzizontal")
+            // Wenn gültiger Bereich (Raum passt auf Karte und überschneidet nicht mit anderen Elementen)
             if (event.target.__vnode.key.y - 1 >= 0 &&
             event.target.__vnode.key.x - 1 >= 0 && event.target.__vnode.key.x + 1 < 22) {
                 if(liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 0 &&
@@ -55,15 +49,15 @@ export default defineComponent({
                 liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x].e === 0 && 
                 liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x + 1].e === 0 &&
                 liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x - 1].e === 0) {
-                    CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event));
+                    CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event, editorStore.getters.getAusrichtung));
                     editorStore.setze(0);
                     return;
                 }
             } 
            editorStore.info("Raum passt nicht auf diese Position. Ein horizontaler Raum besteht 2 x 3 Felder. Bitte wähle einen passenden Ort aus.");
-
-        } else {
-            console.log("vertikal")
+        // wenn vertikaler Raum
+        } else if (editorStore.getters.getAusrichtung === 1){
+            // Wenn gültiger Bereich (Raum passt auf Karte und überschneidet nicht mit anderen Elementen)
             if (event.target.__vnode.key.y - 1 >= 0 &&  event.target.__vnode.key.y + 1 < 14 &&
             event.target.__vnode.key.x - 1 >= 0) {
                 if(liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 0 &&
@@ -72,7 +66,7 @@ export default defineComponent({
                 liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x].e === 0 && 
                 liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x - 1].e === 0 &&
                 liste[event.target.__vnode.key.y + 1][event.target.__vnode.key.x - 1].e === 0) {
-                    CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event));
+                    CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event, editorStore.getters.getAusrichtung));
                     editorStore.setze(0);
                     return;
                 }

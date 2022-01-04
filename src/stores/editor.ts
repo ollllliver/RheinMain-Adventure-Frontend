@@ -8,17 +8,19 @@ import { Karte } from '@/components/EditorKomponenten/Karte';
  * info = Text für das Infofenster
  * start = wenn Start platziert true
  * ziel = wenn Ziel platziert ture
+ * raeume = Anzahhl platzierter Räume
+ * ausrichtung = Raumausrichtung der aktuellen Platzierung
  */
-
+const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
+const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. R1-R5 sind platzierbare Räume. Standardausrichtung ist horizontal."
 const karte = new Karte();
-
 const state = reactive({
-    grid: karte,
     wegbeschreibung: 0,
     aktiv: false,
-    info: '',
+    info: willkommen,
     start: false,
     ziel: false,
+    raeume: 0,
     ausrichtung: 0
 })
 
@@ -44,8 +46,11 @@ const getters = reactive({
     getAusrichtung: computed(() => {
         return state.ausrichtung;
     }),
+    getRaeume: computed(()=> {
+        return state.raeume
+    }),
     getGrid: computed(() => {
-        return karte;
+        return karte
     })
 })
 
@@ -69,7 +74,7 @@ const actions = {
                     if (state.aktiv) {
                         state.wegbeschreibung = 0
                         state.aktiv = false
-                        state.info = ""
+                        state.info = waehlen
                     }
                 } else {
                     state.wegbeschreibung = wb
@@ -83,7 +88,7 @@ const actions = {
                     if (state.aktiv) {
                         state.wegbeschreibung = 0
                         state.aktiv = false
-                        state.info = ""
+                        state.info = waehlen
                     }
                 } else {
                     state.wegbeschreibung = wb
@@ -97,7 +102,7 @@ const actions = {
                     if (state.aktiv) {
                         state.wegbeschreibung = 0
                         state.aktiv = false
-                        state.info = ""
+                        state.info = waehlen
                     }
                 } else {
                     state.wegbeschreibung = wb
@@ -122,6 +127,9 @@ const actions = {
     },
     async ausrichten(richtung: number) {
         state.ausrichtung = richtung
+    },
+    async setzeRaum(gesetzt: number) {
+        state.raeume += gesetzt
     }
 
 }

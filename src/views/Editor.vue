@@ -33,7 +33,7 @@
 
       <!-- Info Fenster -->
       <div class="col col-lg-2" id="infofenster">
-        {{editorStore.getters.getInfo}}
+        <p class="infotext">{{editorStore.getters.getInfo}}</p>
       </div>
 
     </div>
@@ -101,6 +101,11 @@ export default defineComponent({
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  
+  .infotext {
+    font-weight: 300;
+    color: black;
   }
 
 </style>

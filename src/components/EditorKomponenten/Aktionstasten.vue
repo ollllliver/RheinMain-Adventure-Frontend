@@ -15,7 +15,7 @@
         <button class="btn btn-outline-secondary" >
             abbrechen
         </button>
-        <button class="btn btn-outline-secondary" >
+        <button class="btn btn-outline-secondary">
             alles entfernen
         </button>
         <button class="btn btn-outline-secondary" >
@@ -39,23 +39,33 @@ import editorStore from "@/stores/editor";
 export default defineComponent({
     name: "Aktionstasten",
     methods: {
-        doSomething() {
-            // CommandStack.getInstance().execAndPush(new ConcreteCommandTest(this.wand))
-            // console.log(CommandStack.getInstance().toString())
-        },
         undo() {
+            // letzten Befehl vom Stack rückgängig machen
             CommandStack.getInstance().undo();
-            // console.log(CommandStack.getInstance().toString())
         },
         redo() {
+            // letzten Befehl vom Stack wiederherstellen
             CommandStack.getInstance().redo();
-            // console.log(CommandStack.getInstance().toString())
         },
 
     },
     setup() {
+        // Karte nach Prüfung ob Start/Ziel und Raum platziert wurde loggen (vorerst)
         const zurPruefung = () => {
-            console.log(editorStore.getters.getGrid)
+            if(editorStore.getters.getZiel === true) {
+                if(editorStore.getters.getStart === true) {
+                    if(editorStore.getters.getRaeume > 0) {
+                        editorStore.info('Karte wird eingereicht. Raumanzahl: '+ editorStore.getters.getRaeume)
+                        console.log(editorStore.getters.getGrid)
+                    } else {
+                        editorStore.info('Jede Karte benötigt mindestens 1 Raum. Bitte platziere erst einen Raum bevor du die Karte zur Prüfung einreichst.')
+                    }
+                } else {
+                    editorStore.info('Jede Karte benötigt einen Startpunkt. Bitte markiere einen Startpunkt.')
+                }
+            } else {
+                editorStore.info('Jede Karte benötigt einen Zielpunkt. Bitte platziere einen Zielpunkt.')
+            }
         }
         return {
             zurPruefung
@@ -66,7 +76,10 @@ export default defineComponent({
 </script>
 
 <style scoped>
-    button{
+    button {
       width: 100%;
+      font-size: 15px;
+      font-weight: 400;
+      color:black;
     }
 </style>
