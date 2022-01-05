@@ -25,6 +25,12 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Join.vue')
   },
   {
+    path: '/editoruebersicht',
+    name: 'Editoruebersicht',
+    component: () => import('../views/Editoruebersicht.vue')
+  },
+
+  {
     path: '/editor',
     name: 'Editor',
     component: () => import('../views/Editor.vue')

@@ -14,10 +14,11 @@
      <button class="btn btn-default" @click="$router.push('create')">
       Create Lobby
     </button>
-    <!-- Wechsel zum "Editor"-Fenster -->
-    <button class="btn btn-default" @click="$router.push('editor')">
-      Level Editor
+    <!-- Wechsel zum "Editorübersicht"-Fenster -->
+    <button class="btn btn-default" @click="$router.push('editoruebersicht')">
+      Editorübersicht
     </button>
+
     <br>
     <!-- Logout Button - Wechsel zum "Home"-Fenster -->
     <button class="btn btn-danger" @click="userStore.logout()">
