@@ -21,7 +21,7 @@
     <div v-if="lobbystate.errormessage != ''" class="alert alert-danger" role="alert">
       {{lobbystate.errormessage}}
     </div>
-    <div class="row">
+    <div class="row" style="margin:1em;">
       <Einstellungen class="col border border-secondary rounded px-4 mx-3" />
       <div class="col">
         <div class="row">
