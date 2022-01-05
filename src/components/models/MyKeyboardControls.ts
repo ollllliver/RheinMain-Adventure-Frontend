@@ -1,4 +1,7 @@
 import { Euler, Vector3, EventDispatcher } from 'three';
+import { SpielerLokal } from './SpielerLokal';
+import { Camera } from "three/src/cameras/Camera";
+
 
 const direction = new Vector3();
 
@@ -18,7 +21,7 @@ export class MyKeyboardControls {
     update: (velocity: any, delta: number) => void;
     disconnect: () => void;
 
-    constructor(domElement: Document) {
+    constructor(camera: Camera, domElement: Document, spieler: SpielerLokal) {
 
         const velocity = new Vector3();
 
@@ -142,7 +145,6 @@ export class MyKeyboardControls {
                 velocity.x -= direction.x * speed * delta;
             if (this.moveUp || this.moveDown)
                 velocity.y -= direction.y * speed * delta;
-
         };
         connect();
     }

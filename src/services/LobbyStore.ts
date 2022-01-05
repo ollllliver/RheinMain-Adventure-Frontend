@@ -202,6 +202,12 @@ async function joinRandomLobby() {
 }
 
 async function starteLobby() {
+
+    //subscribed an den State vom allen Spielern
+    stompclient.subscribe("topic/updateTeilnehmer", (message) => {
+        console.log(message)
+    });
+
     console.log("Fetch auf: /api/lobby/{lobbyId}/start")
     return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
         method: 'POST',
@@ -244,6 +250,7 @@ function resetLobbyState(){
 async function leaveLobby(): Promise<boolean> {
     stompclient.unsubscribe("topic/lobby/" + lobbystate.lobbyID);
     stompclient.unsubscribe("topic/lobby/" + lobbystate.lobbyID + "/chat");
+    stompclient.unsubscribe("topic/update");
 
     console.log("Fetch auf: /leave/" + lobbystate.lobbyID  )
     router.push("/uebersicht");

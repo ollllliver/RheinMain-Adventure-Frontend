@@ -9,6 +9,7 @@ import { defineComponent, onMounted } from "vue";
 import { Loader } from './models/Loader';
 import { MyMouseControls } from '@/components/models/MyMouseControls';
 import { MyKeyboardControls } from '@/components/models/MyKeyboardControls';
+import { SpielerLokal } from '@/components/models/SpielerLokal';
 
 
 export default defineComponent({
@@ -33,16 +34,7 @@ export default defineComponent({
     let mouseControls: MyMouseControls;
     let keyControls: MyKeyboardControls;
 
-    let player = {
-      height: .5,
-      turnSpeed: .1,
-      speed: .1,
-      jumpHeight: .2,
-      gravity: .01,
-      velocity: 0,
-      jumps: false,
-      ducks: false,
-    };
+    let spieler: SpielerLokal
 
     let prevTime = performance.now();
 		let velocity = new Three.Vector3();
@@ -99,9 +91,12 @@ export default defineComponent({
      * Initialisiert Kamera
      */
     const initCamera = () => {
+
+      spieler = new SpielerLokal
       camera = new Three.PerspectiveCamera(50,window.innerWidth / window.innerHeight,0.1,window.innerHeight);
-      camera.position.set(0, player.height, -5);
-      camera.lookAt(new Three.Vector3(0, player.height, 0));
+      camera.position.set(0, spieler.height, -5);
+      camera.lookAt(new Three.Vector3(0, spieler.height, 0));
+  
     };
 
     /**
@@ -109,7 +104,7 @@ export default defineComponent({
      */
     const initControls = () => {
       mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
-      keyControls = new MyKeyboardControls(document); //init Keyboardsteuerung
+      keyControls = new MyKeyboardControls(camera, document, spieler); //init Keyboardsteuerung
 
       connect();
     }
@@ -165,8 +160,6 @@ export default defineComponent({
       // const time = performance.now();
       // const delta = ( time - prevTime ) / 1000;
       // keyControls.update()(delta);
-
-
       
       const time = performance.now();
       const delta=(time-prevTime)/1000;
@@ -179,6 +172,13 @@ export default defineComponent({
       mouseControls.update(velocity, delta); //Maus Steuerung
       keyControls.update(velocity, delta) //Tastatur Steuerung
 			prevTime = time;
+
+      //wohin damit?
+      spieler.position.x = camera.position.x;
+      spieler.position.y = camera.position.y;
+      spieler.position.z = camera.position.z;
+
+      spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
 
 			renderer.render( scene, camera );
      
