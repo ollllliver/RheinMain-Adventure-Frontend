@@ -1,8 +1,8 @@
 module.exports = {
     devServer: {
-        // Setzt voraus, dass Spring Backend auf localhost, Port 9090, laeuft.
+        // Setzt voraus, dass Spring Backend auf localhost, Port 8080, laeuft.
         // Von der Kommandozeile erreichbar mit: SERVER_PORT=8080 ./gradlew bootRun
-        // oder dauerhaft per Eintrag in applications.property: server.port=9090
+        // oder dauerhaft per Eintrag in applications.property: server.port=8080
 
         proxy: {
             '^/api': {

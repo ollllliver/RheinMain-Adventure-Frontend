@@ -6,8 +6,10 @@
             <div class="row">
             <div class="form-control">
                 <ul id="messageArea"></ul>
-                <input type="text" v-model="form.message" placeholder="Sag hallo...">
-                <button type="submit" class="primary">Senden</button>
+                <button type="submit" style="float: right">Senden</button>
+                <div style="overflow: hidden; padding-right: .5em;">
+                    <input type="text" style="width: 100%;" v-model="form.message" placeholder="Sag hallo...">
+                </div>
             </div>
             </div>
         </div>
@@ -43,7 +45,7 @@ export default defineComponent({
 
         function senden(nachricht:string){
             if(nachricht){
-                props.sendeNachricht(nachricht, userStore.state.benutzername)
+                props.sendeNachricht("CHAT", nachricht, userStore.state.benutzername)
             }
         }
 
