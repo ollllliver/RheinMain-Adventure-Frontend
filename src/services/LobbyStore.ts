@@ -1,6 +1,6 @@
 import { reactive, readonly } from 'vue'
 import { Lobby } from './Lobby'
-import { Benutzer } from './Benutzer'
+import { Spieler } from './Spieler'
 import { LobbyMessage } from './LobbyMessage'
 import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
@@ -21,8 +21,8 @@ let uebersichtSubscription: StompSubscription;
  */
 const lobbystate = reactive({
     lobbyID: "",
-    teilnehmerliste: Array<Benutzer>(),
-    host: {} as Benutzer,
+    teilnehmerliste: Array<Spieler>(),
+    host: {} as Spieler,
     istGestartet: false,
     istVoll: false,
     spielerlimit: 0,
@@ -365,8 +365,8 @@ async function starteLobby() {
  */
 function resetLobbyState() {
     lobbystate.lobbyID = "";
-    lobbystate.teilnehmerliste = Array<Benutzer>();
-    lobbystate.host = {} as Benutzer;
+    lobbystate.teilnehmerliste = Array<Spieler>();
+    lobbystate.host = {} as Spieler;
     lobbystate.istGestartet = false;
     lobbystate.istVoll = false;
     lobbystate.spielerlimit = 0;
@@ -552,6 +552,38 @@ function changeHost(neuerHost) {
 }
 
 /**
+ * Fragt im Backend per fetch das Entfernen des Spielers aus der Lobby an.
+ * 
+ * @param zuEntzfernenderSpieler 
+ */
+function spielerEntfernen(zuEntzfernenderSpieler:Spieler) {
+    console.log('entferne Mitspieler:', zuEntzfernenderSpieler);
+    fetch('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', {
+        method: 'DELETE',
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(zuEntzfernenderSpieler)
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((lobbyMessage: LobbyMessage) => {
+        console.log(lobbyMessage);
+        if (lobbyMessage.istFehler){
+            lobbystate.errormessage="Du darfst das nicht!"
+            // Todo: vielleicht nen timer, der die nachricht nach 5 Sekunden entfernt?
+        }
+    }).catch((e) => {
+        console.log(e);
+    });}
+
+/**
  * stellt mit dem returnobjekt gewisse objekte und functionen für die Views und Componenten zur Verfügung
  * 
  * @returns Return-Objekt mit den zur verfügung zu stellenden Objekten.
@@ -572,7 +604,7 @@ export function useLobbyStore() {
         alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht,
 
         // Lobby Funktionen zum Ändern
-        neueLobby, joinRandomLobby, leaveLobby, starteLobby,
+        neueLobby, joinRandomLobby, leaveLobby, starteLobby, spielerEntfernen,
 
         // Funktionen zum ändern der Lobby Einstellungen:
         einstellungsfunktionen: { changeLimit, changePrivacy, changeHost },

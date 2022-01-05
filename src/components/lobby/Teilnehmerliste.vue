@@ -1,8 +1,9 @@
 <template>
   <div class="container">
     <div :teilnehmer="teilnehmer" v-for="teilnehmer in teilnehemrliste" :key="teilnehmer.id" class="col" >
-        <img src="../../assets/user.png" alt="{{ teilnehmer.name }}"  width="100" height="100">
-        <li>{{ teilnehmer.name }}</li>
+      <button class="btn btn-danger btn-sm" style="position: absolute;" @click="spielerEntfernen(teilnehmer)">X</button>
+      <img src="../../assets/user.png" alt="{{ teilnehmer.name }}"  width="100" height="100">
+      <li>{{ teilnehmer.name }}</li>
     </div>
   </div>
 </template>
@@ -17,13 +18,13 @@ export default defineComponent({
 
   props: {},
   setup() {
-    const { lobbystate } = useLobbyStore();
+    const { lobbystate, spielerEntfernen } = useLobbyStore();
     const angezeigteteilnehmer = computed(() => {
       return lobbystate.teilnehmerliste;
     });
 
     return {
-      teilnehemrliste: angezeigteteilnehmer,
+      teilnehemrliste: angezeigteteilnehmer, spielerEntfernen,
     };
   },
 });
