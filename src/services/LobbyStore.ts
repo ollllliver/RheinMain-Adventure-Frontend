@@ -32,6 +32,7 @@ const lobbystate = reactive({
     // dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird.
     darfBeitreten: false,
     istPrivat: false,
+    countdown: 10,
 })
 
 /**
@@ -219,12 +220,32 @@ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string)
         if (lobbymessage.typ == NachrichtenCode.MITSPIELER_VERLAESST && lobbymessage.payload == userStore.state.benutzername) {
             alleLobbiesState.errormessage = 'Du wurdest leider rausgeschmissen. :(';
             router.push("/uebersicht");
+        } else if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET){
+            starteTimer();
         } else {
             updateLobby(lobby_id);
             lobbystate.errormessage = '';
         }
     }
 }
+
+/**
+ * Rekursive Cowntdownmethode, die sich jede sekunde selbst aufruft und den lobbystate.countdown um 1 veringert.
+ * Wird mit umleiten auf Spielansicht beendet, wenn lobbystate.countdown bei 0 ankommt.
+ * 
+ * @param delay 
+ */
+function starteTimer(delay = 1000) {
+    if (lobbystate.countdown > 0) {
+      setTimeout(() => {
+        lobbystate.countdown -= 1;
+        starteTimer();
+      }, delay);
+    } else {
+      router.push("/environment");
+    }
+  }
+
 
 /**
  * diese Methode behandelt über Stomp empfangene Lobbymessages zur Lobbyübersicht

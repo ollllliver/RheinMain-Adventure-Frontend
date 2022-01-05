@@ -45,7 +45,7 @@
       </div>
 
       <!-- START BUTTON -->
-      <button class="row btn btn-primary" v-on:click="starten">
+      <button class="row btn btn-primary" v-on:click="starten" :disabled="startbuttonUnsichtbar">
         SPIEL STARTEN
       </button>
     </div>
@@ -58,7 +58,7 @@
       <h3 class="row">private Lobby: {{ lobbystate.istPrivat }}</h3>
       <h3 class="row">host: {{ lobbystate.host.name }}</h3>
     </div>
-    <h1>{{ timer.time }}</h1>
+    <h1>{{ lobbystate.countdown }}</h1>
     <audio id="ticking">
       <source src="../../assets/sounds/ticking.mp3" type="audio/mpeg" />
     </audio>
@@ -74,16 +74,14 @@ export default defineComponent({
   name: "Einstellungen",
   setup() {
     const { lobbystate, starteLobby, einstellungsfunktionen } = useLobbyStore();
-
-    // Spielstart countdown
-    const timer = reactive({ time: 10 });
-
     // DEFAULT max spielerlimit aktuell = 10
     const limitArray = ref(Array.from({ length: 10 }, (_, i) => i + 1));
     // das setzt spielerlimit immer auf das neuste lobbystate.spielerlimit
     // eventuell eine art lobbystate.karte mit maxSpieler?
     // watchEffect(() => limitArray.value = Array.from({length: lobbystate.karte.maxSpieler}, (_, i) => i + 1));
     // gibt es noch nicht -> ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+    let startbuttonUnsichtbar = ref(false);
 
     // ref's auf änderbare Einstellungen und watchEffects auf lobbystate parameter für den neusten Stand
     const spielerlimit = ref();
@@ -104,34 +102,23 @@ export default defineComponent({
       einstellungsfunktionen["changeHost"](host.value);
     }
 
-    function starteTimer(delay = 1000) {
-      if (timer.time > 0) {
-        setTimeout(() => {
-          timer.time -= 1;
-          starteTimer();
-        }, delay);
-      } else {
-        router.push("/environment");
-      }
-    }
-
     function starten() {
+      // startbutton.setAttribute("disabled", "disabled");
+      startbuttonUnsichtbar.value = true;
       starteLobby()
         .then((response) => {
           console.log(response);
-          starteTimer();
         })
         .catch((err) => {
           console.log(err);
         });
+
     }
 
     return {
       lobbystate,
       userStore,
       starten,
-      starteTimer,
-      timer,
       spielerlimit,
       changeLimit,
       limitArray,
@@ -139,6 +126,7 @@ export default defineComponent({
       changePrivacy,
       host,
       changeHost,
+      startbuttonUnsichtbar,
     };
   },
 });
