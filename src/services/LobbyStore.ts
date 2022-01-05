@@ -4,6 +4,7 @@ import { Spieler } from './Spieler'
 import { LobbyMessage } from './LobbyMessage'
 import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
+import userStore from '@/stores/user'
 import { NachrichtenCode } from './NachrichtenCode';
 import { NachrichtenTyp } from './NachrichtenTyp';
 import { ChatNachricht } from './ChatNachricht';
@@ -215,8 +216,13 @@ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string)
         lobbystate.errormessage = lobbymessage.typ;
     }
     else {
-        updateLobby(lobby_id);
-        lobbystate.errormessage = '';
+        if (lobbymessage.typ == NachrichtenCode.MITSPIELER_VERLAESST && lobbymessage.payload == userStore.state.benutzername) {
+            alleLobbiesState.errormessage = 'Du wurdest leider rausgeschmissen. :(';
+            router.push("/uebersicht");
+        } else {
+            updateLobby(lobby_id);
+            lobbystate.errormessage = '';
+        }
     }
 }
 
@@ -556,7 +562,7 @@ function changeHost(neuerHost) {
  * 
  * @param zuEntzfernenderSpieler 
  */
-function spielerEntfernen(zuEntzfernenderSpieler:Spieler) {
+function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
     console.log('entferne Mitspieler:', zuEntzfernenderSpieler);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', {
         method: 'DELETE',
@@ -575,13 +581,14 @@ function spielerEntfernen(zuEntzfernenderSpieler:Spieler) {
         return response.json();
     }).then((lobbyMessage: LobbyMessage) => {
         console.log(lobbyMessage);
-        if (lobbyMessage.istFehler){
-            lobbystate.errormessage="Du darfst das nicht!"
+        if (lobbyMessage.istFehler) {
+            lobbystate.errormessage = "Du darfst das nicht!";
             // Todo: vielleicht nen timer, der die nachricht nach 5 Sekunden entfernt?
         }
     }).catch((e) => {
         console.log(e);
-    });}
+    });
+}
 
 /**
  * stellt mit dem returnobjekt gewisse objekte und functionen für die Views und Componenten zur Verfügung

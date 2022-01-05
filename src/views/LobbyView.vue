@@ -17,6 +17,10 @@
         </div>
       </div>
     </nav>
+    <!-- Eorror Balken, wenn errormessage vorliegt-->
+    <div v-if="lobbystate.errormessage != ''" class="alert alert-danger" role="alert">
+      {{lobbystate.errormessage}}
+    </div>
     <div class="row">
       <Einstellungen class="col border border-secondary rounded px-4 mx-3" />
       <div class="col">
