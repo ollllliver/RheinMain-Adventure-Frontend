@@ -71,8 +71,11 @@ export class MyKeyboardControls {
                 case 'ShiftLeft':
                     this.moveDown = true;
                     break;
+                
 
             }
+            spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+
 
         };
 

@@ -1,5 +1,5 @@
 import { useLobbyStore } from '@/services/LobbyStore';
-import { Client } from '@stomp/stompjs';
+import { Client, Message } from '@stomp/stompjs';
 import { Spieler, Position } from './Spieler';
 
 export class SpielerLokal extends Spieler{
@@ -12,14 +12,18 @@ export class SpielerLokal extends Spieler{
     
         const wsurl = `ws://localhost:8080/gamebroker`;
         this.stompclient = new Client({ brokerURL: wsurl })
-        this.connectToTeilnehmer();
         const { lobbystate } = useLobbyStore(); 
         this.lobbyID = lobbystate.lobbyID;
+        this.name = lobbystate.host;
+        this.connectToTeilnehmer();
+        
+        
   
     }
 
-    async connectToTeilnehmer(){
+    connectToTeilnehmer(){
         const DEST = "/topic/spiel/" + this.lobbyID;
+        console.log("##### Subscribed auf Lobby ID: " + this.lobbyID + " #####")
 
         this.stompclient.onWebSocketError = () => { /* WS-Fehler */ }
         this.stompclient.onStompError = () => { /* STOMP-Fehler */ }
@@ -29,16 +33,25 @@ export class SpielerLokal extends Spieler{
             this.stompclient.subscribe(DEST, (message) => { //subscribe zu jedem spieler einzeln oder alle zusammen?
                 console.log(message);
             });
+            this.stompclient.subscribe("/topic/spiel", (message) => { //Die Messages kommen hier an aber nicht im Backend
+                console.log(message);
+            });
         };
         this.stompclient.activate();
     }
 
 
     async updatePosition (position: Position) {
-        const DEST_POS = "/topic/spiel/" + this.lobbyID + '/pos/' + this.name;
-        //this.stompclient.publish({destination: "/topic/spiel/", body: JSON.stringify(position)});
+        const DEST_POS = "/topic/spiel/" + this.lobbyID + '/pos/' + "tim";
+        // this.stompclient.publish({destination: "/topic/spiel/", body: JSON.stringify(position)});
+        // try {
+        //     this.stompclient.publish({destination: "/topic/spiel", body: "TEST"});
+        // } catch (e){
+        //     console.error(e);
+        // }
         try {
-            this.stompclient.publish({destination: "/topic/spiel/", body: "TEST"});
+            this.stompclient.publish({destination: DEST_POS, body: "TEST", skipContentLengthHeader: true,});
+            this.stompclient.publish({destination: "/topic/spiel", body: "TEST", skipContentLengthHeader: true,});
         } catch (e){
             console.error(e);
         }

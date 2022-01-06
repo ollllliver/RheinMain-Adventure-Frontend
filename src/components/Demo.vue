@@ -177,9 +177,7 @@ export default defineComponent({
       spieler.position.x = camera.position.x;
       spieler.position.y = camera.position.y;
       spieler.position.z = camera.position.z;
-
-      spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
-
+      
 			renderer.render( scene, camera );
      
     };
