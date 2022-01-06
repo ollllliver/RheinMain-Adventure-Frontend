@@ -6,10 +6,13 @@
   </div>
   <div v-else class="text-center">
     <h2>Welcome, {{ userStore.state.benutzername }}</h2>
-     <button class="btn btn-default" @click="$router.push('uebersicht')">
+    <button class="btn btn-default" @click="$router.push('uebersicht')">
       Lobbyübersicht
     </button>
     <!-- Wechsel zum "Editor"-Fenster -->
+    <button class="btn btn-default" @click="$router.push('environment')">
+      Game Environment
+    </button>
     <button class="btn btn-default" @click="$router.push('editor')">
       Level Editor
     </button>

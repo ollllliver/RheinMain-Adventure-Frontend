@@ -18,16 +18,27 @@ const routes: Array<RouteRecordRaw> = [
         name: 'SignUp',
         component: Register
     },
+
     {
         path: '/uebersicht',
         name: 'Lobbyuebersicht',
         component: LobbyuebersichtView
     },
     {
+        path: '/join',
+        name: 'Join',
+        component: () => import('../views/Join.vue')
+    },
+    {
         path: '/lobby/:lobby_id',
         name: 'LobbyView',
         component: LobbyView,
         props: true
+    },
+    {
+        path: '/environment',
+        name: 'Environment',
+        component: () => import('../views/Environment.vue')
     },
     {
         path: '/editor',
