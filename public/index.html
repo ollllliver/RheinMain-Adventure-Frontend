@@ -7,13 +7,11 @@
     <link rel="icon" href="<%= BASE_URL %>favicon.ico">
     <title><%= htmlWebpackPlugin.options.title %></title>
   </head>
-  <body onmousedown="document.getElementById('audio').play()">
-    <audio autoplay id="audio"><source src="<%= BASE_URL %>O_Tannenbaum_8_Bit.mp3" type="audio/mpeg"></audio>
+  <body>
     <noscript>
       <strong>We're sorry but <%= htmlWebpackPlugin.options.title %> doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
     </noscript>
     <div id="app"></div>
     <!-- built files will be auto injected -->
-    <script src="<%= BASE_URL %>snow.js"></script>
   </body>
 </html>
