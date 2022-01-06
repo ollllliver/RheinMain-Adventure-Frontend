@@ -20,6 +20,12 @@ const routes: Array<RouteRecordRaw> = [
     },
 
     {
+        path: '/instructions',
+        name: 'Instructions',
+        component: () => import('../views/Instructions.vue')
+    },
+
+    {
         path: '/uebersicht',
         name: 'Lobbyuebersicht',
         component: LobbyuebersichtView

@@ -1,4 +1,4 @@
-import {Vector3, Raycaster, ArrowHelper} from 'three';
+import {Vector3, Raycaster} from 'three';
 
 const direction = new Vector3();
 
@@ -19,6 +19,7 @@ export class MyKeyboardControls {
     cameraCollidable: any;
     collidableList: any;
     rayCaster: any;
+    disconnect: () => void;
 
 
     constructor(collidableList: any, cameraCollidable: any, domElement: Document) {
@@ -36,7 +37,10 @@ export class MyKeyboardControls {
         this.cameraCollidable = cameraCollidable;
         this.collidableList = collidableList;
 
-
+        /**
+		 * Wird ausgelöst wenn eine Taste gedrückt wird
+         * @param event Taste die gedrückt wurde
+		 */
         const onKeyDown = (event: KeyboardEvent) => {
 
             switch (event.code) {
@@ -75,6 +79,10 @@ export class MyKeyboardControls {
 
         };
 
+        /**
+		 * Wird ausgelöst wenn eine Taste losgelassen wird
+         * @param event Taste die losgelassen wurde
+		 */
         const onKeyUp = (event: KeyboardEvent) => {
 
             switch (event.code) {
@@ -110,15 +118,16 @@ export class MyKeyboardControls {
             }
         }
 
-
         const connect = () => {
             this.domElement.addEventListener('keydown', onKeyDown),
-                this.domElement.addEventListener('keyup', onKeyUp)
+            this.domElement.addEventListener('keyup', onKeyUp)
+            console.log("keyboard controls connected")
         };
 
-        const disconnect = () => {
+        this.disconnect = () => {
             this.domElement.removeEventListener('keydown', onKeyDown),
-                this.domElement.removeEventListener('keyup', onKeyUp)
+            this.domElement.removeEventListener('keyup', onKeyUp)
+            console.log("keyboard controls disconnected")
         };
 
         const collisionDetection = (blickVektor:any, originPoint: any) => {
@@ -138,7 +147,7 @@ export class MyKeyboardControls {
             }
             return false
         }
-        
+
 
         this.update = (camera: any, velocity: any, delta: number) => {
 
@@ -152,26 +161,26 @@ export class MyKeyboardControls {
             // cameraCollidable immer mit Kamera updaten
             this.cameraCollidable.position.set(camera.position.x,camera.position.y, camera.position.z)
             // cameraCollidable ist Object3D (siehe Mesh) bestehend aus:
-            // - BoxGeometry(Buffergeometry bestehend aus BufferAttribute) 
-            // - single oder Array von Material(MeshBasicMaterial) 
+            // - BoxGeometry(Buffergeometry bestehend aus BufferAttribute)
+            // - single oder Array von Material(MeshBasicMaterial)
 
             // Positionsvariable benoetigt zum berechnen der (Blickrichtung der Kamera fuer) CollisionDetection
             const originPoint = this.cameraCollidable.position.clone(); // position in SPielfeld
             // cameraCollidable.                        arbeitet auf Mesh
-            
+
             // cameraCollidable.geometry.               arbeitet auf Buffergeometry
-            // cameraCollidable.geometry.attributes.    arbeitet auf Bufferattribute 
+            // cameraCollidable.geometry.attributes.    arbeitet auf Bufferattribute
 
 
 
             // Blickrichtung cameraCollidable an KameraBlickrichtung anpassen
-            // nimmt punkt auf den Kamera schaut (von 0,0,0) und addiert aktuelle Position der Kamera drauf 
+            // nimmt punkt auf den Kamera schaut (von 0,0,0) und addiert aktuelle Position der Kamera drauf
             const blickRichtung = new Vector3(0,0,-1).applyQuaternion(camera.quaternion)
-            
-            const blickRichtungCubePos = blickRichtung.clone().add(camera.position) 
+
+            const blickRichtungCubePos = blickRichtung.clone().add(camera.position)
             cameraCollidable.lookAt(blickRichtungCubePos)
-            
-            // 90 Grad Winkel 
+
+            // 90 Grad Winkel
             // vorne ist einfach die Blickrichtung
             const links = Math.PI / 2;
             const hinten = Math.PI;
@@ -201,14 +210,14 @@ export class MyKeyboardControls {
             const hintenCollision = collisionDetection(hintenVektor,originPoint);
             const linksCollision = collisionDetection(linksVektor,originPoint);
             const rechtsCollision = collisionDetection(rechtsVektor,originPoint);
-            
+
 
             //console.log(vorneCollision,hintenCollision,linksCollision,rechtsCollision)
 
             // x rot, y gelb, z blau
-    
+
             if ((this.moveForward && !vorneCollision) || (this.moveBackward && !hintenCollision))
-                velocity.z -= direction.z * speed * delta;    
+                velocity.z -= direction.z * speed * delta;
             if ((this.moveLeft&& !linksCollision ) || (this.moveRight&& !rechtsCollision ))
                 velocity.x -= direction.x * speed * delta;
             if (this.moveUp || this.moveDown)
@@ -217,18 +226,12 @@ export class MyKeyboardControls {
 
             // Nicht in Wand haengenbleiben, ist man halt ein Gummi Mensch
             if ((this.moveForward && vorneCollision) || (this.moveBackward && hintenCollision))
-                velocity.z += direction.z * speed * delta; 
+                velocity.z += direction.z * speed * delta;
             if ((this.moveLeft&& linksCollision ) || (this.moveRight&& rechtsCollision ))
                 velocity.x += direction.x * speed * delta;
 
 
         };
-
-
-
         connect();
-
     }
-
-
 }

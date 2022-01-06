@@ -1,17 +1,15 @@
 import { Euler, Vector3, EventDispatcher } from 'three';
-import { Camera } from 'three/src/cameras/Camera';
+import { Camera } from "three/src/cameras/Camera";
 import * as Three from "three";
 
 const _euler = new Euler(0, 0, 0, 'YXZ');
 const _vector = new Vector3();
-
 
 const _changeEvent = { type: 'change' };
 const _lockEvent = { type: 'lock' };
 const _unlockEvent = { type: 'unlock' };
 
 const _PI_2 = Math.PI / 2;
-
 
 /**
  * Verwertet Mauseingaben 
@@ -78,17 +76,28 @@ class MyMouseControls extends EventDispatcher {
 			console.error('THREE.PointerLockControls: Unable to use Pointer Lock API');
 		}
 
+		/**
+		 * Achtet auf Änderungen Maus
+		 */
 		this.connect = function () {
 			this.domElement.ownerDocument.addEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.addEventListener('pointerlockchange', onPointerlockChange);
 			this.domElement.ownerDocument.addEventListener('pointerlockerror', onPointerlockError);
+			console.log("mouse controls connected")
+
 
 		};
 
+		/**
+		 * Achtet nicht mehr auf Änderungen Maus
+		 */
 		this.disconnect = function () {
 			this.domElement.ownerDocument.removeEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.removeEventListener('pointerlockchange', onPointerlockChange);
 			this.domElement.ownerDocument.removeEventListener('pointerlockerror', onPointerlockError);
+			this.unlock();
+			console.log("mouse controls disconnect")
+
 
 		};
 
@@ -116,6 +125,11 @@ class MyMouseControls extends EventDispatcher {
 
 		}();
 
+
+		/**
+		 * Beweget die Kamera nach vorne
+		 * @param distance Wert wie weit die Kamera sich nach vorne bewegt
+		 */
 		this.moveForward = function (distance:any) {
 
 			// bewegt  parallel zur xz-achse
@@ -128,6 +142,10 @@ class MyMouseControls extends EventDispatcher {
 
 		};
 
+		/**
+		 * Beweget die Kamera nach rechts
+		 * @param distance Wert wie weit die Kamera sich nach rechts bewegt
+		 */
 		this.moveRight = function (distance:any) {
 
 			_vector.setFromMatrixColumn(camera.matrix, 0);
@@ -136,18 +154,30 @@ class MyMouseControls extends EventDispatcher {
 
 		};
 
-		this.lock = function () {
+		/**
+		 * "Lockt" die Maus 
+		 */
+		this.lock = () => {
 
 			this.domElement.requestPointerLock();
+			console.log("mouse controls: lock")
+
 
 		};
 
-		this.unlock = function () {
+		/**
+		 * Lässt die Maus wieder frei 
+		 */
+		this.unlock = () => {
 
 			this.domElement.ownerDocument.exitPointerLock();
+			console.log("mouse controls: unlock")
 
 		};
 
+		/**
+		 * Aktualisiert die Bewegungen
+		 */
 		this.update = (velocity: any, delta: number) => {
 			this.moveRight(-velocity.x * delta);
 			this.moveForward(-velocity.z * delta);

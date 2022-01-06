@@ -9,12 +9,18 @@
     <button class="btn btn-default" @click="$router.push('uebersicht')">
       Lobbyübersicht
     </button>
-    <!-- Wechsel zum "Editor"-Fenster -->
+    <button class="btn btn-default" @click="$router.push('create')">
+      Create Lobby
+    </button>
     <button class="btn btn-default" @click="$router.push('environment')">
       Game Environment
     </button>
     <button class="btn btn-default" @click="$router.push('editor')">
       Level Editor
+    </button>
+    <!-- Wechsel zum "Anleitungs"-Fenster -->
+    <button class="btn btn-default" @click="$router.push('instructions')">
+      Anleitung
     </button>
     <br>
     <!-- Logout Button - Wechsel zum "Home"-Fenster -->

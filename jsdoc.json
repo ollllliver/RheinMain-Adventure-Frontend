@@ -1,0 +1,25 @@
+{
+    "source": {
+      "include": ["src"],
+      "includePattern": ".ts$",
+      "excludePattern": "(node_modules/|docs)"
+    },
+    "plugins": [
+      "node_modules/jsdoc-babel"
+    ],
+    "babel": {
+      "extensions": ["ts", "tsx"],
+      "ignore": ["**/*.(test|spec).ts"],
+      "babelrc": false,
+      "presets": ["@babel/typescript"]
+    },
+    "templates": {
+      "cleverLinks": true,
+      "monospaceLinks": true
+    },
+    "opts": {
+      "recurse": true,
+      "template": "node_modules/minami",
+      "destination": "./docs/"
+    }
+  }

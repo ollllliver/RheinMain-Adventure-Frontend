@@ -6,7 +6,7 @@
 <script lang="ts">
 import * as Three from "three";
 import { defineComponent, onMounted } from "vue";
-import { Loader } from './models/Loader';
+import { GraphicLoader } from './models/GraphicLoader';
 import { MyMouseControls } from '@/components/models/MyMouseControls';
 import { MyKeyboardControls } from '@/components/models/MyKeyboardControls';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
@@ -25,7 +25,7 @@ export default defineComponent({
     let meshPlane: any;
     let meshCube: any;
     let raycaster: any;
-    let loader: Loader;
+    let loader: GraphicLoader;
     let moveForward = false;
     let moveBackward = false;
     let moveLeft = false;
@@ -84,7 +84,7 @@ export default defineComponent({
      * Initialisiert Loader Klasse
      */
     const initLoader = () => {
-      loader = new Loader();
+      loader = new GraphicLoader();
       console.log(loader)
       loader.ladeDatei('/assets/blender/room.gltf')
       .then((res:any) => {
@@ -104,6 +104,9 @@ export default defineComponent({
       })
     };
 
+    /**
+     * Initialisiert Kamera
+     */
     const initCamera = () => {
 
       
@@ -140,13 +143,27 @@ export default defineComponent({
 
     };
 
+    /**
+     * Initialisiert die Steuerung
+     */
     const initControls = () => {
       mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
       keyControls = new MyKeyboardControls(collidableList, cameraCollidable, document); //init Keyboardsteuerung
 
-      window.addEventListener( 'click', function () { mouseControls.lock(); } ); //locked die Maus
+      connect();
     }
 
+    const connect = () => {
+      window.addEventListener( 'click', mouseControls.lock ); //locked die Maus
+    }
+
+    const disconnect = () => {
+      mouseControls.dispose();
+      keyControls.disconnect();
+      window.removeEventListener('click', mouseControls.lock );
+      console.log("Müsste disconnected sein")
+    }
+    
     // const initPlane = () => {
     //   let plane = new Three.PlaneGeometry(5, 5, 1, 1);
     //   let material = new Three.MeshBasicMaterial();
@@ -254,85 +271,6 @@ export default defineComponent({
     function degInRad(deg: number) {
       return (deg * Math.PI) / 90;
     }
-
-    const onKeyDown = function ( event:KeyboardEvent ) {
-
-					switch ( event.code ) {
-
-						case 'ArrowUp':
-						case 'KeyW':
-							moveForward = true;
-							break;
-
-						case 'ArrowLeft':
-						case 'KeyA':
-							moveLeft = true;
-							break;
-
-						case 'ArrowDown':
-						case 'KeyS':
-							moveBackward = true;
-							break;
-
-						case 'ArrowRight':
-						case 'KeyD':
-							moveRight = true;
-							break;
-
-						case 'Space':
-              moveUp=true;
-							// if ( canJump === true ) velocity.y += 350;
-							// canJump = false;
-							break;
-            
-            case 'ShiftLeft':
-							moveDown = true;
-							break;
-
-					}
-
-				};
-
-    const onKeyUp = function ( event:KeyboardEvent ) {
-
-      switch ( event.code ) {
-
-        case 'ArrowUp':
-        case 'KeyW':
-          moveForward = false;
-          break;
-
-        case 'ArrowLeft':
-        case 'KeyA':
-          moveLeft = false;
-          break;
-
-        case 'ArrowDown':
-        case 'KeyS':
-          moveBackward = false;
-          break;
-
-        case 'ArrowRight':
-        case 'KeyD':
-          moveRight = false;
-          break;
-        case 'Space':
-            moveUp = false;
-							// if ( canJump === true ) velocity.y += 350;
-							// canJump = false;
-						break;
-            
-        case 'ShiftLeft':
-						moveDown = false;
-						break;
-
-      }
-
-    };
-
-    document.addEventListener( 'keydown', onKeyDown),
-    document.addEventListener( 'keyup', onKeyUp),
-
   
     function rotateObject(mesh: any, degreeX = 0, degreeY = 0, degreeZ = 0) {
       mesh.rotateX(Three.Math.degToRad(degreeX));
@@ -344,9 +282,19 @@ export default defineComponent({
       mesh.position.x -= Math.min(moveX);
       mesh.position.y -= Math.min(moveY);
       mesh.position.z -= Math.min(moveZ);
-    }
+    } 
+    
+    return {connect, disconnect}
+
+  },
+  beforeUnmount() {
+
+    this.disconnect();
+    console.log("unmounted")
   },
 });
+
+
 </script>
 
 <style scoped>

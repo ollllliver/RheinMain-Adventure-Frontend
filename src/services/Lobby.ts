@@ -1,10 +1,10 @@
-import { Benutzer } from "./Benutzer";
+import { Spieler } from "./Spieler";
 
 export interface Lobby {
-    lobbyID: String;
-    teilnehmerliste: Array<Benutzer>;
-    host: Benutzer;
-    istVoll: Boolean;
-    istGestartet: Boolean;
-    spielerlimit: Number;
+    lobbyID: string;
+    teilnehmerliste: Array<Spieler>;
+    host: Spieler;
+    istVoll: boolean;
+    istGestartet: boolean;
+    spielerlimit: number;
 }
