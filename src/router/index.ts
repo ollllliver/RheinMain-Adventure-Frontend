@@ -30,11 +30,7 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Lobbyuebersicht',
         component: LobbyuebersichtView
     },
-    {
-        path: '/join',
-        name: 'Join',
-        component: () => import('../views/Join.vue')
-    },
+
     {
         path: '/lobby/:lobby_id',
         name: 'LobbyView',
