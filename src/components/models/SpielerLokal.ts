@@ -5,7 +5,7 @@ import { Spieler, Position } from './Spieler';
 export class SpielerLokal extends Spieler{
     stompclient: Client;
     lobbyID: string;
-    DEST = "/topic/spiel/";
+    DEST = "/topic/spiel";
 
     
     constructor(){ 
@@ -21,13 +21,13 @@ export class SpielerLokal extends Spieler{
 
     async connectToTeilnehmer(){
 
-        this.stompclient.onWebSocketError = () => { /* WS-Fehler */ }
-        this.stompclient.onStompError = () => { /* STOMP-Fehler */ }
-        this.stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
+        this.stompclient.onWebSocketError = () => {console.error("SpielerLokal.onWebSocketError")}
+        this.stompclient.onStompError = () => { console.error("SpielerLokal.onStompError") }
+        this.stompclient.onDisconnect = () => { console.error("SpielerLokal.onDisconnect") }
         this.stompclient.onConnect = async (frame) => {
-            console.log("Erfolgreich verbunden: " + frame);
+            console.log("SpielerLokalErfolgreich verbunden: " + frame);
             this.stompclient.subscribe(this.DEST, (message) => { //subscribe zu jedem spieler einzeln oder alle zusammen?
-                console.log('TEST empfangen', message)
+                console.log(`SpielerLokal TEST von ${this.DEST} empfangen`, message)
             });
         };
         this.stompclient.activate();
@@ -35,7 +35,7 @@ export class SpielerLokal extends Spieler{
 
     sendeTest(){
         this.stompclient.publish({destination: this.DEST, body: "TEST"});
-        console.log('TEST gesendet')
+        console.log(`SpielerLokal: TEST gesendet ${this.stompclient} -> ${this.DEST}`)
     }
 
     async updatePosition (position: Position) {
@@ -46,7 +46,7 @@ export class SpielerLokal extends Spieler{
         } catch (e){
             console.error(e);
         }
-        console.log("Gesendete Nachricht: ", position);
+        console.log("SpielerLokal.updatePosition Gesendete Nachricht: ", position);
     }
 
 }
