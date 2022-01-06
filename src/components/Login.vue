@@ -24,10 +24,12 @@
     <div class="text-danger my-2">{{ userStore.state.error }}</div>
     <button class="btn btn-success btn-block my-2" type="submit">Login</button>
     <button class="btn btn-secondary" @click="$router.push('SignUp')">Sign Up</button>
+    <button class="btn btn-warning" @click="senden">TROMP TEST</button>
   </form>
 </template>
 <script lang="ts">
 import { defineComponent, reactive } from 'vue'
+import { SpielerLokal } from '@/components/models/SpielerLokal';
 import userStore from '@/stores/user'
 export default defineComponent({
   setup() {
@@ -40,7 +42,11 @@ export default defineComponent({
       form.benutzername = ''
       form.passwort = ''
     }
-    return { form, userStore, onSubmit }
+    const spieler = new SpielerLokal;
+    function senden(){
+      spieler.sendeTest();
+    }
+    return { form, userStore, onSubmit, senden }
   }
 })
 </script>

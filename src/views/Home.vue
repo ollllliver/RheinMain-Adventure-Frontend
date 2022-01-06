@@ -22,9 +22,6 @@
     <button class="btn btn-default" @click="$router.push('instructions')">
       Anleitung
     </button>
-    <button class="btn btn-warning" @click="senden">
-      TROMP TEST
-    </button>
     <br>
     <!-- Logout Button - Wechsel zum "Home"-Fenster -->
     <button class="btn btn-danger" @click="userStore.logout()">
@@ -35,7 +32,6 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
-import { SpielerLokal } from '@/components/models/SpielerLokal';
 import userStore from '@/stores/user'
 import Login from '@/components/Login.vue'
 export default defineComponent({
@@ -43,13 +39,7 @@ export default defineComponent({
   components: { Login },
   setup() {
     onMounted(userStore.getUser)
-  
-    const spieler = new SpielerLokal;
-    function senden(){
-      spieler.sendeTest();
-    }
-
-    return { userStore, senden }
+    return { userStore }
   }
 });
 </script>
