@@ -174,10 +174,10 @@ export default defineComponent({
 			prevTime = time;
 
       //wohin damit?
-      spieler.position.x = camera.position.x;
-      spieler.position.y = camera.position.y;
-      spieler.position.z = camera.position.z;
-      
+      spieler.position.x = camera.position.x.toFixed(2);
+      spieler.position.y = camera.position.y.toFixed(2);
+      spieler.position.z = camera.position.z.toFixed(2);
+
 			renderer.render( scene, camera );
      
     };
