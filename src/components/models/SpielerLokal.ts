@@ -1,6 +1,7 @@
 import { useLobbyStore } from '@/services/LobbyStore';
 import { Client, Message } from '@stomp/stompjs';
 import { Spieler, Position } from './Spieler';
+import user from '@/stores/user' 
 
 export class SpielerLokal extends Spieler{
     stompclient: Client;
@@ -15,11 +16,10 @@ export class SpielerLokal extends Spieler{
         this.stompclient = new Client({ brokerURL: wsurl })
         const { lobbystate } = useLobbyStore(); 
         this.lobbyID = lobbystate.lobbyID;
-        this.name = lobbystate.host;
+        super.name = user.state.benutzername;
+        console.log(`SpielerLokal: name=${this.name}, `)
         this.connectToTeilnehmer();
         
-        
-  
     }
 
     async connectToTeilnehmer(){
@@ -32,7 +32,7 @@ export class SpielerLokal extends Spieler{
         this.stompclient.onConnect = async (frame) => {
             console.log("SpielerLokal erfolgreich verbunden: " + frame);
             this.stompclient.subscribe(DEST, (message) => { //subscribe zu jedem spieler einzeln oder alle zusammen?
-                console.log(`SpielerLokal TEST von ${DEST} empfangen`, message)
+                console.log(`SpielerLokal von ${DEST} empfangen`, message.body)
             });
             // this.stompclient.subscribe("/topic/spiel", (message) => { //Die Messages kommen hier an aber nicht im Backend
             //     console.log(message);
@@ -41,22 +41,10 @@ export class SpielerLokal extends Spieler{
         this.stompclient.activate();
     }
 
-    sendeTest(){
-        this.stompclient.publish({destination: this.DEST, body: "TEST"});
-        console.log(`SpielerLokal: TEST gesendet ${this.stompclient} -> ${this.DEST}`)
-    }
-
     async updatePosition (position: Position) {
-        const DEST_POS = "/topic/spiel/" + this.lobbyID + '/pos/' + "tim";
-        //this.stompclient.publish({destination: "/topic/spiel/", body: JSON.stringify(position)});
-        // try {
-        //     this.stompclient.publish({destination: this.DEST, body: "TEST"});
-        // } catch (e){
-        //     console.error(e);
-        // }
-        console.log("SpielerLokal.updatePosition Gesendete Nachricht: ", position);
+        const DEST_POS = "/topic/spiel/" + this.lobbyID + '/pos/' + this.name;
+        console.log(`SpielerLokal.updatePosition (${this.name}) gesendete: `, position);
         this.stompclient.publish({destination: DEST_POS, body: JSON.stringify(position), skipContentLengthHeader: true,});
-        // this.stompclient.publish({destination: "/topic/spiel", body: "TEST", skipContentLengthHeader: true,});
     }
 
 }

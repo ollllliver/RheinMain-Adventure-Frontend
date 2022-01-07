@@ -24,7 +24,6 @@
     <div class="text-danger my-2">{{ userStore.state.error }}</div>
     <button class="btn btn-success btn-block my-2" type="submit">Login</button>
     <button class="btn btn-secondary" @click="$router.push('SignUp')">Sign Up</button>
-    <button class="btn btn-warning" @click="senden">TROMP TEST</button>
   </form>
 </template>
 <script lang="ts">
@@ -42,11 +41,8 @@ export default defineComponent({
       form.benutzername = ''
       form.passwort = ''
     }
-    const spieler = new SpielerLokal;
-    function senden(){
-      spieler.sendeTest();
-    }
-    return { form, userStore, onSubmit, senden }
+
+    return { form, userStore, onSubmit }
   }
 })
 </script>
