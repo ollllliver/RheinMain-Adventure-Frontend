@@ -91,7 +91,7 @@ export default defineComponent({
 
       console.log("ABFRAGE VOM LEVEL AUS DEM BACKEND");
       fetch('http://localhost:8080/level/1/0', {
-        method: 'GET'
+        method: 'GET',
       }).then((response) => {
         if (!response.ok) {
           console.log("error");
@@ -106,25 +106,35 @@ export default defineComponent({
           console.log(raumMobiliar)
           var posX = raumMobiliar.positionX;
           var posY = raumMobiliar.positionY;
+          // Idee von Olli:
+          // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platzieren
+          // Davor müsste man zu begin ein Set des Mobiliars erstellen
 
-          var mobiliarId = raumMobiliar.mobiliarId;
-          fetch('http://localhost:8080/level/' + mobiliarId, {method: 'GET'})
-              .then((response) => response.json())
-              .then((json) => {
-                console.log(json);
+          var mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
+          console.log("Die MobiliarId ist " + mobiliarId);
+          loader.ladeDatei('http://localhost:8080/level/' + mobiliarId).then((res: any) => {
+            console.log(res)
+            res.scene.positionX = 50 * posX
+            res.scene.positionY = 50 * posY
+            scene.add(res.scene)
+          });
 
-                const jsonString = JSON.stringify(json);
-                loader.ladeDatei(jsonString).then((res: any) => {
-                  console.log(res)
-                  scene.add(res.scene)
-                });
+          /*          fetch('http://localhost:8080/level/' + mobiliarId, {method: 'GET'})
+                        .then((response) => response.json())
+                        .then((json) => {
+                          console.log(json);
 
-
-              });
-          console.log("Bing")
-        }).catch((e) => {
-          console.log(e);
+                          const jsonString = JSON.stringify(json);
+                          console.log("Laden erfolgreich, versuche das Ding in den Loader zu schmeißen");
+                          loader.ladeDatei(json).then((res: any) => {
+                            console.log(res)
+                            scene.add(res.scene)
+                          });
+                        }).catch((e) => {
+                      console.log(e);
+                    });*/
         });
+        console.log("Fertig iteriert")
       });
 
 
