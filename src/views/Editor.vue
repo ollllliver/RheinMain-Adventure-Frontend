@@ -106,6 +106,7 @@ export default defineComponent({
   .infotext {
     font-weight: 300;
     color: black;
+    
   }
 
 </style>

@@ -8,10 +8,14 @@
     <button class="btn btn-outline-secondary" :class="weg" @click="waehle($event, weg)" id="weg"> W </button>
     <button class="btn btn-outline-secondary" :class="start" @click="waehle($event, start)" id="start"> S </button>
     <button class="btn btn-outline-secondary" :class="ziel" @click="waehle($event,ziel)" id="ziel"> Z </button>
-    
+    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, tuer)" @click="setzeInfo(tuer)" >T </button>
+    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, schluessel)" @click="setzeInfo(tuer)" >Sch </button>
+    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, npc)" @click="setzeInfo(tuer)" >NPC </button>
+    <!--
+        Räume vorerst verschoben
     <button class="btn btn-outline-secondary" v-for="raum in raeume" :key="raum.id" draggable="true" 
     @dragstart="startDrag($event, raum)" @click="setzeInfo(raum)" id="räume"> R{{raum.title}} </button>
-    
+     -->
     <div class="btn-group btn-group-toggle" data-toggle="buttons" id="raumausrichtung">
         <p class="ueberschrift"> Raumausrichtung </p> 
         <label class="btn">
@@ -37,8 +41,12 @@ export default defineComponent({
         const weg = 1
         const start = 2
         const ziel = 3
-
-        // Räume
+        const tuer = 4
+        const schluessel = 5
+        const npc = 6
+        
+        /*
+        // Räume === vorerst verschoben
         const raeume = ref(
             [
                 {id:4, title:'1', rauminfo: 'In Raum 1 ist das Ziel einen versteckten Schlüssel zu finden.'+
@@ -58,12 +66,15 @@ export default defineComponent({
                 'öffnet sich die Tür.'},
             ]
         )
+        */
 
         // bei drag (Drag-and-Drop) Baustein kopieren und platzierbar machen
         const startDrag = (event: any, item: any) => {
             event.dataTransfer.dropEffect = 'move'
             event.dataTransfer.effectAllowed = 'copy'
-            event.dataTransfer.setData('itemID',item.id)
+            /*event.dataTransfer.setData('itemID',item.id) fuer Räume*/
+            event.dataTransfer.setData('itemID',item)
+            //console.log(event.dataTransfer.getData('itemID'))
             editorStore.setze(9) 
         }
 
@@ -74,7 +85,8 @@ export default defineComponent({
 
         // Infobox füllen
         const setzeInfo = (item: any) => {
-            editorStore.info(item.rauminfo)
+            //editorStore.info(item.rauminfo)
+            editorStore.info('hallo')
         }
 
         // Anleitung über i in Infobox
@@ -98,7 +110,7 @@ export default defineComponent({
         }
 
         return {
-                raeume, startDrag, waehle, setzeInfo, ausrichten, weg, start, ziel, info
+                /*raeume,*/ startDrag, waehle, setzeInfo, ausrichten, weg, start, ziel, info, tuer, schluessel, npc
         }
     },
     

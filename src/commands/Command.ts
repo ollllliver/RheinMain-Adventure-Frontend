@@ -1,7 +1,6 @@
 import { ICommand } from "./CommandManager";
 import {Karte} from '../components/EditorKomponenten/Karte'
 import editorStore from '@/stores/editor'
-
 /*
  * Jeder Befehl bekommt seine eigene Klasse und implementiert das ICommand Interface
  */
@@ -106,6 +105,47 @@ export class ElementHinzufuegen implements ICommand {
                     editorStore.ziel(true)
                     break;
                 }
+
+                case 4: {
+                    // Tür in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung);  
+                    // Tür je nach Ausrichtung im Div platzieren
+                    if(this._ausrichtung === 0) {
+                        this._event.target.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)" 
+                    }
+                    if(this._ausrichtung === 1) {
+                        this._event.target.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)" 
+                    }
+                    //this._event.dataTransfer.getData("src")
+                    //this._event.target.style = "background-image url('../assets/tuer.png'); background-size:auto;"
+                    editorStore.info("Tür platziert.")
+                    editorStore.setzeTuer(1)
+                    break;
+                }
+                case 5: {
+                    // Schlüssel in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posY, this._element.posX, this._element.e);  
+                    // Schlüssel im Div platzieren
+                    this._event.target.style.background = "no-repeat center url('../img/schluessel.png') rgba(255,211,155, 0.75)" 
+                    editorStore.info("Schluessl platziert.")
+                    editorStore.setzeSchluessel(1)
+                    break;
+                }
+                
+                case 6: {
+                    // NPC in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posY, this._element.posX, this._element.e);  
+                    // Hintergrund des Divs auf Farbe des Elements ändern
+                    this._event.target.style.background = "no-repeat center url('../img/npc.png') rgba(255,211,155, 0.75)" 
+                    editorStore.info("NPC platziert.")
+                    editorStore.setzeNpc(1)
+                    
+                    break;
+                }
+            
+
+                /* Raumplatzierung vorerst aufgeschoben
+
                 // Wenn Element ein Raum ist
                 case 4:
                 case 5:
@@ -114,7 +154,6 @@ export class ElementHinzufuegen implements ICommand {
                 case 8: {
                     // Wenn horizontale Ausrichtung
                     // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
-                    console.log('ausrichtung', this._ausrichtung)
                     if(this._ausrichtung === 0) {
                         this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung)
                         this._karte.setElement(this._element.posY, this._element.posX-1, this._element.e, this._ausrichtung)
@@ -155,6 +194,7 @@ export class ElementHinzufuegen implements ICommand {
                     }
                     break;
                 }
+                */
             }
         }
         else {
@@ -189,11 +229,31 @@ export class ElementHinzufuegen implements ICommand {
                 editorStore.ziel(false)
                 break;
             }
+            case 4: {
+                this._karte.setElement(this._element.posY, this._element.posX, 1);  
+                this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
+                editorStore.setzeTuer(-1)
+                break;
+            }
+            case 5: {
+                this._karte.setElement(this._element.posY, this._element.posX, 1);  
+                this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
+                editorStore.setzeSchluessel(-1)
+                break;
+            }
+            case 6: {
+                this._karte.setElement(this._element.posY, this._element.posX, 1);  
+                this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
+                editorStore.setzeNpc(-1)
+                break;
+            }
+        
+            /*
+            // Bei Raum ===== voerst verschoben
             case 4:
             case 5:
             case 6:
             case 7:
-            // Bei Raum
             case 8: {
                 // wenn horizontrale Ausrichtung
                 if(this._ausrichtung === 0) {
@@ -234,6 +294,7 @@ export class ElementHinzufuegen implements ICommand {
                 }
                 break;
             }
+            */
         }
         editorStore.info("letzten Schritt rückgängig gemacht")
     }
@@ -248,7 +309,6 @@ export class ElementHinzufuegen implements ICommand {
             y: this._element.posY.toString(),
             e:this._element.e.toString()
         }
-        //console.log(this._ausrichtung)
         return "{ ["+hinzugefuegt.y+","+hinzugefuegt.x+"]"+" - "+hinzugefuegt.e+" }"
         
     }

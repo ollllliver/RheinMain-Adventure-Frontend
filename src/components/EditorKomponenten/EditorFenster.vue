@@ -37,7 +37,20 @@ export default defineComponent({
      * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
      */
     const onDrop = (event: any) => {
-        const itemID = parseInt(event.dataTransfer.getData("itemID"));
+      const itemID = parseInt(event.dataTransfer.getData("itemID"));
+      console.log(itemID,'itemID Editorfenster')
+      // wenn an der Stelle ein Weg ist
+      if(liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 1) {
+        CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event, editorStore.getters.getAusrichtung));
+        editorStore.setze(0);
+        return;
+      } else {
+        editorStore.info("Um dieses Element platzieren zu können muss vorher ein Wegpunkt an der Stelle sein.")
+      }
+      
+      
+      /* Raum Platzierung ====== vorerst aufgeschoben
+        
         // wenn horizontaler Raum   
         if (editorStore.getters.getAusrichtung === 0) {
             // Wenn gültiger Bereich (Raum passt auf Karte und überschneidet nicht mit anderen Elementen)
@@ -73,6 +86,9 @@ export default defineComponent({
             }
             editorStore.info("Raum passt nicht auf diese Position. Ein vertikaler Raum besteht 3 x 2 Felder. Bitte wähle einen passenden Ort aus.");
         }
+
+
+        */
     };
     onMounted(() => {
       console.log(liste)

@@ -21,7 +21,10 @@ const state = reactive({
     start: false,
     ziel: false,
     raeume: 0,
-    ausrichtung: 0
+    ausrichtung: 0,
+    schluessel: 0,
+    tuer: 0,
+    npc: 0
 })
 
 /**
@@ -51,6 +54,15 @@ const getters = reactive({
     }),
     getGrid: computed(() => {
         return karte
+    }),
+    getSchluessel: computed(() => {
+        return state.schluessel
+    }),
+    getTuer: computed(() => {
+        return state.tuer
+    }),
+    getNpc: computed(() => {
+        return state.npc
     })
 })
 
@@ -113,6 +125,7 @@ const actions = {
             }
             case 9: {
                 state.aktiv = false
+                
             }
         }
     },
@@ -130,6 +143,15 @@ const actions = {
     },
     async setzeRaum(gesetzt: number) {
         state.raeume += gesetzt
+    },
+    async setzeSchluessel(gesetzt: number) {
+        state.schluessel += gesetzt
+    },
+    async setzeTuer(gesetzt: number) {
+        state.tuer += gesetzt
+    },
+    async setzeNpc(gesetzt: number) {
+        state.npc += gesetzt
     }
 
 }
