@@ -10,7 +10,7 @@ import {GraphicLoader} from './models/GraphicLoader';
 import {MyMouseControls} from '@/components/models/MyMouseControls';
 import {MyKeyboardControls} from '@/components/models/MyKeyboardControls';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
-import { SpielerLokal } from '@/components/models/SpielerLokal';
+import {SpielerLokal} from '@/components/models/SpielerLokal';
 
 
 export default defineComponent({
@@ -34,7 +34,7 @@ export default defineComponent({
     let moveUp = false;
     let moveDown = false;
     let collidableList: Array<any> = [];
-    let developer = true;
+    let developer = false;
     let developerCamera: any;
     let controls: any;
 
@@ -52,8 +52,7 @@ export default defineComponent({
       initScene();
       initLoader();
       initCamera();
-      //initPlane();
-      //initCube();
+      initPlane();
       initRaycaster();
       initRenderer();
       initControls();
@@ -106,8 +105,8 @@ export default defineComponent({
           console.log("Die MobiliarId ist " + mobiliarId);
           loader.ladeDatei('http://localhost:8080/level/' + mobiliarId).then((res: any) => {
             console.log(res)
-            res.scene.positionX = 50 * posX
-            res.scene.positionY = 50 * posY
+            res.scene.position.x = 1 * posX
+            res.scene.position.z = 1 * posY
             scene.add(res.scene)
           });
 
@@ -208,26 +207,14 @@ export default defineComponent({
       console.log("Müsste disconnected sein")
     }
 
-    // const initPlane = () => {
-    //   let plane = new Three.PlaneGeometry(5, 5, 1, 1);
-    //   let material = new Three.MeshBasicMaterial();
+    const initPlane = () => {
+      let plane = new Three.PlaneGeometry(5, 5, 1, 1);
+      let material = new Three.MeshBasicMaterial();
 
-    //   meshPlane = new Three.Mesh(plane, material);
-    //   meshPlane.position.z = -2
-    //   rotateObject(meshPlane, -70, 0, 0);
-    //   moveObject(meshPlane, 0, 1, 0);
-    //   //scene.add(meshPlane);
-    // };
-
-    const initCube = () => {
-
-      let geometry = new Three.BoxGeometry(0.2, 0.2, 0.2);
-      let material = new Three.MeshNormalMaterial();
-
-      meshCube = new Three.Mesh(geometry, material);
-      meshCube.position.z = -1;
-      //scene.add(meshCube);
+      meshPlane = new Three.Mesh(plane, material);
+      scene.add(meshPlane);
     };
+
 
     const initRaycaster = () => {
       raycaster = new Three.Raycaster(new Three.Vector3(), new Three.Vector3(0, -1, 0), 0, 10);
