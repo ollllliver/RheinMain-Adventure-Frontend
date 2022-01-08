@@ -1,6 +1,6 @@
 import { reactive, readonly } from 'vue'
 import { Lobby } from './Lobby'
-import { Spieler } from './Spieler'
+import { Spieler } from '../components/models/Spieler'
 import { LobbyMessage } from './LobbyMessage'
 import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
