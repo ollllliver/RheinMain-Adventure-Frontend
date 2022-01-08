@@ -9,6 +9,7 @@ import { defineComponent, onMounted } from "vue";
 import { GraphicLoader } from './models/GraphicLoader';
 import { MyMouseControls } from '@/components/models/MyMouseControls';
 import { MyKeyboardControls } from '@/components/models/MyKeyboardControls';
+import { Interactions } from '@/components/models/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 
 
@@ -33,12 +34,14 @@ export default defineComponent({
     let moveUp = false;
     let moveDown = false;
     let collidableList: Array<any> = [];
+    let interactableList: Array<any> = [];
     let developer = true;
     let developerCamera: any;
     let controls: any;
 
     let mouseControls: MyMouseControls;
     let keyControls: MyKeyboardControls;
+    let interactions: Interactions;
 
     let player = {
       height: .5,
@@ -65,6 +68,7 @@ export default defineComponent({
       initRaycaster();
       initRenderer();
       initControls();
+      initInteractions();
       doAnimate();
       
     });
@@ -153,6 +157,13 @@ export default defineComponent({
       connect();
     }
 
+    /**
+     * Initialisiert der Interaktionen
+     */
+    const initInteractions = () => {
+      interactions = new Interactions(interactableList, cameraCollidable, document);
+    }
+
     const connect = () => {
       window.addEventListener( 'click', mouseControls.lock ); //locked die Maus
     }
@@ -160,6 +171,7 @@ export default defineComponent({
     const disconnect = () => {
       mouseControls.dispose();
       keyControls.disconnect();
+      interactions.disconnect();
       window.removeEventListener('click', mouseControls.lock );
       console.log("Müsste disconnected sein")
     }
@@ -177,12 +189,16 @@ export default defineComponent({
 
     const initCube = () => {
       
-      let geometry = new Three.BoxGeometry(0.2, 0.2, 0.2);
+      let geometry = new Three.BoxGeometry(0.5, 0.5, 0.5);
       let material = new Three.MeshNormalMaterial();
 
       meshCube = new Three.Mesh(geometry, material);
-      meshCube.position.z = -1;
-      //scene.add(meshCube);
+      meshCube.position.x = -5;
+      meshCube.position.y = 0.5;
+      meshCube.position.z = -3;
+      meshCube.name = "Testwuerfel"
+      scene.add(meshCube);
+      interactableList.push(meshCube)
     };
 
     const initRaycaster = () => {
@@ -234,6 +250,15 @@ export default defineComponent({
       
       mouseControls.update(velocity, delta); //Maus Steuerung
       keyControls.update(camera, velocity, delta) //Tastatur Steuerung
+      interactions.update(camera) //Interaktionen
+
+      // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
+      if(interactions.erkannteInteraktion){
+        zeigeInteraktionText(interactions.erkannteInteraktion)
+      }else{
+        verbergeInteraktionText()
+      }
+
 			prevTime = time;
 
       // developer sicht
@@ -283,6 +308,16 @@ export default defineComponent({
       mesh.position.y -= Math.min(moveY);
       mesh.position.z -= Math.min(moveZ);
     } 
+
+    function zeigeInteraktionText(interaktion:any){
+      //TODO: Interaktionstext anzeigen
+      //console.log("Interagiere mit " + interaktion.object.name)
+    }
+
+    function verbergeInteraktionText(){
+      //TODO: Interaktionstext verbergen
+      //console.log("Hide")
+    }
     
     return {connect, disconnect}
 
