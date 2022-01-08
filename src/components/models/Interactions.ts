@@ -49,7 +49,7 @@ import {Vector3, Raycaster} from 'three';
 
         const interaktionErkennung = (blickVektor:any, originPoint: any) => {
 
-            this.rayCaster.set(originPoint, blickVektor);
+            this.rayCaster.set(originPoint, blickVektor)
 
             const collisionResult = this.rayCaster.intersectObjects(interaktionsListe)
 
@@ -62,7 +62,7 @@ import {Vector3, Raycaster} from 'three';
 
         const interagiere = (interaktion:any) => {
             //TODO: Interaktion
-            console.log(interaktion.object.name)
+            interaktion.object.position.x += 0.5
         }
 
         this.update = (camera: any) => {
@@ -76,8 +76,8 @@ import {Vector3, Raycaster} from 'three';
             this.rayCaster = new Raycaster(originPoint, vorneVektor, 0, interaktionReichweite)
 
             this.erkannteInteraktion = interaktionErkennung(vorneVektor, originPoint)
-        };
+        }
 
-        connect();
+        connect()
     }
 }

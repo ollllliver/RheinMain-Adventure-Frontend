@@ -1,5 +1,7 @@
 <template>
-  <div id="container"></div>
+  <div id="container">
+    <h2 id="InteraktionText"></h2>
+  </div>
   
 </template>
 
@@ -42,6 +44,7 @@ export default defineComponent({
     let mouseControls: MyMouseControls;
     let keyControls: MyKeyboardControls;
     let interactions: Interactions;
+    let interaktionText: any;
 
     let player = {
       height: .5,
@@ -162,6 +165,7 @@ export default defineComponent({
      */
     const initInteractions = () => {
       interactions = new Interactions(interactableList, cameraCollidable, document);
+      interaktionText = document.getElementById("InteraktionText")
     }
 
     const connect = () => {
@@ -310,13 +314,17 @@ export default defineComponent({
     } 
 
     function zeigeInteraktionText(interaktion:any){
-      //TODO: Interaktionstext anzeigen
-      //console.log("Interagiere mit " + interaktion.object.name)
+      if(interaktionText != null && interaktionText.style.display == "none"){
+        interaktionText.textContent = "Interagiere mit " + interaktion.object.name
+        interaktionText.style.display = "block"
+      }
     }
 
     function verbergeInteraktionText(){
-      //TODO: Interaktionstext verbergen
-      //console.log("Hide")
+      if(interaktionText != null && interaktionText.style.display != "none"){
+        interaktionText.textContent = ""
+        interaktionText.style.display = "none"
+      }
     }
     
     return {connect, disconnect}
