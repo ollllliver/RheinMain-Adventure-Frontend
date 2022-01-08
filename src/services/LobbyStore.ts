@@ -364,8 +364,9 @@ async function joinRandomLobby() {
 }
 
 async function starteLobby() {
-    console.log('Fetch auf: /api/lobby/' + lobbystate.lobbyID + '/start');
-    return fetch('/api/lobby/' + lobbystate.lobbyID + '/start', {
+
+    console.log("Fetch auf: /api/lobby/{lobbyId}/start")
+    return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

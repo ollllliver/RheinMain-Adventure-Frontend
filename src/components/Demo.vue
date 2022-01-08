@@ -10,6 +10,7 @@ import {GraphicLoader} from './models/GraphicLoader';
 import {MyMouseControls} from '@/components/models/MyMouseControls';
 import {MyKeyboardControls} from '@/components/models/MyKeyboardControls';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
+import { SpielerLokal } from '@/components/models/SpielerLokal';
 
 
 export default defineComponent({
@@ -40,16 +41,7 @@ export default defineComponent({
     let mouseControls: MyMouseControls;
     let keyControls: MyKeyboardControls;
 
-    let player = {
-      height: .5,
-      turnSpeed: .1,
-      speed: .1,
-      jumpHeight: .2,
-      gravity: .01,
-      velocity: 0,
-      jumps: false,
-      ducks: false,
-    };
+    let spieler: SpielerLokal
 
     let prevTime = performance.now();
     let velocity = new Three.Vector3();
@@ -162,19 +154,20 @@ export default defineComponent({
      * Initialisiert Kamera
      */
     const initCamera = () => {
-
+      
+      spieler = new SpielerLokal
 
       // First Person View inset (camera)
       camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
       //camera.position.set(0, player.height, -5);
-      camera.position.set(-2, player.height * 3, -5);
-      camera.lookAt(new Three.Vector3(-2, player.height * 3, 0));
+      camera.position.set(-2, spieler.height * 3, -5);
+      camera.lookAt(new Three.Vector3(-2, spieler.height * 3, 0));
 
       // Developer Kamera Main (camera2)
       if (developer) {
         developerCamera = new Three.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
         developerCamera.position.set(-50, 50, -50);
-        developerCamera.lookAt(new Three.Vector3(0, player.height, 0));
+        developerCamera.lookAt(new Three.Vector3(0, spieler.height, 0));
 
         // Axes Helper (x,y,z)
         const axesHelper = new Three.AxesHelper(30);
@@ -188,8 +181,8 @@ export default defineComponent({
       let cubeGeometry = new Three.BoxGeometry(1, 1, 1);
       let wireMaterial = new Three.MeshBasicMaterial({color: 0xff0000, wireframe: true});
       cameraCollidable = new Three.Mesh(cubeGeometry, wireMaterial);
-      cameraCollidable.position.set(0, player.height / 2, 0);
-      cameraCollidable.lookAt(new Three.Vector3(0, player.height, 0))
+      cameraCollidable.position.set(0, spieler.height / 2, 0);
+      cameraCollidable.lookAt(new Three.Vector3(0, spieler.height, 0))
 
 
     };
@@ -199,7 +192,7 @@ export default defineComponent({
      */
     const initControls = () => {
       mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
-      keyControls = new MyKeyboardControls(collidableList, cameraCollidable, document); //init Keyboardsteuerung
+      keyControls = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
 
       connect();
     }
@@ -267,15 +260,13 @@ export default defineComponent({
       // const time = performance.now();
       // const delta = ( time - prevTime ) / 1000;
       // keyControls.update()(delta);
-
-
+      
       const time = performance.now();
       const delta = (time - prevTime) / 1000;
       //entweder hier oder in MyKeyboardControl
       velocity.x -= velocity.x * 10.0 * delta;
       velocity.z -= velocity.z * 10.0 * delta;
       velocity.y -= velocity.y * 10.0 * delta;
-
 
       mouseControls.update(velocity, delta); //Maus Steuerung
       keyControls.update(camera, velocity, delta) //Tastatur Steuerung
@@ -310,23 +301,14 @@ export default defineComponent({
       }
 
 
+      //wohin damit?
+      spieler.position.x = camera.position.x.toFixed(2);
+      spieler.position.y = camera.position.y.toFixed(2);
+      spieler.position.z = camera.position.z.toFixed(2);
+
+			renderer.render( scene, camera );
+     
     };
-
-    function degInRad(deg: number) {
-      return (deg * Math.PI) / 90;
-    }
-
-    function rotateObject(mesh: any, degreeX = 0, degreeY = 0, degreeZ = 0) {
-      mesh.rotateX(Three.Math.degToRad(degreeX));
-      mesh.rotateY(Three.Math.degToRad(degreeY));
-      mesh.rotateZ(Three.Math.degToRad(degreeZ));
-    }
-
-    function moveObject(mesh: any, moveX = 0, moveY = 0, moveZ = 0) {
-      mesh.position.x -= Math.min(moveX);
-      mesh.position.y -= Math.min(moveY);
-      mesh.position.z -= Math.min(moveZ);
-    }
 
     return {connect, disconnect}
 
