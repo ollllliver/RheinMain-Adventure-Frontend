@@ -20,7 +20,7 @@ export default defineComponent({
   name: "RenderDemo",
   setup() {
 
-    const {initScene, initLoader, initCamera, initPlane, initInteractionTestCube, initRaycaster, initRenderer, initControls, initInteractions, doAnimate, connect, disconnect, setContainer} = useGameEngine();
+    const {initScene, initLoader, initCamera, initPlane, initInteractionTestObject, initRaycaster, initRenderer, initControls, initInteractions, doAnimate, connect, disconnect, setContainer} = useGameEngine();
     
 
     onMounted(() => {
@@ -29,7 +29,7 @@ export default defineComponent({
       initLoader();
       initCamera();
       initPlane();
-      initInteractionTestCube();
+      initInteractionTestObject();
       initRaycaster();
       initRenderer();
       initControls();

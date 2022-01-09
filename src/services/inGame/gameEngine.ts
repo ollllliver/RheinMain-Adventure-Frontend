@@ -146,6 +146,17 @@ const initCamera = () => {
 };
 
 /**
+* Passe Spielanzeige an die groeße des Browserfensters an
+*/
+ window.addEventListener('resize', () =>{
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  })
+
+/**
  * Initialisiert die Steuerung
  */
 const initControls = () => {
@@ -185,18 +196,18 @@ const initPlane = () => {
     scene.add(meshPlane);
 };
 
-const initInteractionTestCube = () => {
-      
-    const geometry = new Three.BoxGeometry(0.5, 0.5, 0.5);
-    const material = new Three.MeshNormalMaterial();
+const initInteractionTestObject = () => {
 
-    meshCube = new Three.Mesh(geometry, material);
-    meshCube.position.x = -5;
-    meshCube.position.y = 0.5;
-    meshCube.position.z = -3;
-    meshCube.name = "Testwuerfel"
-    scene.add(meshCube);
-    interactableList.push(meshCube)
+    loader.ladeDatei('/assets/blender/key.gltf').then((key: any) => {
+        const keyModel = key.scene;
+        keyModel.children[0].name = "Schluessel";
+        keyModel.position.x = -5;
+        keyModel.position.y = 0.5;
+        keyModel.position.z = -3;
+        scene.add(keyModel);
+        interactableList.push(keyModel);
+    }).catch((e)=>
+    console.log('ERROR:',e));
   };
 
 
@@ -284,14 +295,14 @@ const doAnimate = () => {
 };
 
 function zeigeInteraktionText(interaktion:any){
-    if(interaktionText != null && interaktionText.style.display == "none"){
+    if(interaktionText != null /*&& interaktionText.style.display == "none"*/){
         interaktionText.textContent = "Interagiere mit " + interaktion.object.name
         interaktionText.style.display = "block"
       }
   }
 
   function verbergeInteraktionText(){
-    if(interaktionText != null && interaktionText.style.display != "none"){
+    if(interaktionText != null /*&& interaktionText.style.display != "none"*/){
         interaktionText.textContent = ""
         interaktionText.style.display = "none"
       }
@@ -314,7 +325,7 @@ export function useGameEngine(){
         initLoader,
         initCamera,
         initPlane,
-        initInteractionTestCube,
+        initInteractionTestObject,
         initRaycaster,
         initRenderer,
         initControls,
