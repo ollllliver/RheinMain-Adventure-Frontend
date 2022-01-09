@@ -20,8 +20,17 @@ export class Spieler {
         this.position = { x:0, y:0, z:0 };
         this.jumps = false;
         this.ducks = false;
-        this.eigenschaften = {position: this.position};
+        this.eigenschaften = new SpielerEigenschaften;
     }
+
+    setPosition(pos: Position): void{
+        this.eigenschaften.position = pos;
+    }
+}
+
+class SpielerEigenschaften{
+    position = new Position(0,0,0);
+    statusListe: any;
 }
 
 export class Position {
@@ -30,19 +39,7 @@ export class Position {
     z:number;
     constructor(x:number,y:number,z:number){
         this.x = x;
-        this.y = x;
+        this.y = y;
         this.z = z;
     }
 }
-
-export interface SpielerInterface{
-    name: string;
-    eigenschaften: SpielerEigenschaften;
-    host: boolean;
-}
-
-interface SpielerEigenschaften{
-    position: Position;
-    statusListe: any;
-}
-

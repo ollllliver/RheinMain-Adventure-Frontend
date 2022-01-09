@@ -1,6 +1,6 @@
 import { useLobbyStore } from '@/services/lobby/LobbyStore';
 import { Client, Message } from '@stomp/stompjs';
-import { Spieler, Position, SpielerInterface } from '@/models/Spieler';
+import { Spieler, Position } from '@/models/Spieler';
 import user from '@/stores/user' 
 
 const wsurl = `ws://localhost:8080/gamebroker`;

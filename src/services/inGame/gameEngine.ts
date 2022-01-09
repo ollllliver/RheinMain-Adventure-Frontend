@@ -1,12 +1,13 @@
 import * as Three from "three";
-import {defineComponent, onMounted} from "vue";
 import {GraphicLoader} from '@/services/inGame/GraphicLoader';
 import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
 import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
-import { Position } from "@/models/Spieler";
+import { Position, Spieler } from "@/models/Spieler";
+import { useLobbyStore } from "../lobby/LobbyStore";
+import userStore from '@/stores/user'
 
 
 
@@ -40,6 +41,12 @@ const velocity = new Three.Vector3();
 const direction = new Three.Vector3();
 
 const stompClient = gamebrokerStompclient;
+
+const {lobbystate} = useLobbyStore();
+
+const mitspieler3dObjektListe = new Map();
+
+let startPosition: Position;
 
 function setContainer(element: HTMLElement|null){
     container = element
@@ -79,26 +86,50 @@ const initLoader = () => {
     return response.json();
 
     }).then((RaumMobiliarListe) => {
-    console.log(RaumMobiliarListe);
-    console.log("Jetzt wird iteriert")
-    RaumMobiliarListe.forEach(function (raumMobiliar) {
-        // console.log(raumMobiliar)
-        const posX = raumMobiliar.positionX;
-        const posY = raumMobiliar.positionY;
-        // Idee von Olli:
-        // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platzieren
-        // Davor müsste man zu begin ein Set des Mobiliars erstellen
+        console.log(RaumMobiliarListe);
+        console.log("Jetzt wird iteriert")
+        RaumMobiliarListe.forEach(function (raumMobiliar) {
+            // console.log(raumMobiliar)
+            const posX = raumMobiliar.positionX;
+            const posY = raumMobiliar.positionY;
+            console.log(raumMobiliar);
+            if (raumMobiliar.raumMobiliarId == 43){
+                startPosition = new Position(posX, spieler.height *3, posY);
+            }
+            
+            // Idee von Olli:
+            // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platzieren
+            // Davor müsste man zu begin ein Set des Mobiliars erstellen
 
-        const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
-        loader.ladeDatei('http://localhost:3000/api/level/' + mobiliarId).then((res: any) => {
-        // console.log(res)
-        res.scene.position.x = 1 * posX
-        res.scene.position.z = 1 * posY
-        collidableList.push(res.scene)
-        scene.add(res.scene)
+            const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
+            loader.ladeDatei('http://localhost:3000/api/level/' + mobiliarId).then((res: any) => {
+                // console.log(res)
+                res.scene.position.x = 1 * posX
+                res.scene.position.z = 1 * posY
+                collidableList.push(res.scene)
+                scene.add(res.scene)
+            });
         });
-    });
-    console.log("Fertig iteriert")
+        console.log("Fertig iteriert")
+
+        camera.position.set(startPosition.x, startPosition.y, startPosition.z);
+
+        lobbystate.teilnehmerliste.forEach( function (spieler){
+            if (spieler.name!=userStore.state.benutzername){
+                loader.ladeDatei('/assets/blender/player.gltf').then((spieler3D: any) => {
+
+                    const objektInScene = spieler3D.scene;
+
+                    scene.add(objektInScene)
+
+                    objektInScene.position.x = 1 * startPosition.x;
+                    objektInScene.position.z = 1 * startPosition.z;
+    
+                    mitspieler3dObjektListe.set(spieler.name, objektInScene);
+                });
+            } 
+        });
+
     });
 };
 
@@ -113,8 +144,8 @@ const initCamera = () => {
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
-    //camera.position.set(0, player.height, -5);
-    camera.position.set(-2, spieler.height * 3, -5);
+    camera.position.set(0, spieler.height *3, 0);
+    // camera.position.set(-2, spieler.height * 3, -5);
     camera.lookAt(new Three.Vector3(-2, spieler.height * 3, 0));
 
     // Developer Kamera Main (camera2)
@@ -247,14 +278,11 @@ const doAnimate = () => {
 
 };
 
-function setzeMitspielerAufPosition(position: Position){
-    loader.ladeDatei('/assets/blender/player.gltf').then((res: any) => {
-        // console.log(res)
-        res.scene.position.x = 1 * position.x
-        res.scene.position.z = 1 * position.z
-        scene.add(res.scene)
-    }).catch((e)=>
-    console.log('ERROR:',e));
+function setzeMitspielerAufPosition(spieler: Spieler){
+    const objektInScene = mitspieler3dObjektListe.get(spieler.name);
+    
+    objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
+    objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
 export function useGameEngine(){

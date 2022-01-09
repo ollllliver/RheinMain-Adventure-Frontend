@@ -4,14 +4,7 @@
 </template>
 
 <script lang="ts">
-import * as Three from "three";
 import {defineComponent, onMounted} from "vue";
-import {GraphicLoader} from '@/services/inGame/GraphicLoader';
-import {MyMouseControls} from '@/services/inGame/MyMouseControls';
-import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
-//import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
-import {SpielerLokal} from '@/models/SpielerLokal';
-import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 import { useGameEngine } from "@/services/inGame/gameEngine";
 
 
