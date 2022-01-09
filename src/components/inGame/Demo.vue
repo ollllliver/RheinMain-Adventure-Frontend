@@ -1,6 +1,7 @@
 <template>
-  <div id="container"></div>
-
+  <div id="container">
+    <h2 id="interaktionText"></h2>
+  </div>
 </template>
 
 <script lang="ts">
@@ -12,7 +13,7 @@ export default defineComponent({
   name: "RenderDemo",
   setup() {
 
-    const {initScene, initLoader, initCamera, initPlane, initRaycaster, initRenderer, initControls, doAnimate, connect, disconnect, setContainer} = useGameEngine();
+    const {initScene, initLoader, initCamera, initPlane, initInteractionTestObject, initRaycaster, initRenderer, initControls, initInteractions, doAnimate, connect, disconnect, setContainer} = useGameEngine();
     
 
     onMounted(() => {
@@ -21,9 +22,11 @@ export default defineComponent({
       initLoader();
       initCamera();
       initPlane();
+      initInteractionTestObject();
       initRaycaster();
       initRenderer();
       initControls();
+      initInteractions();
       doAnimate();
 
     });

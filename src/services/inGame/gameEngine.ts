@@ -2,6 +2,7 @@ import * as Three from "three";
 import {GraphicLoader} from '@/services/inGame/GraphicLoader';
 import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
+import { Interactions } from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
 import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
@@ -27,12 +28,15 @@ const loader = new GraphicLoader();
 // let moveUp = false;
 // let moveDown = false;
 const collidableList: Array<any> = [];
+const interactableList: Array<any> = [];
 const developer = false;
 let developerCamera: any;
 let controls: any;
 
 let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
+let interactions: Interactions;
+let interaktionText: any;
 
 let spieler: SpielerLokal
 
@@ -173,6 +177,17 @@ const initCamera = () => {
 };
 
 /**
+* Passe Spielanzeige an die groeße des Browserfensters an
+*/
+ window.addEventListener('resize', () =>{
+    camera.aspect = window.innerWidth / window.innerHeight
+    camera.updateProjectionMatrix()
+
+    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+  })
+
+/**
  * Initialisiert die Steuerung
  */
 const initControls = () => {
@@ -182,6 +197,14 @@ const initControls = () => {
     connect();
 }
 
+/**
+* Initialisiert die Interaktionen
+*/
+ const initInteractions = () => {
+    interactions = new Interactions(interactableList, cameraCollidable, document);
+    interaktionText = document.getElementById("interaktionText");
+}
+
 const connect = () => {
     window.addEventListener('click', mouseControls.lock); //locked die Maus
 }
@@ -189,6 +212,7 @@ const connect = () => {
 const disconnect = () => {
     mouseControls.dispose();
     keyControls.disconnect();
+    interactions.disconnect();
     window.removeEventListener('click', mouseControls.lock);
     console.log("Müsste disconnected sein")
 }
@@ -202,6 +226,20 @@ const initPlane = () => {
     meshPlane.position.x = 0
     scene.add(meshPlane);
 };
+
+const initInteractionTestObject = () => {
+
+    loader.ladeDatei('/assets/blender/key.gltf').then((key: any) => {
+        const keyModel = key.scene;
+        keyModel.children[0].name = "Schluessel";
+        keyModel.position.x = -5;
+        keyModel.position.y = 0.5;
+        keyModel.position.z = -3;
+        scene.add(keyModel);
+        interactableList.push(keyModel);
+    }).catch((e)=>
+    console.log('ERROR:',e));
+  };
 
 
 const initRaycaster = () => {
@@ -238,6 +276,15 @@ const doAnimate = () => {
 
     mouseControls.update(velocity, delta); //Maus Steuerung
     keyControls.update(camera, velocity, delta) //Tastatur Steuerung
+    interactions.update(camera) //Interaktionen
+
+    // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
+    if(interactions.erkannteInteraktion){
+        zeigeInteraktionText(interactions.erkannteInteraktion)
+    }else{
+        verbergeInteraktionText()
+    }
+
     prevTime = time;
 
     // developer sicht
@@ -278,7 +325,21 @@ const doAnimate = () => {
 
 };
 
-function setzeMitspielerAufPosition(spieler: Spieler){
+function zeigeInteraktionText(interaktion:any){
+    if(interaktionText != null /*&& interaktionText.style.display == "none"*/){
+        interaktionText.textContent = "Interagiere mit " + interaktion.object.name
+        interaktionText.style.display = "block"
+      }
+  }
+
+  function verbergeInteraktionText(){
+    if(interaktionText != null /*&& interaktionText.style.display != "none"*/){
+        interaktionText.textContent = ""
+        interaktionText.style.display = "none"
+      }
+  }
+
+  function setzeMitspielerAufPosition(spieler: Spieler){
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
     
     objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
@@ -292,9 +353,11 @@ export function useGameEngine(){
         initLoader,
         initCamera,
         initPlane,
+        initInteractionTestObject,
         initRaycaster,
         initRenderer,
         initControls,
+        initInteractions,
         doAnimate,
         connect, disconnect,
         setContainer,
