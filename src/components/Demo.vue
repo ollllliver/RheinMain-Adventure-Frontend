@@ -80,8 +80,12 @@ export default defineComponent({
     const initLoader = () => {
       loader = new GraphicLoader();
 
-      console.log("ABFRAGE VOM LEVEL AUS DEM BACKEND");
-      fetch('http://localhost:8080/level/1/0', {
+      // TODO: Level-ID dynamisch bestimmen
+
+      // const { lobbystate } = useLobbyStore()
+      // const levelId : number = lobbystate.levelID
+
+      fetch('http://localhost:3000/api/level/1/0', {
         method: 'GET',
       }).then((response) => {
         if (!response.ok) {
@@ -102,58 +106,23 @@ export default defineComponent({
           // Davor müsste man zu begin ein Set des Mobiliars erstellen
 
           var mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
-          console.log("Die MobiliarId ist " + mobiliarId);
-          loader.ladeDatei('http://localhost:8080/level/' + mobiliarId).then((res: any) => {
+          loader.ladeDatei('http://localhost:3000/api/level/' + mobiliarId).then((res: any) => {
             console.log(res)
             res.scene.position.x = 1 * posX
             res.scene.position.z = 1 * posY
+            collidableList.push(res.scene)
             scene.add(res.scene)
           });
-
-          /*          fetch('http://localhost:8080/level/' + mobiliarId, {method: 'GET'})
-                        .then((response) => response.json())
-                        .then((json) => {
-                          console.log(json);
-
-                          const jsonString = JSON.stringify(json);
-                          console.log("Laden erfolgreich, versuche das Ding in den Loader zu schmeißen");
-                          loader.ladeDatei(json).then((res: any) => {
-                            console.log(res)
-                            scene.add(res.scene)
-                          });
-                        }).catch((e) => {
-                      console.log(e);
-                    });*/
         });
         console.log("Fertig iteriert")
       });
-
-
-      // loader = new GraphicLoader();
-      // console.log(loader);
-      // loader.ladeDatei('/assets/blender/room.gltf')
-      //     .then((res: any) => {
-      //       // TODO:
-      //       // Kamera, Steuerung und scene.position der gltf.scene zuweisen (Hier oder in Loader Klasse?)
-      //       //   gltf.scene.scale.set( 20, 20, 20 );
-      //       //   gltf.scene.position.x = 0;
-      //       //   gltf.scene.position.y = 0;
-      //       //   gltf.scene.position.z = 0;
-      //       //   gltf.controls = controls
-      //       //   gltf.camera = camera;
-      //       // vielleicht extra Methode konfiguriere in Loader Klasse und dann hier loader.konfiguere(res.scene)
-      //       console.log(res)
-      //       scene.add(res.scene)
-      //       // TODO: Mehrere Dateien handlen koennen fuer Collision Detection
-      //       collidableList.push(res.scene)
-      //     })
     };
 
     /**
      * Initialisiert Kamera
      */
     const initCamera = () => {
-      
+
       spieler = new SpielerLokal
 
       // First Person View inset (camera)
@@ -208,10 +177,12 @@ export default defineComponent({
     }
 
     const initPlane = () => {
-      let plane = new Three.PlaneGeometry(5, 5, 1, 1);
-      let material = new Three.MeshBasicMaterial();
+      let plane = new Three.PlaneGeometry(100, 100);
+      let material = new Three.MeshBasicMaterial({color: 0xB4A290, side: Three.DoubleSide});
 
       meshPlane = new Three.Mesh(plane, material);
+      meshPlane.rotateX(1 / 2 * Math.PI)
+      meshPlane.position.x = 0
       scene.add(meshPlane);
     };
 
@@ -240,14 +211,7 @@ export default defineComponent({
 
     const doAnimate = () => {
       requestAnimationFrame(doAnimate);
-      // meshCube.rotation.x += 0.01;
-      // meshCube.rotation.y += 0.02;
-      //update();
 
-      // const time = performance.now();
-      // const delta = ( time - prevTime ) / 1000;
-      // keyControls.update()(delta);
-      
       const time = performance.now();
       const delta = (time - prevTime) / 1000;
       //entweder hier oder in MyKeyboardControl
@@ -293,8 +257,8 @@ export default defineComponent({
       spieler.position.y = camera.position.y.toFixed(2);
       spieler.position.z = camera.position.z.toFixed(2);
 
-			renderer.render( scene, camera );
-     
+      renderer.render(scene, camera);
+
     };
 
     return {connect, disconnect}
