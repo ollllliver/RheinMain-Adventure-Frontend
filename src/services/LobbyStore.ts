@@ -5,12 +5,12 @@ import { LobbyMessage } from './LobbyMessage'
 import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
 import userStore from '@/stores/user'
-import { NachrichtenCode } from './NachrichtenCode';
-import { NachrichtenTyp } from './NachrichtenTyp';
-import { ChatNachricht } from './ChatNachricht';
+import {NachrichtenCode} from './NachrichtenCode';
+import {NachrichtenTyp} from './NachrichtenTyp';
+import {ChatNachricht} from './ChatNachricht';
 
 const wsurl = `ws://localhost:8080/messagebroker`;
-const stompclient = new Client({ brokerURL: wsurl });
+const stompclient = new Client({brokerURL: wsurl});
 
 // verwendete StompSubscriptions:
 let lobbySubscription: StompSubscription;
@@ -21,6 +21,7 @@ let uebersichtSubscription: StompSubscription;
  * lobbystate ist ein reactive, das zu einer Lobby essentielle Infos hält + errormessage
  */
 const lobbystate = reactive({
+    // TODO: Level-Id (als Number)
     lobbyID: "",
     teilnehmerliste: Array<Spieler>(),
     host: {} as Spieler,
