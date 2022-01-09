@@ -1,5 +1,5 @@
 import { ICommand } from "./CommandManager";
-import Demo from "@/components/Demo.vue";
+import Demo from "@/components/inGame/Demo.vue";
 
 /*
  * Jeder Befehl bekommt seine eigene Klasse und implementiert das ICommand Interface

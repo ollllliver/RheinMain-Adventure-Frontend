@@ -7,7 +7,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Demo from "@/components/Demo.vue";
+import Demo from "@/components/inGame/Demo.vue";
 export default defineComponent({
   name: "Environment",
   components: { Demo }

@@ -1,4 +1,4 @@
-import { Spieler } from "../components/models/Spieler";
+import { Spieler } from "@/models/Spieler";
 
 export interface Lobby {
     lobbyID: string;

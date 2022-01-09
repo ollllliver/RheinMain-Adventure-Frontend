@@ -6,11 +6,12 @@
 <script lang="ts">
 import * as Three from "three";
 import {defineComponent, onMounted} from "vue";
-import {GraphicLoader} from './models/GraphicLoader';
-import {MyMouseControls} from '@/components/models/MyMouseControls';
-import {MyKeyboardControls} from '@/components/models/MyKeyboardControls';
+import {GraphicLoader} from '@/services/inGame/GraphicLoader';
+import {MyMouseControls} from '@/services/inGame/MyMouseControls';
+import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
-import {SpielerLokal} from '@/components/models/SpielerLokal';
+import {SpielerLokal} from '@/models/SpielerLokal';
+import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 
 
 export default defineComponent({
@@ -46,6 +47,8 @@ export default defineComponent({
     let prevTime = performance.now();
     let velocity = new Three.Vector3();
     const direction = new Three.Vector3();
+
+    const stompClient = gamebrokerStompclient;
 
     onMounted(() => {
       container = document.getElementById("container");
@@ -123,7 +126,9 @@ export default defineComponent({
      */
     const initCamera = () => {
 
-      spieler = new SpielerLokal
+      stompClient.activate();
+      spieler = new SpielerLokal(stompClient);
+      subscribeToSpielerPositionenUpdater(stompClient);
 
       // First Person View inset (camera)
       camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);

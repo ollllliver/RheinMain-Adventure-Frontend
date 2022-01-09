@@ -12,7 +12,7 @@
 
 <script lang="ts">
 import { computed, defineComponent } from "vue";
-import { useLobbyStore } from "@/services/LobbyStore";
+import { useLobbyStore } from "@/services/lobby/LobbyStore";
 import userStore from "@/stores/user";
 import { toSvg } from "jdenticon";
 

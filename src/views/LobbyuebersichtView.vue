@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted} from "vue";
-import { useLobbyStore } from "@/services/LobbyStore";
+import { useLobbyStore } from "@/services/lobby/LobbyStore";
 
 export default defineComponent({
   name: "LobbyuebersichtView",

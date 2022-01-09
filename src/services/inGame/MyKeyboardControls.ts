@@ -1,5 +1,5 @@
 import { Euler, Vector3, EventDispatcher, Raycaster } from 'three';
-import { SpielerLokal } from './SpielerLokal';
+import { SpielerLokal } from '../../models/SpielerLokal';
 import { Camera } from "three/src/cameras/Camera";
 
 

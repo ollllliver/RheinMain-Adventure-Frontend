@@ -1,4 +1,4 @@
-import { NachrichtenTyp } from "./NachrichtenTyp";
+import { NachrichtenTyp } from "@/messaging/NachrichtenTyp";
 
 export interface ChatNachricht{
     typ: NachrichtenTyp;

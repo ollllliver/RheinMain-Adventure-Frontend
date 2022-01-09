@@ -1,13 +1,13 @@
 import { reactive, readonly } from 'vue'
-import { Lobby } from './Lobby'
-import { Spieler } from '../components/models/Spieler'
-import { LobbyMessage } from './LobbyMessage'
+import { Lobby } from '../../models/Lobby'
+import { Spieler } from '@/models/Spieler'
+import { LobbyMessage } from '@/messaging/LobbyMessage'
 import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
 import userStore from '@/stores/user'
-import {NachrichtenCode} from './NachrichtenCode';
-import {NachrichtenTyp} from './NachrichtenTyp';
-import {ChatNachricht} from './ChatNachricht';
+import {NachrichtenCode} from '@/messaging/NachrichtenCode';
+import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
+import {ChatNachricht} from '@/messaging/ChatNachricht';
 
 const wsurl = `ws://localhost:8080/messagebroker`;
 const stompclient = new Client({brokerURL: wsurl});
