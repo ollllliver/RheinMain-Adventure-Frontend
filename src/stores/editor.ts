@@ -12,7 +12,7 @@ import { Karte } from '@/components/EditorKomponenten/Karte';
  * ausrichtung = Raumausrichtung der aktuellen Platzierung
  */
 const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
-const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. R1-R5 sind platzierbare Räume. Standardausrichtung ist horizontal."
+const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tuer ist horizontal."
 const karte = new Karte();
 const state = reactive({
     wegbeschreibung: 0,

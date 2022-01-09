@@ -54,11 +54,17 @@ export default defineComponent({
         const zurPruefung = () => {
             if(editorStore.getters.getZiel === true) {
                 if(editorStore.getters.getStart === true) {
-                    if(editorStore.getters.getRaeume > 0) {
+                    /*if(editorStore.getters.getRaeume > 0) {
                         editorStore.info('Karte wird eingereicht. Raumanzahl: '+ editorStore.getters.getRaeume)
                         console.log(editorStore.getters.getGrid)
                     } else {
                         editorStore.info('Jede Karte benötigt mindestens 1 Raum. Bitte platziere erst einen Raum bevor du die Karte zur Prüfung einreichst.')
+                    }*/
+                    if(editorStore.getters.getSchluessel === editorStore.getters.getTuer) {
+                        editorStore.info('Karte wird eingereicht. Schluessel='+ editorStore.getters.getSchluessel +' Tueren='+editorStore.getters.getTuer)
+                        console.log(editorStore.getters.getGrid)
+                    } else {
+                        editorStore.info('Fuer jede Tuer muss ein Schluessel existieren. Aktuelle Anzahl Tueren='+editorStore.getters.getTuer+ ' Schluessel='+editorStore.getters.getSchluessel)
                     }
                 } else {
                     editorStore.info('Jede Karte benötigt einen Startpunkt. Bitte markiere einen Startpunkt.')

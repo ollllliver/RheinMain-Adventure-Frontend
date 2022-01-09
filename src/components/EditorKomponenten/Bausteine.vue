@@ -8,16 +8,20 @@
     <button class="btn btn-outline-secondary" :class="weg" @click="waehle($event, weg)" id="weg"> W </button>
     <button class="btn btn-outline-secondary" :class="start" @click="waehle($event, start)" id="start"> S </button>
     <button class="btn btn-outline-secondary" :class="ziel" @click="waehle($event,ziel)" id="ziel"> Z </button>
-    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, tuer)" @click="setzeInfo(tuer)" >T </button>
-    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, schluessel)" @click="setzeInfo(tuer)" >Sch </button>
-    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, npc)" @click="setzeInfo(tuer)" >NPC </button>
+    
+    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, schluessel)" @click="setzeInfo(schluessel)" id="schluessel"><img src="/img/schluessel.png"
+    style="display: block; margin-left: auto; margin-right: auto;"/> </button>
+    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, npc)" @click="setzeInfo(npc)" id="npc"><img src="/img/npc.png"
+    style="display: block; margin-left: auto; margin-right: auto;"/> </button>
+    <button class="btn btn-outline-secondary" draggable="true" @dragstart="startDrag($event, tuer)" @click="setzeInfo(tuer)" id="tuer"> <img src="/img/tuer-h.png" 
+    style="display: block; margin-left: auto; margin-right: auto;"/> </button>
     <!--
         Räume vorerst verschoben
     <button class="btn btn-outline-secondary" v-for="raum in raeume" :key="raum.id" draggable="true" 
     @dragstart="startDrag($event, raum)" @click="setzeInfo(raum)" id="räume"> R{{raum.title}} </button>
      -->
     <div class="btn-group btn-group-toggle" data-toggle="buttons" id="raumausrichtung">
-        <p class="ueberschrift"> Raumausrichtung </p> 
+        <p class="ueberschrift"> Tuerausrichtung </p> 
         <label class="btn">
             <input type="radio" name="options" autocomplete="off" checked @click="ausrichten(0)"> 
             <p class="beschreibung">horizontal </p>
@@ -41,9 +45,9 @@ export default defineComponent({
         const weg = 1
         const start = 2
         const ziel = 3
-        const tuer = 4
-        const schluessel = 5
-        const npc = 6
+        const schluessel = 4
+        const npc = 5
+        const tuer = 6
         
         /*
         // Räume === vorerst verschoben
@@ -85,13 +89,23 @@ export default defineComponent({
 
         // Infobox füllen
         const setzeInfo = (item: any) => {
+            switch (item) {
+                case 4:
+                    editorStore.info('Platziere einen Schluessel auf der Karte. Mit Schluesseln koennen Tuere geoeffnet werden. Bitte beachte das die Anzahl der Schluessel mit der Anzahl der Tueren uebereinstimmt.')
+                break;
+                case 5:
+                    editorStore.info('Platziere einen NPC auf der Karte. NPC geben dir Hinweise zu den versteckten Schluessel auf der Karte.')
+                break;
+                case 6:
+                    editorStore.info('Platziere eine Tuer auf der Karte. Standardausrichrtung ist horizontal, diese kann ueber die Auswahl veraendert werden. Bitte beachte das die Anzahl der Schluessel mit der Anzahl der Tueren uebereinstimmt.')
+                break;
+            }
             //editorStore.info(item.rauminfo)
-            editorStore.info('hallo')
         }
 
         // Anleitung über i in Infobox
         const info = () => {
-            editorStore.info("Die Karte startet voller Wände. Mit Klick auf W, S oder Z kann das gewünschte Element auf der Karte per Mausklick eingezeichnet werden. R1 - R5 sind platzierbare Räume die über Drag-and-Drop auf die Karte gezogen werden können. Die Räume können über die Auswahl entweder horizontal oder vertikal platziert werden.")
+            editorStore.info("Die Karte startet voller Wände. Mit Klick auf W, S oder Z kann das gewünschte Element auf der Karte per Mausklick eingezeichnet werden. Die weiteren Bausteine sind platzierbare Elemente die über Drag-and-Drop auf die Karte gezogen werden können. Die Tueren können über die Auswahl entweder horizontal oder vertikal platziert werden.")
         } 
         
         // Ausrichtung des Raums bestimmen
@@ -99,11 +113,11 @@ export default defineComponent({
             editorStore.ausrichten(richtung)
             switch (richtung) {
                 case 0:{
-                    editorStore.info("Räume werden jetzt horizontal platziert. Horizontale Räume bestehen aus 2x3 Felder.")
+                    editorStore.info("Tuere werden jetzt horizontal platziert.")
                     break;
                 }
                 case 1: {
-                    editorStore.info("Räume werden jetzt vertikal platziert. Vertikale Räume bestehen aus 3x2 Felder.")
+                    editorStore.info("Tuere werden jetzt vertikal platziert.")
                     break;
                 }
             }
@@ -164,5 +178,6 @@ export default defineComponent({
         background-color: rgba(210, 222, 255, 0.87);
         color: black;
     }
+    
     
 </style>

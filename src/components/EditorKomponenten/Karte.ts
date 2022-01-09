@@ -12,7 +12,7 @@ export class Karte {
         for(let i = 0; i < 14; i++) {
             this._liste[i] = [];
             for(let j = 0; j< 22; j++) {
-                this._liste[i][j] = {y:i, x:j, e:0, a:9};
+                this._liste[i][j] = {y:i, x:j, e:0};
             }
         }
     }

@@ -107,6 +107,26 @@ export class ElementHinzufuegen implements ICommand {
                 }
 
                 case 4: {
+                    // Schlüssel in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posY, this._element.posX, this._element.e);  
+                    // Schlüssel im Div platzieren
+                    this._event.target.style.background = "no-repeat center url('../img/schluessel.png') rgba(255,211,155, 0.75)" 
+                    editorStore.info("Schluessl platziert.")
+                    editorStore.setzeSchluessel(1)
+                    break;
+                }
+                case 5: {
+                    // NPC in Karte einfügen falls noch kein Element an dieser Stelle ist
+                    this._karte.setElement(this._element.posY, this._element.posX, this._element.e);  
+                    // Hintergrund des Divs auf Farbe des Elements ändern
+                    this._event.target.style.background = "no-repeat center url('../img/npc.png') rgba(255,211,155, 0.75)" 
+                    editorStore.info("NPC platziert.")
+                    editorStore.setzeNpc(1)
+                    
+                    break;
+                }
+                
+                case 6: {
                     // Tür in Karte einfügen falls noch kein Element an dieser Stelle ist
                     this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung);  
                     // Tür je nach Ausrichtung im Div platzieren
@@ -120,26 +140,6 @@ export class ElementHinzufuegen implements ICommand {
                     //this._event.target.style = "background-image url('../assets/tuer.png'); background-size:auto;"
                     editorStore.info("Tür platziert.")
                     editorStore.setzeTuer(1)
-                    break;
-                }
-                case 5: {
-                    // Schlüssel in Karte einfügen falls noch kein Element an dieser Stelle ist
-                    this._karte.setElement(this._element.posY, this._element.posX, this._element.e);  
-                    // Schlüssel im Div platzieren
-                    this._event.target.style.background = "no-repeat center url('../img/schluessel.png') rgba(255,211,155, 0.75)" 
-                    editorStore.info("Schluessl platziert.")
-                    editorStore.setzeSchluessel(1)
-                    break;
-                }
-                
-                case 6: {
-                    // NPC in Karte einfügen falls noch kein Element an dieser Stelle ist
-                    this._karte.setElement(this._element.posY, this._element.posX, this._element.e);  
-                    // Hintergrund des Divs auf Farbe des Elements ändern
-                    this._event.target.style.background = "no-repeat center url('../img/npc.png') rgba(255,211,155, 0.75)" 
-                    editorStore.info("NPC platziert.")
-                    editorStore.setzeNpc(1)
-                    
                     break;
                 }
             
