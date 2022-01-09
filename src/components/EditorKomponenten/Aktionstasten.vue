@@ -63,6 +63,17 @@ export default defineComponent({
                     if(editorStore.getters.getSchluessel === editorStore.getters.getTuer) {
                         editorStore.info('Karte wird eingereicht. Schluessel='+ editorStore.getters.getSchluessel +' Tueren='+editorStore.getters.getTuer)
                         console.log(editorStore.getters.getGrid)
+                        fetch("http://localhost:8080/api/levelEditor/speichern", {
+                            method: "POST",
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify(editorStore.getters.getGrid.liste)}
+                        ).then(function(res) {
+                            console.log("LEVEL GESPEICHERT");
+                            console.log(res);
+                        });
                     } else {
                         editorStore.info('Fuer jede Tuer muss ein Schluessel existieren. Aktuelle Anzahl Tueren='+editorStore.getters.getTuer+ ' Schluessel='+editorStore.getters.getSchluessel)
                     }
