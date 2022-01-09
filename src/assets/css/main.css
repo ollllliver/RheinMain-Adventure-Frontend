@@ -22,3 +22,13 @@
 .chat-message {
   position: relative;
 }
+
+#interaktionText{
+  position: absolute;
+  color: white;
+  margin: 0;
+  top: 80%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%)
+}

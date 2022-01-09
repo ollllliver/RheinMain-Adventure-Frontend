@@ -3,6 +3,7 @@ import {defineComponent, onMounted} from "vue";
 import {GraphicLoader} from '@/services/inGame/GraphicLoader';
 import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
+import { Interactions } from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
 import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
@@ -26,12 +27,15 @@ const loader = new GraphicLoader();
 // let moveUp = false;
 // let moveDown = false;
 const collidableList: Array<any> = [];
+const interactableList: Array<any> = [];
 const developer = false;
 let developerCamera: any;
 let controls: any;
 
 let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
+let interactions: Interactions;
+let interaktionText: any;
 
 let spieler: SpielerLokal
 
@@ -151,6 +155,14 @@ const initControls = () => {
     connect();
 }
 
+/**
+* Initialisiert die Interaktionen
+*/
+ const initInteractions = () => {
+    interactions = new Interactions(interactableList, cameraCollidable, document);
+    interaktionText = document.getElementById("interaktionText");
+}
+
 const connect = () => {
     window.addEventListener('click', mouseControls.lock); //locked die Maus
 }
@@ -158,6 +170,7 @@ const connect = () => {
 const disconnect = () => {
     mouseControls.dispose();
     keyControls.disconnect();
+    interactions.disconnect();
     window.removeEventListener('click', mouseControls.lock);
     console.log("Müsste disconnected sein")
 }
@@ -171,6 +184,20 @@ const initPlane = () => {
     meshPlane.position.x = 0
     scene.add(meshPlane);
 };
+
+const initInteractionTestCube = () => {
+      
+    const geometry = new Three.BoxGeometry(0.5, 0.5, 0.5);
+    const material = new Three.MeshNormalMaterial();
+
+    meshCube = new Three.Mesh(geometry, material);
+    meshCube.position.x = -5;
+    meshCube.position.y = 0.5;
+    meshCube.position.z = -3;
+    meshCube.name = "Testwuerfel"
+    scene.add(meshCube);
+    interactableList.push(meshCube)
+  };
 
 
 const initRaycaster = () => {
@@ -207,6 +234,15 @@ const doAnimate = () => {
 
     mouseControls.update(velocity, delta); //Maus Steuerung
     keyControls.update(camera, velocity, delta) //Tastatur Steuerung
+    interactions.update(camera) //Interaktionen
+
+    // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
+    if(interactions.erkannteInteraktion){
+        zeigeInteraktionText(interactions.erkannteInteraktion)
+    }else{
+        verbergeInteraktionText()
+    }
+
     prevTime = time;
 
     // developer sicht
@@ -247,6 +283,20 @@ const doAnimate = () => {
 
 };
 
+function zeigeInteraktionText(interaktion:any){
+    if(interaktionText != null && interaktionText.style.display == "none"){
+        interaktionText.textContent = "Interagiere mit " + interaktion.object.name
+        interaktionText.style.display = "block"
+      }
+  }
+
+  function verbergeInteraktionText(){
+    if(interaktionText != null && interaktionText.style.display != "none"){
+        interaktionText.textContent = ""
+        interaktionText.style.display = "none"
+      }
+  }
+
 function setzeMitspielerAufPosition(position: Position){
     loader.ladeDatei('/assets/blender/player.gltf').then((res: any) => {
         // console.log(res)
@@ -264,9 +314,11 @@ export function useGameEngine(){
         initLoader,
         initCamera,
         initPlane,
+        initInteractionTestCube,
         initRaycaster,
         initRenderer,
         initControls,
+        initInteractions,
         doAnimate,
         connect, disconnect,
         setContainer,
