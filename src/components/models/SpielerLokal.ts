@@ -1,6 +1,6 @@
 import { useLobbyStore } from '@/services/LobbyStore';
 import { Client, Message } from '@stomp/stompjs';
-import { Spieler, Position } from './Spieler';
+import { Spieler, Position, SpielerInterface } from './Spieler';
 import user from '@/stores/user' 
 
 export class SpielerLokal extends Spieler{
@@ -32,7 +32,10 @@ export class SpielerLokal extends Spieler{
         this.stompclient.onConnect = async (frame) => {
             console.log("SpielerLokal erfolgreich verbunden: " + frame);
             this.stompclient.subscribe(DEST, (message) => { //subscribe zu jedem spieler einzeln oder alle zusammen?
-                console.log(`SpielerLokal von ${DEST} empfangen`, message.body)
+                const spieler: SpielerInterface = JSON.parse(message.body);
+                console.log(`SpielerLokal von ${DEST} empfangen`, spieler.name);
+                console.log(`SpielerLokal von ${DEST} empfangen`, spieler.eigenschaften.position);
+
             });
             // this.stompclient.subscribe("/topic/spiel", (message) => { //Die Messages kommen hier an aber nicht im Backend
             //     console.log(message);

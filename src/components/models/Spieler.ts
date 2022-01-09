@@ -9,7 +9,7 @@ export class Spieler {
     position: Position;
     jumps: boolean;
     ducks: boolean;
-
+    eigenschaften: {position: Position};
     constructor(){ 
         this.name = "default"; //TODO
         this.height = .5;
@@ -20,6 +20,7 @@ export class Spieler {
         this.position = { x:0, y:0, z:0 };
         this.jumps = false;
         this.ducks = false;
+        this.eigenschaften = {position: this.position};
     }
 }
 
@@ -33,3 +34,15 @@ export class Position {
         this.z = z;
     }
 }
+
+export interface SpielerInterface{
+    name: string;
+    eigenschaften: SpielerEigenschaften;
+    host: boolean;
+}
+
+interface SpielerEigenschaften{
+    position: Position;
+    statusListe: any;
+}
+
