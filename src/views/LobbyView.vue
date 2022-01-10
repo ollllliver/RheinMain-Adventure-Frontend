@@ -53,6 +53,10 @@ export default defineComponent({
   setup(props) {
     const { lobbystate, connectToLobby, leaveLobby, sendeChatNachricht, empfangeChatNachricht} = useLobbyStore();
 
+    window.addEventListener('beforeunload',function(e){
+      leaveLobby();
+    });
+
     onMounted(async () => {
       connectToLobby(String(props.lobby_id));
     });
