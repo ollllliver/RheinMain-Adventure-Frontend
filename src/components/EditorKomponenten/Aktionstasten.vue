@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import {defineComponent} from 'vue'
 import {CommandStack} from '../../commands/CommandManager'
 import editorStore from "@/stores/editor";
 //import {ConcreteCommandTest} from '../../commands/Command'
@@ -61,19 +61,25 @@ export default defineComponent({
                         editorStore.info('Jede Karte benötigt mindestens 1 Raum. Bitte platziere erst einen Raum bevor du die Karte zur Prüfung einreichst.')
                     }*/
                     if(editorStore.getters.getSchluessel === editorStore.getters.getTuer) {
-                        editorStore.info('Karte wird eingereicht. Schluessel='+ editorStore.getters.getSchluessel +' Tueren='+editorStore.getters.getTuer)
-                        console.log(editorStore.getters.getGrid)
-                        fetch("http://localhost:8080/api/levelEditor/speichern", {
-                            method: "POST",
+                      editorStore.info('Karte wird eingereicht. Schluessel=' + editorStore.getters.getSchluessel + ' Tueren=' + editorStore.getters.getTuer)
+                      console.log(editorStore.getters.getGrid)
+                      fetch("http://localhost:8080/api/level", {
+                            method: "PUT",
                             headers: {
-                                'Accept': 'application/json',
-                                'Content-Type': 'application/json'
+                              'Accept': 'application/json',
+                              'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify({karte:editorStore.getters.getGrid.liste, name: editorStore.getters.getLevelName, minSpieler: editorStore.getters.getMinSpieler, maxSpieler: editorStore.getters.getMaxSpieler})}
-                        ).then(function(res) {
-                            console.log("LEVEL GESPEICHERT");
-                            console.log(res);
-                        });
+                            body: JSON.stringify({
+                              karte: editorStore.getters.getGrid.liste,
+                              name: editorStore.getters.getLevelName,
+                              minSpieler: editorStore.getters.getMinSpieler,
+                              maxSpieler: editorStore.getters.getMaxSpieler
+                            })
+                          }
+                      ).then(function (res) {
+                        console.log("LEVEL GESPEICHERT");
+                        console.log(res);
+                      });
                     } else {
                         editorStore.info('Fuer jede Tuer muss ein Schluessel existieren. Aktuelle Anzahl Tueren='+editorStore.getters.getTuer+ ' Schluessel='+editorStore.getters.getSchluessel)
                     }
