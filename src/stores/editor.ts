@@ -10,7 +10,14 @@ import { Karte } from '@/components/EditorKomponenten/Karte';
  * ziel = wenn Ziel platziert ture
  * raeume = Anzahhl platzierter Räume
  * ausrichtung = Raumausrichtung der aktuellen Platzierung
+ * schluessel = anzahl der Schluessel
+ * tuer = Anzahl der Tueren
+ * npc = Anzahl der NPC's
+ * levelname = name der aktuellen Karte
+ * minSpieler = Anzahl min Spieler
+ * maxSpieler = Anzahl max Spieler
  */
+
 const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
 const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tuer ist horizontal."
 const karte = new Karte();
@@ -24,7 +31,10 @@ const state = reactive({
     ausrichtung: 0,
     schluessel: 0,
     tuer: 0,
-    npc: 0
+    npc: 0,
+    levelName: "",
+    minSpieler: 0,
+    maxSpieler: 0
 })
 
 /**
@@ -63,7 +73,16 @@ const getters = reactive({
     }),
     getNpc: computed(() => {
         return state.npc
-    })
+    }),
+    getLevelName: computed(() => {
+        return state.levelName
+    }),
+    getMinSpieler: computed(() => {
+        return state.minSpieler
+    }),
+    getMaxSpieler: computed(() => {
+        return state.maxSpieler
+    }),
 })
 
 /**
@@ -72,6 +91,8 @@ const getters = reactive({
  * info = setzt Infotext
  * start = setzt start
  * ziel = setzt ziel
+ * ausrichten = setzt ausrichtung des Elements
+ * setze xy = setzt jeweiliges Element
  */
 const actions = {
     async setze(wb: number) {
@@ -152,7 +173,16 @@ const actions = {
     },
     async setzeNpc(gesetzt: number) {
         state.npc += gesetzt
-    }
+    },
+    async setzeLevelName(gesetzt: string) {
+        state.levelName = gesetzt
+    },
+    async setzeMinSpieler(gesetzt: number) {
+        state.minSpieler = gesetzt
+    },
+    async setzeMaxSpieler(gesetzt: number) {
+        state.maxSpieler = gesetzt
+    },
 
 }
 

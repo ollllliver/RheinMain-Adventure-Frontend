@@ -73,7 +73,7 @@ export class ElementHinzufuegen implements ICommand {
     execute = () => {
         // Braucht man für CommandManager ?
         this._state += 1;
-       
+        
         if (this._karte.liste[this._element.posY][this._element.posX].e !== this._element.e) {
             switch (this._element.e) {
                 // Wenn Element Wegpunkt ist

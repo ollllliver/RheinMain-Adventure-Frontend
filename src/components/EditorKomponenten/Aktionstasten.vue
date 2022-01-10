@@ -9,7 +9,7 @@
         <button class="btn btn-outline-secondary " @click="zurPruefung()">
             zur Prüfung einreichen
         </button>
-        <button class="btn btn-outline-secondary" >
+        <button class="btn btn-outline-secondary" @clicke="test()">
             später beenden
         </button>
         <button class="btn btn-outline-secondary" >
@@ -69,7 +69,7 @@ export default defineComponent({
                                 'Accept': 'application/json',
                                 'Content-Type': 'application/json'
                             },
-                            body: JSON.stringify(editorStore.getters.getGrid.liste)}
+                            body: JSON.stringify({karte:editorStore.getters.getGrid.liste, name: editorStore.getters.getLevelName, minSpieler: editorStore.getters.getMinSpieler, maxSpieler: editorStore.getters.getMaxSpieler})}
                         ).then(function(res) {
                             console.log("LEVEL GESPEICHERT");
                             console.log(res);
@@ -84,8 +84,11 @@ export default defineComponent({
                 editorStore.info('Jede Karte benötigt einen Zielpunkt. Bitte platziere einen Zielpunkt.')
             }
         }
+        const test = () => {
+            console.log("test",editorStore.getters.getLevelName, editorStore.getters.getMinSpieler, editorStore.getters.getMaxSpieler)
+        }
         return {
-            zurPruefung
+            zurPruefung, test
         }
     }
 
