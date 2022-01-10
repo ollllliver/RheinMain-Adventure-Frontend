@@ -67,7 +67,7 @@
 
 <script lang="ts">
 import { defineComponent, reactive, watchEffect, ref } from "vue";
-import { useLobbyStore } from "@/services/lobby/LobbyStore";
+import { useLobbyStore } from "@/services/lobby/lobbyService";
 import userStore from "@/stores/user";
 import router from "@/router";
 export default defineComponent({

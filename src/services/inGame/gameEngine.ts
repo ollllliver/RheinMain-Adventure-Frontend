@@ -7,7 +7,7 @@ import { Interactions } from '@/services/inGame/Interactions';
 import {SpielerLokal} from '@/models/SpielerLokal';
 import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 import { Position, Spieler } from "@/models/Spieler";
-import { useLobbyStore } from "../lobby/LobbyStore";
+import { useLobbyStore } from "../lobby/lobbyService";
 import userStore from '@/stores/user'
 
 

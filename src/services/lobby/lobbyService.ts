@@ -8,6 +8,7 @@ import userStore from '@/stores/user'
 import {NachrichtenCode} from '@/messaging/NachrichtenCode';
 import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
+import {alleLobbiesState, lobbystate} from '@/stores/lobbyStore';
 
 const wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
 const stompclient = new Client({brokerURL: wsurl});
@@ -16,33 +17,6 @@ const stompclient = new Client({brokerURL: wsurl});
 let lobbySubscription: StompSubscription;
 let lobbyChatSubscription: StompSubscription;
 let uebersichtSubscription: StompSubscription;
-
-/**
- * lobbystate ist ein reactive, das zu einer Lobby essentielle Infos hält + errormessage
- */
-const lobbystate = reactive({
-    // TODO: Level-Id (als Number)
-    lobbyID: "",
-    teilnehmerliste: Array<Spieler>(),
-    host: {} as Spieler,
-    istGestartet: false,
-    istVoll: false,
-    spielerlimit: 0,
-    errormessage: "",
-    // die darfBeitreten-Flag ist dafür, wenn jemand per Link joint, aber nicht joinen darf,
-    // dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird.
-    darfBeitreten: false,
-    istPrivat: false,
-    countdown: 10,
-})
-
-/**
- * alleLobbiesState ist ein reactive, das die Liste von Lobbys hält + errormessage
- */
-const alleLobbiesState = reactive({
-    lobbies: Array<Lobby>(),
-    errormessage: ""
-})
 
 /**
  * connectToStomp ist die Function, in der der stompclient sich beim MessageBroker aus dem Backend einschreibt.

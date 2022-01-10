@@ -1,4 +1,4 @@
-import { useLobbyStore } from '@/services/lobby/LobbyStore';
+import { useLobbyStore } from '@/services/lobby/lobbyService';
 import { Client, Message } from '@stomp/stompjs';
 import { Spieler, Position } from '@/models/Spieler';
 import user from '@/stores/user' 
