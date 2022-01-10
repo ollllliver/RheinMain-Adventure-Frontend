@@ -228,10 +228,10 @@ const initPlane = () => {
 };
 
 const initInteractionTestObject = () => {
-
+    // erzeuge Schluessel
     loader.ladeDatei('/assets/blender/key.gltf').then((key: any) => {
         const keyModel = key.scene;
-        keyModel.children[0].name = "Schluessel";
+        keyModel.children[0].name = "Schlüssel";
         keyModel.position.x = -5;
         keyModel.position.y = 0.5;
         keyModel.position.z = -3;
@@ -239,6 +239,17 @@ const initInteractionTestObject = () => {
         interactableList.push(keyModel);
     }).catch((e)=>
     console.log('ERROR:',e));
+
+    // erzeuge Tuer
+    const geometry = new Three.BoxGeometry(0.1, 2, 1);
+    const material = new Three.MeshNormalMaterial();
+    const door = new Three.Mesh(geometry, material);
+    door.name = "Tür"
+    door.position.x = -5;
+    door.position.y = 1;
+    door.position.z = 3;
+    scene.add(door);
+    interactableList.push(door)
   };
 
 
@@ -327,7 +338,7 @@ const doAnimate = () => {
 
 function zeigeInteraktionText(interaktion:any){
     if(interaktionText != null /*&& interaktionText.style.display == "none"*/){
-        interaktionText.textContent = "Interagiere mit " + interaktion.object.name
+        interaktionText.textContent = "[E] Interagiere mit " + interaktion.object.name
         interaktionText.style.display = "block"
       }
   }

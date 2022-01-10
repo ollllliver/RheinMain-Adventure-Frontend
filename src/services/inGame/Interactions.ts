@@ -17,6 +17,7 @@ import {Vector3, Raycaster} from 'three';
     constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document) {
 
         const interaktionReichweite = 2
+        let hatSchluessel = false
 
         this.domElement = domElement
         this.cameraCollidable = cameraCollidable
@@ -61,8 +62,29 @@ import {Vector3, Raycaster} from 'three';
         }
 
         const interagiere = (interaktion:any) => {
-            //TODO: Interaktion
-            interaktion.object.position.x += 0.5
+            //TODO: Überprüfung nicht anhand vom Namen machen & hatSchluessel in eigene Inventar Klasse
+            switch (interaktion.object.name) {
+                case "Schlüssel":
+                    hatSchluessel = true
+                    interaktion.object.parent.remove(interaktion.object);
+                    break;
+                case "Tür":
+                    if(hatSchluessel){
+                        hatSchluessel = false
+
+                        // öffne Tür
+                        interaktion.object.rotation.y = Math.PI / 2;
+
+                        // entferne Tür aus interaktionsListe
+                        const index = interaktionsListe.indexOf(interaktion.object);
+                        if (index > -1) {
+                            interaktionsListe.splice(index, 1);
+                        }
+                    }else{
+                        //TODO: "Du benötigst einen Schlüssel" - Meldung
+                    }
+                    break;
+            }
         }
 
         this.update = (camera: any) => {
