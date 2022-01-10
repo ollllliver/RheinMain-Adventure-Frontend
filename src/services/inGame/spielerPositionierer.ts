@@ -2,7 +2,7 @@ import {Spieler } from '@/models/Spieler';
 import { Client } from '@stomp/stompjs';
 import { useLobbyStore } from '@/services/lobby/LobbyStore';
 
-const wsurl = `ws://localhost:8080/gamebroker`;
+const wsurl = `ws://${window.location.hostname}:8080/gamebroker`;
 export const gamebrokerStompclient = new Client({ brokerURL: wsurl });
 const { lobbystate } = useLobbyStore();
 import userStore from '@/stores/user'
