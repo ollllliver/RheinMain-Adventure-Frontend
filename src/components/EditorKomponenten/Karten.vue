@@ -1,6 +1,5 @@
 <template>
   <div class="container" style="max-width: 600px">
-    
     <!-- Eingabe Kartenname -->
     <div class="d-flex mt-5">
       <input
@@ -8,13 +7,8 @@
         v-model="task"
         placeholder="Kartename"
         class="w-100 form-control"
-      />
-      <button class="btn btn-warning rounded-0" @click="submitTask">
-        OK
-      </button>
+      /><button class="btn btn-warning rounded-0" @click="submitTask">OK</button>
     </div>
-
-
 
     <!-- Tabelle -->
     <table class="table table-bordered mt-5">
@@ -30,9 +24,7 @@
       <tbody>
         <tr v-for="(task, index) in tasks" :key="index">
           <td>
-            <span>
-              {{ task.name }}
-            </span>
+            <span>{{ task.name }}</span>
           </td>
           <td>
             <span
@@ -42,9 +34,7 @@
                 'text-danger': task.status === 'in Arbeit',
                 'text-success': task.status === 'freigegeben',
               }"
-            >
-              {{ capitalizeFirstChar(task.status) }}
-            </span>
+            >{{ capitalizeFirstChar(task.status) }}</span>
           </td>
           <td class="text-center">
             <div @click="deleteTask(index)">
@@ -79,7 +69,6 @@ export default {
           name: "Labyrinth",
           status: "freigegeben",
         },
-
       ],
     };
   },
@@ -119,7 +108,6 @@ export default {
       }
       this.task = "";
     },
-
   },
 };
 </script>
