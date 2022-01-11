@@ -1,5 +1,5 @@
 import { ICommand } from "./CommandManager";
-import {Karte} from '../components/EditorKomponenten/Karte'
+import {Karte} from '@/models/Karte'
 import editorStore from '@/stores/editor'
 /*
  * Jeder Befehl bekommt seine eigene Klasse und implementiert das ICommand Interface
