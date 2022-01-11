@@ -80,7 +80,7 @@ const initLoader = () => {
     // const { lobbystate } = useLobbyStore()
     // const levelId : number = lobbystate.levelID
 
-    fetch('http://localhost:3000/api/level/1/0', {
+    fetch(`http://${window.location.hostname}:3000/api/level/1/0`, {
     method: 'GET',
     }).then((response) => {
     if (!response.ok) {
@@ -106,7 +106,7 @@ const initLoader = () => {
             // Davor müsste man zu begin ein Set des Mobiliars erstellen
 
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
-            loader.ladeDatei('http://localhost:3000/api/level/' + mobiliarId).then((res: any) => {
+            loader.ladeDatei(`http://${window.location.hostname}:3000/api/level/` + mobiliarId).then((res: any) => {
                 // console.log(res)
                 res.scene.position.x = 1 * posX
                 res.scene.position.z = 1 * posY
