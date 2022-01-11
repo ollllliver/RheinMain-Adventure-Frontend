@@ -38,7 +38,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted} from "vue";
-import { useLobbyStore } from "@/services/LobbyStore";
+import { useLobbyStore } from "@/services/lobby/lobbyService";
 import InviteCopy from "@/components/lobby/InviteCopy.vue";
 import Chat from "@/components/lobby/Chat.vue";
 import Einstellungen from "@/components/lobby/Einstellungen.vue";

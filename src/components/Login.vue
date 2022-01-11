@@ -28,6 +28,7 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive } from 'vue'
+import { SpielerLokal } from '@/models/SpielerLokal';
 import userStore from '@/stores/user'
 export default defineComponent({
   setup() {
@@ -40,6 +41,7 @@ export default defineComponent({
       form.benutzername = ''
       form.passwort = ''
     }
+
     return { form, userStore, onSubmit }
   }
 })

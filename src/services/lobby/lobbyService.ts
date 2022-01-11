@@ -1,47 +1,22 @@
 import { reactive, readonly } from 'vue'
-import { Lobby } from './Lobby'
-import { Spieler } from './Spieler'
-import { LobbyMessage } from './LobbyMessage'
+import { Lobby } from '../../models/Lobby'
+import { Spieler } from '@/models/Spieler'
+import { LobbyMessage } from '@/messaging/LobbyMessage'
 import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
 import userStore from '@/stores/user'
-import { NachrichtenCode } from './NachrichtenCode';
-import { NachrichtenTyp } from './NachrichtenTyp';
-import { ChatNachricht } from './ChatNachricht';
+import {NachrichtenCode} from '@/messaging/NachrichtenCode';
+import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
+import {ChatNachricht} from '@/messaging/ChatNachricht';
+import {alleLobbiesState, lobbystate} from '@/stores/lobbyStore';
 
-const wsurl = `ws://localhost:8080/messagebroker`;
-const stompclient = new Client({ brokerURL: wsurl });
+const wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
+const stompclient = new Client({brokerURL: wsurl});
 
 // verwendete StompSubscriptions:
 let lobbySubscription: StompSubscription;
 let lobbyChatSubscription: StompSubscription;
 let uebersichtSubscription: StompSubscription;
-
-/**
- * lobbystate ist ein reactive, das zu einer Lobby essentielle Infos hält + errormessage
- */
-const lobbystate = reactive({
-    lobbyID: "",
-    teilnehmerliste: Array<Spieler>(),
-    host: {} as Spieler,
-    istGestartet: false,
-    istVoll: false,
-    spielerlimit: 0,
-    errormessage: "",
-    // die darfBeitreten-Flag ist dafür, wenn jemand per Link joint, aber nicht joinen darf,
-    // dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird.
-    darfBeitreten: false,
-    istPrivat: false,
-    countdown: 10,
-})
-
-/**
- * alleLobbiesState ist ein reactive, das die Liste von Lobbys hält + errormessage
- */
-const alleLobbiesState = reactive({
-    lobbies: Array<Lobby>(),
-    errormessage: ""
-})
 
 /**
  * connectToStomp ist die Function, in der der stompclient sich beim MessageBroker aus dem Backend einschreibt.
@@ -364,8 +339,9 @@ async function joinRandomLobby() {
 }
 
 async function starteLobby() {
-    console.log('Fetch auf: /api/lobby/' + lobbystate.lobbyID + '/start');
-    return fetch('/api/lobby/' + lobbystate.lobbyID + '/start', {
+
+    console.log("Fetch auf: /api/lobby/{lobbyId}/start")
+    return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

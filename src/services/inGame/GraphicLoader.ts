@@ -1,4 +1,4 @@
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import {GLTFLoader} from 'three/examples/jsm/loaders/GLTFLoader';
 
 /**
  * Loader Klasse zum Laden der GLTF Objekte
@@ -16,11 +16,10 @@ export class GraphicLoader {
      * @returns geladenes GLTF Objekt
      */
     public ladeDatei = (datei : string) => {
-        const result = new Promise<JSON>((resolve) => {
-            this.loader.load(datei, (gltf:Promise<JSON>) => {
+        return new Promise<JSON>((resolve) => {
+            this.loader.load(datei, (gltf: Promise<JSON>) => {
                 resolve(gltf)
             })
         })
-        return result
     }
 }

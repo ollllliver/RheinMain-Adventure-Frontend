@@ -1,4 +1,4 @@
-import { NachrichtenCode } from "./NachrichtenCode";
+import { NachrichtenCode } from "@/messaging/NachrichtenCode";
 
 export interface LobbyMessage{
     typ: NachrichtenCode;

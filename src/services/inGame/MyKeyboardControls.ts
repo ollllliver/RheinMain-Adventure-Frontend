@@ -1,4 +1,7 @@
-import {Vector3, Raycaster} from 'three';
+import { Euler, Vector3, EventDispatcher, Raycaster } from 'three';
+import { SpielerLokal } from '../../models/SpielerLokal';
+import { Camera } from "three/src/cameras/Camera";
+
 
 const direction = new Vector3();
 
@@ -22,7 +25,7 @@ export class MyKeyboardControls {
     disconnect: () => void;
 
 
-    constructor(collidableList: any, cameraCollidable: any, domElement: Document) {
+    constructor(collidableList: any, cameraCollidable: any, domElement: Document, spieler: SpielerLokal) {
 
         const velocity = new Vector3();
 
@@ -74,8 +77,11 @@ export class MyKeyboardControls {
                 case 'ShiftLeft':
                     this.moveDown = true;
                     break;
+                
 
             }
+            spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+
 
         };
 
@@ -229,7 +235,6 @@ export class MyKeyboardControls {
                 velocity.z += direction.z * speed * delta;
             if ((this.moveLeft&& linksCollision ) || (this.moveRight&& rechtsCollision ))
                 velocity.x += direction.x * speed * delta;
-
 
         };
         connect();
