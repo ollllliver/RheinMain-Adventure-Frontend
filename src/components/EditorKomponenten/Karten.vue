@@ -1,13 +1,20 @@
 <template>
+  <!-- Eingabe Kartenname und Kurzbeschreibung -->
   <div class="container" style="max-width: 600px">
-    <!-- Eingabe Kartenname -->
     <div class="d-flex mt-5">
       <input
+        v-model="karte"
         type="text"
-        v-model="task"
-        placeholder="Kartename"
-        class="w-100 form-control"
-      /><button class="btn btn-warning rounded-0" @click="submitTask">OK</button>
+        placeholder="Kartenname"
+        class="form-control"
+      />
+      <input
+        v-model="kbeschreibung"
+        type="text"
+        placeholder="Kurzbeschreibung"
+        class="form-control"
+      />
+      <button @click="submitName" class="btn btn-warning rounded-0">OK</button>
     </div>
 
     <!-- Tabelle -->
@@ -15,35 +22,34 @@
       <thead>
         <tr>
           <th scope="col">Kartenname</th>
-          <th scope="col" style="width: 120px">Status</th>
-          <th scope="col" style="width: 120px">Kurzbeschreibung</th>
-          <th scope="col" class="text-center"><span>&#9998;</span></th>
-          <th scope="col" class="text-center"><span>&#128465;</span></th>
+          <th scope="col">Status</th>
+          <th scope="col">Kurzbeschreibung</th>
+          <th scope="col">Bearbeiten</th>
+          <th scope="col">Löschen</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="(task, index) in tasks" :key="index">
-          <td>
-            <span>{{ task.name }}</span>
-          </td>
-          <td>
+        <tr v-for="(karte, index) in karten" :key="index">
+          <td>{{ karte.name }}</td>
+          <td style="width: 110px">
             <span
-              class="pointer noselect"
-              @click="changeStatus(index)"
+              @click="aendereStatus(index)"
+              class="pointer"
               :class="{
-                'text-danger': task.status === 'in Arbeit',
-                'text-success': task.status === 'freigegeben',
+                'text-danger': karte.status == 'in Arbeit',
+                'text-success': karte.status == 'freigegeben',
               }"
-            >{{ capitalizeFirstChar(task.status) }}</span>
+            >{{ karte.status }}</span>
           </td>
-          <td class="text-center">
-            <div @click="deleteTask(index)">
-              <span class="fa fa-trash pointer"></span>
+          <td>{{ karte.beschreibung }}</td>
+          <td>
+            <div class="text-center" @click="bearbeiteName(index)">
+              <span class="fa fa-pen"> </span>
             </div>
           </td>
-          <td class="text-center">
-            <div @click="editTask(index)">
-              <p class="fa fa-pen pointer"></p>
+          <td>
+            <div class="text-center" @click="loescheName(index)">
+              <span class="fa fa-trash"> </span>
             </div>
           </td>
         </tr>
@@ -55,69 +61,70 @@
 <script>
 export default {
   name: "Karten",
-  props: {
-    msg: String,
-  },
-  data() {
-    return {
-      task: "",
-      editedTask: null,
-      statuses: ["freigegeben", "in Arbeit"],
+  data(){
+    return{
+      karte: '',
+      bearbeiteterName: null,
+      bearbeiteteBeschreibung: null,
+      kbeschreibung: '',
       /* Spielstatus */
-      tasks: [
+      statuse:['freigegeben','in Arbeit'],
+      karten: [
         {
-          name: "Labyrinth",
-          status: "freigegeben",
+          name:'Schwerer Weg',
+          status:'in Arbeit',
+          beschreibung:'sehr schwer'
         },
-      ],
-    };
+        {
+          name:'Easypeasy',
+          status:'freigegeben',
+          beschreibung:'einfaches Spiel'
+
+        }
+      ]
+    }
   },
-  methods: {
-    /* Großbuchstaben */
-    capitalizeFirstChar(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    },
-    /* Status ändern*/
-    changeStatus(index) {
-      let newIndex = this.statuses.indexOf(this.tasks[index].status);
-      if (++newIndex > 2) newIndex = 0;
-      this.tasks[index].status = this.statuses[newIndex];
-    },
-    /* Löschen*/
-    deleteTask(index) {
-      this.tasks.splice(index, 1);
-    },
-    /* Bearbeiten */
-    editTask(index) {
-      this.task = this.tasks[index].name;
-      this.editedTask = index;
-    },
-    /*Hinzufügen*/
-    submitTask() {
-      if (this.task.length === 0) return;
-      /* Bearbeiten */
-      if (this.editedTask != null) {
-        this.tasks[this.editedTask].name = this.task;
-        this.editedTask = null;
+  methods:{
+    /* Name und Beschreibung hinzufügen */
+    submitName() {
+      if(this.karte.length==0) return;
+      if(this.bearbeiteterName==null && this.bearbeiteteBeschreibung==null){
+        this.karten.push({name: this.karte, status: 'in Arbeit', beschreibung: this.kbeschreibung,})
       } else {
-        /* neue Aufgabe hinzufügen */
-        this.tasks.push({
-          name: this.task,
-          status: "Status",
-        });
+        this.karten[this.bearbeiteterName].name=this.karte;
+        this.karten[this.bearbeiteteBeschreibung].beschreibung=this.kbeschreibung;
+        this.bearbeiteterName=null;
+        this.bearbeiteteBeschreibung=null;
       }
-      this.task = "";
+      /* Leere Felder angezeigt bekommen */
+      this.karte='';
+      this.kbeschreibung='';
     },
-  },
-};
+    /* Name und Beschreibung löschen */
+    loescheName(index){
+      this.karten.splice(index,1);
+    },
+    /* Name und Beschreibung ändern */
+    bearbeiteName(index){
+      this.karte=this.karten[index].name;
+      this.kbeschreibung=this.karten[index].beschreibung;
+      this.bearbeiteterName=index;
+      this.bearbeiteteBeschreibung=index;
+
+    },
+    /* Status ändern */
+    aendereStatus(index){
+      let neuesI=this.statuse.indexOf(this.karten[index].status);
+      if(++neuesI>1)neuesI=0;
+      this.karten[index].status=this.statuse[neuesI];
+
+    },
+  }
+}
 </script>
 
 <style scoped>
 .pointer {
   cursor: pointer;
-}
-
-.line-through {
-  text-decoration: line-through;
 }
 </style>

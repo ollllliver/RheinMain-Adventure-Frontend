@@ -2,7 +2,7 @@
   <!-- Aktionstasten: Buttons zum Auslösen verschiedener Aktionen (speichern/löschen/redo/undo/...) -->
   <div>
     <button class="btn btn-outline-secondary" @click="zurPruefung()">zur Prüfung einreichen</button>
-    <button class="btn btn-outline-secondary">später beenden</button>
+    <button class="btn btn-outline-secondary" @clicke="test()">später beenden</button>
     <button class="btn btn-outline-secondary">abbrechen</button>
     <button class="btn btn-outline-secondary">alles entfernen</button>
     <button class="btn btn-outline-secondary" @click="entfernen()">löschen: An/Aus</button>
@@ -28,6 +28,7 @@ export default defineComponent({
       CommandStack.getInstance().redo();
     },
   },
+
   setup() {
     // Karte nach Prüfung ob Start/Ziel und Raum platziert wurde loggen (vorerst)
     const zurPruefung = () => {
@@ -44,13 +45,18 @@ export default defineComponent({
           if (editorStore.getters.getSchluessel === editorStore.getters.getTuer) {
             editorStore.info("Karte wird eingereicht. Schluessel=" + editorStore.getters.getSchluessel + " Tueren=" + editorStore.getters.getTuer);
             console.log(editorStore.getters.getGrid);
-            fetch("http://localhost:8080/api/levelEditor/speichern", {
-              method: "POST",
+            fetch("http://localhost:8080/api/level", {
+              method: "PUT",
               headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
               },
-              body: JSON.stringify(editorStore.getters.getGrid.liste),
+              body: JSON.stringify({
+                karte: editorStore.getters.getGrid.liste,
+                name: editorStore.getters.getLevelName,
+                minSpieler: editorStore.getters.getMinSpieler,
+                maxSpieler: editorStore.getters.getMaxSpieler,
+              }),
             }).then(function (res) {
               console.log("LEVEL GESPEICHERT");
               console.log(res);
@@ -83,9 +89,19 @@ export default defineComponent({
       }
     };
 
+    const test = () => {
+      console.log(
+        "test",
+        editorStore.getters.getLevelName,
+        editorStore.getters.getMinSpieler,
+        editorStore.getters.getMaxSpieler
+      );
+    };
+
     return {
       zurPruefung,
       entfernen,
+      test,
     };
   },
 });
