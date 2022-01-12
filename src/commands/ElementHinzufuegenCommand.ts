@@ -1,6 +1,7 @@
 import { ICommand } from "./CommandManager";
 import {Karte} from '../models/Karte'
 import editorStore from '@/stores/editor'
+
 /*
  * Jeder Befehl bekommt seine eigene Klasse und implementiert das ICommand Interface
  */
@@ -53,7 +54,6 @@ export class ElementHinzufuegen implements ICommand {
      * @param element element das hinzugefügt wird (1 = Weg, 2 = Start, 3 = Ziel)
      * @param event event auf dem das Einfügen stattfindet (kann man bestimmt besser lösen)
      */
-
     constructor(karte: Karte , element: number, event: any, ausrichtung?: number) {
         this._state = 0;
         this._karte = karte;
@@ -313,6 +313,6 @@ export class ElementHinzufuegen implements ICommand {
             e:this._element.e.toString()
         }
         return "{ ["+hinzugefuegt.y+","+hinzugefuegt.x+"]"+" - "+hinzugefuegt.e+" }"
-        
     }
+
 }
