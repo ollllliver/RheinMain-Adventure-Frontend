@@ -11,7 +11,7 @@ export class Spieler {
     ducks: boolean;
     eigenschaften: {position: Position};
     constructor(){ 
-        this.name = "default"; //TODO
+        this.name = "default";
         this.height = .5;
         this.turnSpeed = .1;
         this.speed = .1;
