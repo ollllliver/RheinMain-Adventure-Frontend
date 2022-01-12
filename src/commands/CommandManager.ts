@@ -8,6 +8,7 @@ interface ICommand {
     undo(): any; //Befehl rückgängig machen
     //redo(): any; //Befehl wiederholen
     describe(): string;
+    getStack(): ICommand[];
 }
 
 /**

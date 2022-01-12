@@ -15,22 +15,26 @@ export class ElementEntfernenCommand implements ICommand {
    * @param element element, dass entfernt werden soll
    * @param event event, auf dem das Entfernen durchgeführt wird.
    */
-  constructor(karte: Karte, element: number, state: number, event: any) {
+  constructor(karte: Karte, element: number, state: number, event: any, xPos?: number, yPos?: number) {
     this._state = state;
     this._karte = karte;
     this._event = event;
-    this._element = { posY: this._event.target.__vnode.key.y, posX: this._event.target.__vnode.key.x, e: element };
+    if (xPos !== undefined && yPos !== undefined) {
+      this._element = { posY: yPos, posX: xPos, e: element};
+    } else {
+      this._element = { posY: this._event.target.__vnode.key.y, posX: this._event.target.__vnode.key.x, e: element };
+    }
   }
 
   execute = () => {
     this._state += 1;
     const pointedElement = this._karte.liste[this._element.posY][this._element.posX].e
-    console.log("Element mit Wert '" + pointedElement + "' angeklick");
     switch (pointedElement) {
       case 1: {
         this._karte.setElement(this._element.posY, this._element.posX, 0);
         this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
         editorStore.info("Wegpunkt entfernt")
+        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         break;
       }
       case 2: {
@@ -38,6 +42,7 @@ export class ElementEntfernenCommand implements ICommand {
         this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
         editorStore.start(false);
         editorStore.info("Start entfernt")
+        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         break;
       }
       case 3: {
@@ -45,6 +50,7 @@ export class ElementEntfernenCommand implements ICommand {
         this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
         editorStore.ziel(false);
         editorStore.info("Ziel entfernt")
+        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         break;
       }
       case 4: {
@@ -95,6 +101,10 @@ export class ElementEntfernenCommand implements ICommand {
       e: this._element.e.toString()
     }
     return "{ [" + entfernt.y + "," + entfernt.x + "]" + " - " + entfernt.e + " }"
+  }
+
+  getStack(): ICommand[] {
+    throw new Error("Method not implemented.");
   }
 
 }

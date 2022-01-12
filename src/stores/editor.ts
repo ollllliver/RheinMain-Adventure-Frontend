@@ -83,13 +83,13 @@ const getters = reactive({
     return state.stackindex
   }),
   getLevelName: computed(() => {
-      return state.levelName
+    return state.levelName
   }),
   getMinSpieler: computed(() => {
-      return state.minSpieler
+    return state.minSpieler
   }),
   getMaxSpieler: computed(() => {
-      return state.maxSpieler
+    return state.maxSpieler
   }),
 })
 
@@ -152,21 +152,6 @@ const actions = {
         }
         break;
       }
-      case 7: {
-        if (state.wegbeschreibung == wb) {
-          if (state.aktiv) {
-            state.wegbeschreibung = 0;
-            state.aktiv = false
-            state.info = waehlen
-          }
-        } else {
-          state.wegbeschreibung = wb
-          state.aktiv = true
-          state.info = "Element löschen"
-          console.log("Element löschen");
-        }
-        break;
-      }
       case 9: {
         state.aktiv = false
       }
@@ -203,15 +188,15 @@ const actions = {
     state.entfernen = gesetzt
   },
   async setzeLevelName(gesetzt: string) {
-      state.levelName = gesetzt
+    state.levelName = gesetzt
   },
   async setzeMinSpieler(gesetzt: number) {
-      state.minSpieler = gesetzt
+    state.minSpieler = gesetzt
   },
   async setzeMaxSpieler(gesetzt: number) {
-      state.maxSpieler = gesetzt
+    state.maxSpieler = gesetzt
   }
 
 }
 
-export default { state, getters, ...actions }
+export default { karte, state, getters, ...actions }

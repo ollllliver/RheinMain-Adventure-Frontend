@@ -2,9 +2,9 @@
   <!-- Aktionstasten: Buttons zum Auslösen verschiedener Aktionen (speichern/löschen/redo/undo/...) -->
   <div>
     <button class="btn btn-outline-secondary" @click="zurPruefung()">zur Prüfung einreichen</button>
-    <button class="btn btn-outline-secondary" @clicke="test()">später beenden</button>
+    <button class="btn btn-outline-secondary" @click="test()">später beenden</button>
     <button class="btn btn-outline-secondary">abbrechen</button>
-    <button class="btn btn-outline-secondary">alles entfernen</button>
+    <button class="btn btn-outline-secondary" v-on:click="allesEntfernen">alles entfernen</button>
     <button class="btn btn-outline-secondary" @click="entfernen()">löschen: An/Aus</button>
     <button class="btn btn-outline-secondary" @click="undo()">letzten Schritt rückgängig</button>
     <button class="btn btn-outline-secondary" @click="redo()">letzten Schritt wiederherstellen</button>
@@ -14,6 +14,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { CommandStack } from "../../commands/CommandManager";
+import { ElementEntfernenCommand } from "@/commands/ElementEntfernenCommand";
 import editorStore from "@/stores/editor";
 
 export default defineComponent({
@@ -30,6 +31,8 @@ export default defineComponent({
   },
 
   setup() {
+    var karte = editorStore.getters.getGrid;
+    const liste = karte.liste;
     // Karte nach Prüfung ob Start/Ziel und Raum platziert wurde loggen (vorerst)
     const zurPruefung = () => {
       if (editorStore.getters.getZiel === true) {
@@ -72,6 +75,35 @@ export default defineComponent({
       }
     };
 
+    const test = () => {
+      console.log(
+        "test",
+        editorStore.getters.getLevelName,
+        editorStore.getters.getMinSpieler,
+        editorStore.getters.getMaxSpieler
+      );
+    };
+
+    const allesEntfernen = (event: any) => {
+      for (let i = 0; i < 14; i++) {
+        for (let j = 0; j < 22; j++) {
+          let storeElement = liste[i][j].e;
+          if (storeElement !== 0) {
+            console.log("Stack Element: { " + i + " " + j + " } " + storeElement);
+            CommandStack.getInstance().execAndPush(
+              new ElementEntfernenCommand(
+                karte,
+                storeElement,
+                editorStore.getters.getStackindex,
+                event,
+                i, j
+              )
+            );
+          }
+        }
+      }
+    }
+
     const entfernen = () => {
       if (editorStore.getters.getEntfernen === false) {
         console.log("Element entfernen Zustand");
@@ -89,19 +121,11 @@ export default defineComponent({
       }
     };
 
-    const test = () => {
-      console.log(
-        "test",
-        editorStore.getters.getLevelName,
-        editorStore.getters.getMinSpieler,
-        editorStore.getters.getMaxSpieler
-      );
-    };
-
     return {
       zurPruefung,
-      entfernen,
       test,
+      allesEntfernen,
+      entfernen
     };
   },
 });

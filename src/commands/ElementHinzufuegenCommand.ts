@@ -17,6 +17,9 @@ export class ConcreteCommandTest implements ICommand {
   constructor(state: { x: number }) {
     this._state = state;
   }
+  getStack(): ICommand[] {
+    throw new Error("Method not implemented.");
+  }
 
   execute = () => {
     this._state.x += 1;
@@ -249,44 +252,43 @@ export class ElementHinzufuegenCommand implements ICommand {
       case 6:
       case 7:
       case 8: {
-          // wenn horizontrale Ausrichtung
-          if(this._ausrichtung === 0) {
-              // Wand an der Stelle einfügen an der Element gesetzt wurde
-              this._karte.setElement(this._element.posY, this._element.posX, 0, 9)
-              this._karte.setElement(this._element.posY, this._element.posX-1, 0, 9)
-              this._karte.setElement(this._element.posY, this._element.posX+1, 0, 9)
-              this._karte.setElement(this._element.posY-1, this._element.posX, 0, 9)
-              this._karte.setElement(this._element.posY-1, this._element.posX-1, 0, 9)
-              this._karte.setElement(this._element.posY-1, this._element.posX+1, 0, 9)
-              // Hintergrund des Divs auf Wand Farbe ändern
-              this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[1].__vnode.children[0].children[this._element.posX+1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[2].children[this._element.posY-1].children[this._element.posX+1].style = "background-color: rgba(92, 92, 92, 0.658);"
-              editorStore.setzeRaum(-1)
-          
-          // Wenn vertikale Ausrichtung
-          } else {
-              // Wand an der Stelle einfügen an der Element gesetzt wurde
-              this._karte.setElement(this._element.posY, this._element.posX, 0, 9)
-              this._karte.setElement(this._element.posY-1, this._element.posX, 0, 9)
-              this._karte.setElement(this._element.posY-1, this._element.posX+1, 0, 9)
-              this._karte.setElement(this._element.posY-1, this._element.posX-1, 0, 9)
-              this._karte.setElement(this._element.posY, this._element.posX+1, 0, 9)
-              this._karte.setElement(this._element.posY, this._element.posX-1, 0, 9)
-              // Hintergrund des Divs auf Wand Farbe ändern
-              this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[2].children[this._element.posY+1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
-              this._event.path[2].children[this._element.posY+1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
-              editorStore.info("Raum platziert.")
-              editorStore.setzeRaum(-1)
-          }
-          break;
+        // wenn horizontrale Ausrichtung
+        if(this._ausrichtung === 0) {
+          // Wand an der Stelle einfügen an der Element gesetzt wurde
+          this._karte.setElement(this._element.posY, this._element.posX, 0, 9)
+          this._karte.setElement(this._element.posY, this._element.posX-1, 0, 9)
+          this._karte.setElement(this._element.posY, this._element.posX+1, 0, 9)
+          this._karte.setElement(this._element.posY-1, this._element.posX, 0, 9)
+          this._karte.setElement(this._element.posY-1, this._element.posX-1, 0, 9)
+          this._karte.setElement(this._element.posY-1, this._element.posX+1, 0, 9)
+          // Hintergrund des Divs auf Wand Farbe ändern
+          this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[1].__vnode.children[0].children[this._element.posX+1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[2].children[this._element.posY-1].children[this._element.posX+1].style = "background-color: rgba(92, 92, 92, 0.658);"
+          editorStore.setzeRaum(-1)
+        // Wenn vertikale Ausrichtung
+        } else {
+          // Wand an der Stelle einfügen an der Element gesetzt wurde
+          this._karte.setElement(this._element.posY, this._element.posX, 0, 9)
+          this._karte.setElement(this._element.posY-1, this._element.posX, 0, 9)
+          this._karte.setElement(this._element.posY-1, this._element.posX+1, 0, 9)
+          this._karte.setElement(this._element.posY-1, this._element.posX-1, 0, 9)
+          this._karte.setElement(this._element.posY, this._element.posX+1, 0, 9)
+          this._karte.setElement(this._element.posY, this._element.posX-1, 0, 9)
+          // Hintergrund des Divs auf Wand Farbe ändern
+          this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[2].children[this._element.posY+1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
+          this._event.path[2].children[this._element.posY+1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
+          editorStore.info("Raum platziert.")
+          editorStore.setzeRaum(-1)
+        }
+        break;
       }
       */
     }
@@ -304,6 +306,10 @@ export class ElementHinzufuegenCommand implements ICommand {
       e: this._element.e.toString()
     }
     return "{ [" + hinzugefuegt.y + "," + hinzugefuegt.x + "]" + " - " + hinzugefuegt.e + " }"
+  }
+
+  getStack(): ICommand[] {
+    throw new Error("Method not implemented.");
   }
 
 }
