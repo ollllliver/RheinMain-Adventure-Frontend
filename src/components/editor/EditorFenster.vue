@@ -21,15 +21,16 @@
 <script lang="ts">
 import { defineComponent, onMounted } from "vue";
 import { CommandStack } from "../../commands/CommandManager";
-import {ElementHinzufuegen} from "../../commands/ElementHinzufuegenCommand"
+import { ElementHinzufuegenCommand } from "../../commands/ElementHinzufuegenCommand";
+import { ElementEntfernenCommand } from "../../commands/ElementEntfernenCommand";
 import editorStore from "@/stores/editor";
 
 export default defineComponent({
   name: "Editorfenster",
   setup() {
     // Kartenklasse mit liste als Array aus editorStore
-    var karte = editorStore.getters.getGrid
-    const liste = karte.liste
+    var karte = editorStore.getters.getGrid;
+    const liste = karte.liste;
 
     /**
      * bei drop (Drag-and-Drop) Raum auf der Karte platzieren
@@ -38,60 +39,65 @@ export default defineComponent({
      */
     const onDrop = (event: any) => {
       const itemID = parseInt(event.dataTransfer.getData("itemID"));
-      console.log(itemID,'itemID Editorfenster')
+      console.log(itemID, "itemID Editorfenster");
       // wenn an der Stelle ein Weg ist
-      if(liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 1) {
-        CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event, editorStore.getters.getAusrichtung));
+      if (liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 1) {
+        CommandStack.getInstance().execAndPush(
+          new ElementHinzufuegenCommand(
+            karte,
+            itemID,
+            editorStore.getters.getStackindex,
+            event,
+            editorStore.getters.getAusrichtung
+          )
+        );
         editorStore.setze(0);
         return;
       } else {
-        editorStore.info("Um dieses Element platzieren zu können muss vorher ein Wegpunkt an der Stelle sein.")
+        editorStore.info("Um dieses Element platzieren zu können muss vorher ein Wegpunkt an der Stelle sein.");
       }
-      
-      
+
       /* Raum Platzierung ====== vorerst aufgeschoben
-        
-        // wenn horizontaler Raum   
-        if (editorStore.getters.getAusrichtung === 0) {
-            // Wenn gültiger Bereich (Raum passt auf Karte und überschneidet nicht mit anderen Elementen)
-            if (event.target.__vnode.key.y - 1 >= 0 &&
-            event.target.__vnode.key.x - 1 >= 0 && event.target.__vnode.key.x + 1 < 22) {
-                if(liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 0 &&
-                liste[event.target.__vnode.key.y][event.target.__vnode.key.x + 1].e === 0 &&
-                liste[event.target.__vnode.key.y][event.target.__vnode.key.x - 1].e === 0 &&
-                liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x].e === 0 && 
-                liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x + 1].e === 0 &&
-                liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x - 1].e === 0) {
-                    CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event, editorStore.getters.getAusrichtung));
-                    editorStore.setze(0);
-                    return;
-                }
-            } 
-           editorStore.info("Raum passt nicht auf diese Position. Ein horizontaler Raum besteht 2 x 3 Felder. Bitte wähle einen passenden Ort aus.");
-        // wenn vertikaler Raum
-        } else if (editorStore.getters.getAusrichtung === 1){
-            // Wenn gültiger Bereich (Raum passt auf Karte und überschneidet nicht mit anderen Elementen)
-            if (event.target.__vnode.key.y - 1 >= 0 &&  event.target.__vnode.key.y + 1 < 14 &&
-            event.target.__vnode.key.x - 1 >= 0) {
-                if(liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 0 &&
-                liste[event.target.__vnode.key.y][event.target.__vnode.key.x - 1].e === 0 &&
-                liste[event.target.__vnode.key.y + 1][event.target.__vnode.key.x].e === 0 &&
-                liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x].e === 0 && 
-                liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x - 1].e === 0 &&
-                liste[event.target.__vnode.key.y + 1][event.target.__vnode.key.x - 1].e === 0) {
-                    CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event, editorStore.getters.getAusrichtung));
-                    editorStore.setze(0);
-                    return;
-                }
-            }
-            editorStore.info("Raum passt nicht auf diese Position. Ein vertikaler Raum besteht 3 x 2 Felder. Bitte wähle einen passenden Ort aus.");
-        }
-
-
-        */
+      
+      // wenn horizontaler Raum   
+      if (editorStore.getters.getAusrichtung === 0) {
+          // Wenn gültiger Bereich (Raum passt auf Karte und überschneidet nicht mit anderen Elementen)
+          if (event.target.__vnode.key.y - 1 >= 0 &&
+          event.target.__vnode.key.x - 1 >= 0 && event.target.__vnode.key.x + 1 < 22) {
+              if(liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 0 &&
+              liste[event.target.__vnode.key.y][event.target.__vnode.key.x + 1].e === 0 &&
+              liste[event.target.__vnode.key.y][event.target.__vnode.key.x - 1].e === 0 &&
+              liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x].e === 0 && 
+              liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x + 1].e === 0 &&
+              liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x - 1].e === 0) {
+                  CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event, editorStore.getters.getAusrichtung));
+                  editorStore.setze(0);
+                  return;
+              }
+          } 
+          editorStore.info("Raum passt nicht auf diese Position. Ein horizontaler Raum besteht 2 x 3 Felder. Bitte wähle einen passenden Ort aus.");
+      // wenn vertikaler Raum
+      } else if (editorStore.getters.getAusrichtung === 1){
+          // Wenn gültiger Bereich (Raum passt auf Karte und überschneidet nicht mit anderen Elementen)
+          if (event.target.__vnode.key.y - 1 >= 0 &&  event.target.__vnode.key.y + 1 < 14 &&
+          event.target.__vnode.key.x - 1 >= 0) {
+              if(liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 0 &&
+              liste[event.target.__vnode.key.y][event.target.__vnode.key.x - 1].e === 0 &&
+              liste[event.target.__vnode.key.y + 1][event.target.__vnode.key.x].e === 0 &&
+              liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x].e === 0 && 
+              liste[event.target.__vnode.key.y - 1][event.target.__vnode.key.x - 1].e === 0 &&
+              liste[event.target.__vnode.key.y + 1][event.target.__vnode.key.x - 1].e === 0) {
+                  CommandStack.getInstance().execAndPush(new ElementHinzufuegen(karte, itemID, event, editorStore.getters.getAusrichtung));
+                  editorStore.setze(0);
+                  return;
+              }
+          }
+          editorStore.info("Raum passt nicht auf diese Position. Ein vertikaler Raum besteht 3 x 2 Felder. Bitte wähle einen passenden Ort aus.");
+      }
+      */
     };
     onMounted(() => {
-      console.log(liste)
+      console.log(liste);
     });
 
     /**
@@ -104,9 +110,7 @@ export default defineComponent({
       if (editorStore.getters.istAktiv) {
         if (editorStore.getters.getElement === 2) {
           if (editorStore.getters.getStart) {
-            editorStore.info(
-              "Start bereits gesetzt. Es gibt nur einen Startpunkt"
-            );
+            editorStore.info("Start bereits gesetzt. Es gibt nur einen Startpunkt");
             return;
           }
         }
@@ -116,16 +120,35 @@ export default defineComponent({
             return;
           }
         }
-        if (
-          liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 0
-        ) {
-          CommandStack.getInstance().execAndPush(
-            new ElementHinzufuegen(karte, editorStore.getters.getElement, event)
-          );
-        } else {
-          editorStore.info(
-            "Stelle bereits belegt. Bitte vorher löschen oder an anderer Position belegen!"
-          );
+        if (editorStore.getters.getEntfernen) {
+          let storeElement = liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e;
+          if (storeElement !== 0) {
+            CommandStack.getInstance().execAndPush(
+              new ElementEntfernenCommand(
+                karte,
+                storeElement,
+                editorStore.getters.getStackindex,
+                event
+              )
+            );
+          } else {
+            editorStore.info("Stelle ist bereits leer!");
+          }
+        }
+        if (!editorStore.getters.getEntfernen) {
+          let storeElement = liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e;
+          if (storeElement === 0) {
+            CommandStack.getInstance().execAndPush(
+              new ElementHinzufuegenCommand(
+                karte,
+                editorStore.getters.getElement,
+                editorStore.getters.getStackindex,
+                event
+              )
+            );
+          } else {
+            editorStore.info("Stelle ist bereits belegt!");
+          }
         }
       } else {
         editorStore.info("Bitte wähle erst ein Baustein aus!");
