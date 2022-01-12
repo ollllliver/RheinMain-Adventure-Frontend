@@ -166,6 +166,19 @@ const actions = {
     },
     async setzeLevelName(gesetzt: string) {
         state.levelName = gesetzt
+    },
+    async default() {
+        state.wegbeschreibung = 0,
+        state.aktiv = false,
+        state.info = willkommen,
+        state.start = false,
+        state.ziel = false,
+        state.raeume = 0,
+        state.ausrichtung = 0,
+        state.schluessel = 0,
+        state.tuer = 0,
+        state.npc = 0,
+        state.levelName = ""
     }
 
 }

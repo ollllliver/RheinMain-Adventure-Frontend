@@ -75,6 +75,7 @@ export default defineComponent({
                         ).then(function(res) {
                             console.log("LEVEL GESPEICHERT");
                             console.log(res);
+                            editorStore.default();
                             router.push("/editoruebersicht")
                         });
                         

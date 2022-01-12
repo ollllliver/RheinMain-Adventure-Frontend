@@ -21,7 +21,7 @@
 <script lang="ts">
 import { defineComponent, onMounted } from "vue";
 import { CommandStack } from "../../commands/CommandManager";
-import {ElementHinzufuegen} from "../../commands/ElementeHinzufuegenCommand.ts"
+import {ElementHinzufuegen} from "../../commands/ElementHinzufuegenCommand.ts"
 import editorStore from "@/stores/editor";
 
 export default defineComponent({
