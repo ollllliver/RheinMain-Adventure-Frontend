@@ -1,7 +1,7 @@
 import * as Three from "three";
 import {GraphicLoader} from '@/services/inGame/GraphicLoader';
-import {MyMouseControls} from '@/services/inGame/MyMouseControls';
-import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
+import {MausSteuerung} from '@/services/inGame/MausSteuerung';
+import {TastaturSteuerung} from '@/services/inGame/TastaturSteuerung';
 import { Interactions } from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
@@ -33,8 +33,8 @@ const developer = false;
 let developerCamera: any;
 let controls: any;
 
-let mouseControls: MyMouseControls;
-let keyControls: MyKeyboardControls;
+let mausSteuerung: MausSteuerung;
+let tastaturSteuerung: TastaturSteuerung;
 let interactions: Interactions;
 let interaktionText: any;
 
@@ -100,6 +100,7 @@ const initLoader = () => {
             if (raumMobiliar.raumMobiliarId == 43){
                 startPosition = new Position(posX, spieler.height *3, posY);
             }
+ 
             
             // Idee von Olli:
             // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platzieren
@@ -108,9 +109,14 @@ const initLoader = () => {
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
             loader.ladeDatei('http://localhost:3000/api/level/' + mobiliarId).then((res: any) => {
                 // console.log(res)
-                res.scene.position.x = 1 * posX
-                res.scene.position.z = 1 * posY
-                collidableList.push(res.scene)
+                res.scene.position.x = 4 * posX
+                res.scene.position.z = 4 * posY
+                if (mobiliarId == 35){
+                    res.scene.children[0].name = "Schlüssel";
+                    interactableList.push(res.scene);
+                } else {
+                    collidableList.push(res.scene)
+                }
                 scene.add(res.scene)
             });
         });
@@ -191,8 +197,8 @@ const initCamera = () => {
  * Initialisiert die Steuerung
  */
 const initControls = () => {
-    mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
-    keyControls = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
+    mausSteuerung = new MausSteuerung(camera, document); //init Maussteuerung
+    tastaturSteuerung = new TastaturSteuerung(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
 
     connect();
 }
@@ -206,14 +212,14 @@ const initControls = () => {
 }
 
 const connect = () => {
-    window.addEventListener('click', mouseControls.lock); //locked die Maus
+    window.addEventListener('click', mausSteuerung.lock); //locked die Maus
 }
 
 const disconnect = () => {
-    mouseControls.dispose();
-    keyControls.disconnect();
+    mausSteuerung.dispose();
+    tastaturSteuerung.disconnect();
     interactions.disconnect();
-    window.removeEventListener('click', mouseControls.lock);
+    window.removeEventListener('click', mausSteuerung.lock);
     console.log("Müsste disconnected sein")
 }
 
@@ -285,8 +291,8 @@ const doAnimate = () => {
     velocity.z -= velocity.z * 10.0 * delta;
     velocity.y -= velocity.y * 10.0 * delta;
 
-    mouseControls.update(velocity, delta); //Maus Steuerung
-    keyControls.update(camera, velocity, delta) //Tastatur Steuerung
+    mausSteuerung.update(velocity, delta); //Maus Steuerung
+    tastaturSteuerung.update(camera, velocity, delta) //Tastatur Steuerung
     interactions.update(camera) //Interaktionen
 
     // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
