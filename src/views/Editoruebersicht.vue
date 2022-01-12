@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import Karten from '@/components/EditorKomponenten/Karten.vue';
+import Karten from '@/components/editor/Karten.vue';
 import { defineComponent, onMounted } from 'vue';
 export default defineComponent({
   name: 'Editoruebersicht',

@@ -1,5 +1,5 @@
 import { computed, reactive } from 'vue'
-import { Karte } from '@/components/EditorKomponenten/Karte';
+import { Karte } from '@/models/Karte';
 
 /**
  * State des Editors
@@ -22,75 +22,67 @@ const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
 const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tuer ist horizontal."
 const karte = new Karte();
 const state = reactive({
-  wegbeschreibung: 0,
-  aktiv: false,
-  info: willkommen,
-  start: false,
-  ziel: false,
-  raeume: 0,
-  ausrichtung: 0,
-  schluessel: 0,
-  tuer: 0,
-  npc: 0,
-  entfernen: false,
-  stackindex: 0,
-  levelName: "",
-  minSpieler: 0,
-  maxSpieler: 0
+    wegbeschreibung: 0,
+    aktiv: false,
+    info: willkommen,
+    start: false,
+    ziel: false,
+    raeume: 0,
+    ausrichtung: 0,
+    schluessel: 0,
+    tuer: 0,
+    npc: 0,
+    levelName: "",
+    minSpieler: 0,
+    maxSpieler: 0
 })
 
 /**
  * Getters für den State
  */
 const getters = reactive({
-  istAktiv: computed(() => {
-    return state.aktiv;
-  }),
-  getElement: computed(() => {
-    return state.wegbeschreibung;
-  }),
-  getInfo: computed(() => {
-    return state.info;
-  }),
-  getStart: computed(() => {
-    return state.start;
-  }),
-  getZiel: computed(() => {
-    return state.ziel;
-  }),
-  getAusrichtung: computed(() => {
-    return state.ausrichtung;
-  }),
-  getRaeume: computed(() => {
-    return state.raeume
-  }),
-  getGrid: computed(() => {
-    return karte
-  }),
-  getSchluessel: computed(() => {
-    return state.schluessel
-  }),
-  getTuer: computed(() => {
-    return state.tuer
-  }),
-  getNpc: computed(() => {
-    return state.npc
-  }),
-  getEntfernen: computed(() => {
-    return state.entfernen
-  }),
-  getStackindex: computed(() => {
-    return state.stackindex
-  }),
-  getLevelName: computed(() => {
-    return state.levelName
-  }),
-  getMinSpieler: computed(() => {
-    return state.minSpieler
-  }),
-  getMaxSpieler: computed(() => {
-    return state.maxSpieler
-  }),
+    istAktiv: computed(() => {
+        return state.aktiv;
+    }),
+    getElement: computed(() => {
+        return state.wegbeschreibung;
+    }),
+    getInfo: computed(() => {
+        return state.info;
+    }),
+    getStart: computed(() => {
+        return state.start;
+    }),
+    getZiel: computed(() => {
+        return state.ziel;
+    }),
+    getAusrichtung: computed(() => {
+        return state.ausrichtung;
+    }),
+    getRaeume: computed(()=> {
+        return state.raeume
+    }),
+    getGrid: computed(() => {
+        return karte
+    }),
+    getSchluessel: computed(() => {
+        return state.schluessel
+    }),
+    getTuer: computed(() => {
+        return state.tuer
+    }),
+    getNpc: computed(() => {
+        return state.npc
+    }),
+    getLevelName: computed(() => {
+        return state.levelName
+    }),
+    getMinSpieler: computed(() => {
+        return state.minSpieler
+    }),
+    getMaxSpieler: computed(() => {
+        return state.maxSpieler
+    }),
 })
 
 /**
@@ -103,100 +95,102 @@ const getters = reactive({
  * setze xy = setzt jeweiliges Element
  */
 const actions = {
-  async setze(wb: number) {
-    switch (wb) {
-      case 0: {
-        state.wegbeschreibung = 0;
-        state.aktiv = false;
-        break;
-      }
-      case 1: {
-        if (state.wegbeschreibung == wb) {
-          if (state.aktiv) {
-            state.wegbeschreibung = 0
-            state.aktiv = false
-            state.info = waehlen
-          }
-        } else {
-          state.wegbeschreibung = wb
-          state.aktiv = true
-          state.info = "Bitte Weg einzeichnen."
+    async setze(wb: number) {
+        switch(wb) {
+            case 0: {
+                state.wegbeschreibung = 0;
+                state.aktiv = false;
+                break;
+            }
+            case 1: {
+                if (state.wegbeschreibung == wb) {
+                    if (state.aktiv) {
+                        state.wegbeschreibung = 0
+                        state.aktiv = false
+                        state.info = waehlen
+                    }
+                } else {
+                    state.wegbeschreibung = wb
+                    state.aktiv = true
+                    state.info = "Bitte Weg einzeichnen."
+                }
+                break;
+            }
+            case 2: {
+                if (state.wegbeschreibung == wb) {
+                    if (state.aktiv) {
+                        state.wegbeschreibung = 0
+                        state.aktiv = false
+                        state.info = waehlen
+                    }
+                } else {
+                    state.wegbeschreibung = wb
+                    state.aktiv = true
+                    state.info = "Bitte Start einzeichnen."
+                }
+                break;
+            }
+            case 3: {
+                if (state.wegbeschreibung == wb) {
+                    if (state.aktiv) {
+                        state.wegbeschreibung = 0
+                        state.aktiv = false
+                        state.info = waehlen
+                    }
+                } else {
+                    state.wegbeschreibung = wb
+                    state.aktiv = true
+                    state.info = "Bitte Ziel einzeichnen."
+                }
+                break;
+            }
+            case 9: {
+                state.aktiv = false
+                
+            }
         }
-        break;
-      }
-      case 2: {
-        if (state.wegbeschreibung == wb) {
-          if (state.aktiv) {
-            state.wegbeschreibung = 0
-            state.aktiv = false
-            state.info = waehlen
-          }
-        } else {
-          state.wegbeschreibung = wb
-          state.aktiv = true
-          state.info = "Bitte Start einzeichnen."
-        }
-        break;
-      }
-      case 3: {
-        if (state.wegbeschreibung == wb) {
-          if (state.aktiv) {
-            state.wegbeschreibung = 0
-            state.aktiv = false
-            state.info = waehlen
-          }
-        } else {
-          state.wegbeschreibung = wb
-          state.aktiv = true
-          state.info = "Bitte Ziel einzeichnen."
-        }
-        break;
-      }
-      case 9: {
-        state.aktiv = false
-      }
+    },
+    async info(info: string) {
+        state.info = info
+    },
+    async start(gesetzt: boolean) {
+        state.start = gesetzt
+    },
+    async ziel(gesetzt: boolean) {
+        state.ziel = gesetzt
+    },
+    async ausrichten(richtung: number) {
+        state.ausrichtung = richtung
+    },
+    async setzeRaum(gesetzt: number) {
+        state.raeume += gesetzt
+    },
+    async setzeSchluessel(gesetzt: number) {
+        state.schluessel += gesetzt
+    },
+    async setzeTuer(gesetzt: number) {
+        state.tuer += gesetzt
+    },
+    async setzeNpc(gesetzt: number) {
+        state.npc += gesetzt
+    },
+    async setzeLevelName(gesetzt: string) {
+        state.levelName = gesetzt
+    },
+    async default() {
+        state.wegbeschreibung = 0,
+        state.aktiv = false,
+        state.info = willkommen,
+        state.start = false,
+        state.ziel = false,
+        state.raeume = 0,
+        state.ausrichtung = 0,
+        state.schluessel = 0,
+        state.tuer = 0,
+        state.npc = 0,
+        state.levelName = ""
     }
-  },
-  async info(info: string) {
-    state.info = info
-  },
-  async wegbeschreibung(gesetzt: number) {
-    state.wegbeschreibung = gesetzt
-  },
-  async start(gesetzt: boolean) {
-    state.start = gesetzt
-  },
-  async ziel(gesetzt: boolean) {
-    state.ziel = gesetzt
-  },
-  async ausrichten(richtung: number) {
-    state.ausrichtung = richtung
-  },
-  async setzeRaum(gesetzt: number) {
-    state.raeume += gesetzt
-  },
-  async setzeSchluessel(gesetzt: number) {
-    state.schluessel += gesetzt
-  },
-  async setzeTuer(gesetzt: number) {
-    state.tuer += gesetzt
-  },
-  async setzeNpc(gesetzt: number) {
-    state.npc += gesetzt
-  },
-  async entfernen(gesetzt: boolean) {
-    state.entfernen = gesetzt
-  },
-  async setzeLevelName(gesetzt: string) {
-    state.levelName = gesetzt
-  },
-  async setzeMinSpieler(gesetzt: number) {
-    state.minSpieler = gesetzt
-  },
-  async setzeMaxSpieler(gesetzt: number) {
-    state.maxSpieler = gesetzt
-  }
 
 }
 
-export default { karte, state, getters, ...actions }
+export default { state, getters, ...actions }

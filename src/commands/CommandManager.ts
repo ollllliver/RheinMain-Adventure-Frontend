@@ -3,27 +3,26 @@ import editorStore from '@/stores/editor'
 /**
  * Das Command interface deklariert eine Methode für das Ausführen eines Befehls (Command)
  */
-interface ICommand {
+ interface ICommand {
     execute(): any; //Befehl ausführen
     undo(): any; //Befehl rückgängig machen
     //redo(): any; //Befehl wiederholen
     describe(): string;
-    getStack(): ICommand[];
 }
 
 /**
  * Die Command-Historie als Stack.
  * Invoker
  */
-class CommandStack {
+class CommandStack{
     private stack: ICommand[] = [];
     private static commandstack: CommandStack;
     private index = 0;
 
-    //constructor(){}
+   //constructor(){}
 
     public static getInstance() {
-        if (!this.commandstack) {
+        if(!this.commandstack){
             this.commandstack = new CommandStack();
         }
         return this.commandstack;
@@ -33,14 +32,14 @@ class CommandStack {
      * Befehl auf den Stack legen
      */
     push = (cmd: ICommand) => {
-        if (this.index < this.stack.length) {
+        if( this.index<this.stack.length ){
             /*
              * Wenn neuer Befehl hinzugefügt wird und man sich nicht am Ende der Liste befindet,
              * werden die restlichen Befehle in der Liste gelöscht.
              * Die Historie geht ab diesem Punkt, also wieder neu weiter.
              * Kann man vielleicht auch eleganter lösen, idk
              */
-            do { this.stack.pop() } while (this.index < this.stack.length);
+            do { this.stack.pop() } while (this.index<this.stack.length);
         }
         this.stack.push(cmd)
         this.index++;
@@ -51,10 +50,12 @@ class CommandStack {
      * Rückgängig machen des zuletzt hinzugefügten Befehls
      */
     undo = () => {
-        if (this.index > 0) {
+        if ( this.index > 0 ){
             this.index--;
             const cmd: ICommand = this.stack[this.index];
             cmd.undo();
+            // this.stack.pop()
+
             editorStore.info(cmd.describe() + " rückgängig gemacht.")
             console.log(cmd.describe() + " rückgängig gemacht.");
         } else {
@@ -66,6 +67,7 @@ class CommandStack {
      * Wiederholen des zuletzt rückgängig gemachten Befehls
      */
     redo = () => {
+        
         if (this.index < this.stack.length) {
             const cmd: ICommand = this.stack[this.index];
             cmd.describe();
@@ -90,7 +92,7 @@ class CommandStack {
     /**
      * @returns Liste der Befehle im Stack liegen
      */
-    toString = () => {
+     toString = () => {
         let res = "Command Stack:\n"
         this.stack.forEach(cmd => {
             res += "\t" + cmd.describe() + "\n";
@@ -101,7 +103,7 @@ class CommandStack {
     getStack = () => {
         return this.stack
     }
-
+      
 }
 
-export { ICommand, CommandStack }
+export {ICommand, CommandStack}
