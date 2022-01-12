@@ -213,7 +213,7 @@ const initControls = () => {
 * Initialisiert die Interaktionen
 */
  const initInteractions = () => {
-    interactions = new Interactions(interactableList, cameraCollidable, document);
+    interactions = new Interactions(interactableList, cameraCollidable, document, stompClient);
     interaktionText = document.getElementById("interaktionText");
 }
 

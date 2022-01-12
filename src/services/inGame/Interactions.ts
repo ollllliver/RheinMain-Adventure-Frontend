@@ -1,4 +1,6 @@
+import { Client } from '@stomp/stompjs';
 import {Vector3, Raycaster} from 'three';
+import { useLobbyStore } from '../lobby/LobbyStore';
 
 /**
  * Verarbeitet Interaktionsmoeglichkeiten
@@ -10,11 +12,13 @@ import {Vector3, Raycaster} from 'three';
     interaktionsListe: any
     erkannteInteraktion: any
     rayCaster: any
+    stompclient:Client
+    lobbyID:any
     update: (cameraPosition: any) => void
     disconnect: () => void
 
 
-    constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document) {
+    constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document, client:Client) {
 
         const interaktionReichweite = 2
         let hatSchluessel = false
@@ -23,6 +27,9 @@ import {Vector3, Raycaster} from 'three';
         this.cameraCollidable = cameraCollidable
         this.interaktionsListe = interaktionsListe
         this.erkannteInteraktion = null
+        const { lobbystate } = useLobbyStore();
+        this.lobbyID = lobbystate.lobbyID;
+        this.stompclient = client;
 
         /**
 		 * Wird ausgelöst wenn eine Taste gedrückt wird
@@ -84,7 +91,13 @@ import {Vector3, Raycaster} from 'three';
                         //TODO: "Du benötigst einen Schlüssel" - Meldung
                     }
                     break;
+
+                    
             }
+
+            const DEST_POS = "/topic/spiel/" + this.lobbyID + '/interagieren';
+            this.stompclient.publish({destination: DEST_POS, body: interaktion.object.name, skipContentLengthHeader: true,});
+            
         }
 
         this.update = (camera: any) => {
