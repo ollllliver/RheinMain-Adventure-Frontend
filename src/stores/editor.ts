@@ -35,8 +35,6 @@ const state = reactive({
   entfernen: false,
   stackindex: 0,
   levelName: "",
-  minSpieler: 0,
-  maxSpieler: 0
 })
 
 /**
@@ -84,13 +82,7 @@ const getters = reactive({
   }),
   getLevelName: computed(() => {
     return state.levelName
-  }),
-  getMinSpieler: computed(() => {
-    return state.minSpieler
-  }),
-  getMaxSpieler: computed(() => {
-    return state.maxSpieler
-  }),
+  })
 })
 
 /**
@@ -190,12 +182,6 @@ const actions = {
   async setzeLevelName(gesetzt: string) {
     state.levelName = gesetzt
   },
-  async setzeMinSpieler(gesetzt: number) {
-    state.minSpieler = gesetzt
-  },
-  async setzeMaxSpieler(gesetzt: number) {
-    state.maxSpieler = gesetzt
-  },
   async default() {
     state.wegbeschreibung = 0,
     state.aktiv = false,
@@ -212,4 +198,4 @@ const actions = {
 
 }
 
-export default { karte, state, getters, ...actions }
+export default { state, getters, ...actions }

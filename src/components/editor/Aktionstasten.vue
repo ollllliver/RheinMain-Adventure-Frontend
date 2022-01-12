@@ -48,6 +48,7 @@ export default defineComponent({
           if (editorStore.getters.getSchluessel === editorStore.getters.getTuer) {
             editorStore.info("Karte wird eingereicht. Schluessel=" + editorStore.getters.getSchluessel + " Tueren=" + editorStore.getters.getTuer);
             console.log(editorStore.getters.getGrid);
+            let n = Math.floor(Math.random() * 120);
             fetch("http://localhost:8080/api/level", {
               method: "PUT",
               headers: {
@@ -56,9 +57,7 @@ export default defineComponent({
               },
               body: JSON.stringify({
                 karte: editorStore.getters.getGrid.liste,
-                name: editorStore.getters.getLevelName,
-                minSpieler: editorStore.getters.getMinSpieler,
-                maxSpieler: editorStore.getters.getMaxSpieler,
+                name: n.toString(),
               }),
             }).then(function (res) {
               console.log("LEVEL GESPEICHERT");
@@ -75,45 +74,39 @@ export default defineComponent({
       }
     };
 
-    const test = () => {
-      console.log(
-        "test",
-        editorStore.getters.getLevelName,
-        editorStore.getters.getMinSpieler,
-        editorStore.getters.getMaxSpieler
-      );
-    };
-
     const allesEntfernen = (event: any) => {
-      for (let i = 0; i < 14; i++) {
+
+      const stack = CommandStack.getInstance().getStack().length
+      for(let i = 0; i < stack; i++) {
+        CommandStack.getInstance().undo()
+        CommandStack.getInstance().getStack().pop()
+      }
+      editorStore.default()
+      console.log(editorStore.getters.getGrid)
+      /*console.log(CommandStack.getInstance().getStack()[1])
+      for (let i = 0; i < editorStore.getters.getStackindex; i++) {
+        
         for (let j = 0; j < 22; j++) {
           let storeElement = liste[i][j].e;
           if (storeElement !== 0) {
             console.log("Stack Element: { " + i + " " + j + " } " + storeElement);
-            CommandStack.getInstance().execAndPush(
-              new ElementEntfernenCommand(
-                karte,
-                storeElement,
-                editorStore.getters.getStackindex,
-                event,
-                i, j
-              )
-            );
+            
+            
           }
         }
-      }
+      }*/
     }
 
     const entfernen = () => {
       if (editorStore.getters.getEntfernen === false) {
-        console.log("Element entfernen Zustand");
+        editorStore.info("Elemente werden jetzt entfernt");
         editorStore.entfernen(true);
         editorStore.wegbeschreibung(0);
         if (!editorStore.state.aktiv) {
           editorStore.state.aktiv = true;
         }
       } else {
-        console.log("Element platzieren Zustand");
+        editorStore.info("");
         editorStore.entfernen(false);
         if (editorStore.state.aktiv) {
           editorStore.state.aktiv = false;
@@ -121,10 +114,14 @@ export default defineComponent({
       }
     };
 
+    const test  = () => {
+      console.log(editorStore.getters.getGrid)
+    }
+
     return {
       zurPruefung,
-      test,
       allesEntfernen,
+      test,
       entfernen
     };
   },

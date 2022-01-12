@@ -6,40 +6,6 @@ import editorStore from '@/stores/editor'
  * Jeder Befehl bekommt seine eigene Klasse und implementiert das ICommand Interface
  */
 
-/**
- * Nur zu Testzwecken und als Beispiel
- */
-
-/* eslint-disable */
-export class ConcreteCommandTest implements ICommand {
-  private _state: { x: number };
-
-  constructor(state: { x: number }) {
-    this._state = state;
-  }
-  getStack(): ICommand[] {
-    throw new Error("Method not implemented.");
-  }
-
-  execute = () => {
-    this._state.x += 1;
-    return "state + 1"
-  }
-
-  redo = () => {
-    return "redo"
-  }
-
-  undo = () => {
-    this._state.x -= 1;
-    return "state -= 1"
-  }
-
-  describe = () => {
-    return "Plus-1-Befehl"
-  }
-
-}
 
 /**
  * Command zum einfügen des gewählten Elements
@@ -128,13 +94,15 @@ export class ElementHinzufuegenCommand implements ICommand {
         }
         case 6: {
           // Tür in Karte einfügen falls noch kein Element an dieser Stelle ist
-          this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung);
+          
           // Tür je nach Ausrichtung im Div platzieren
           if (this._ausrichtung === 0) {
             this._event.target.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)"
+            this._karte.setElement(this._element.posY, this._element.posX, this._element.e);
           }
           if (this._ausrichtung === 1) {
             this._event.target.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)"
+            this._karte.setElement(this._element.posY, this._element.posX, 7);
           }
           //this._event.dataTransfer.getData("src")
           //this._event.target.style = "background-image url('../assets/tuer.png'); background-size:auto;"
@@ -203,7 +171,7 @@ export class ElementHinzufuegenCommand implements ICommand {
    * letzten Befehl rückgängig machen
    */
   undo = () => {
-    this._state -= 1;
+    this._state -= 1
     // Element aus der Karte wieder auf 0 setzten (0 = Wand)
     // Hintergrund des divs auf Wand setzen
     console.log("Platzieren UNDO ----- " + this._element.e);

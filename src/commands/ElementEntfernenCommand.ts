@@ -54,19 +54,31 @@ export class ElementEntfernenCommand implements ICommand {
         break;
       }
       case 4: {
+        this._karte.setElement(this._element.posY, this._element.posX, 1);
+        this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
+        editorStore.info("platziertes Element entfernt entfernt")
+        console.log("Element mit Wert '" + pointedElement + "' angeklick");
+        editorStore.setzeSchluessel(-1)
         break;
       }
       case 5: {
+        this._karte.setElement(this._element.posY, this._element.posX, 1);
+        this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
+        editorStore.info("platziertes Element entfernt entfernt")
+        console.log("Element mit Wert '" + pointedElement + "' angeklick");
+        editorStore.setzeNpc(-1)
         break;
       }
-      case 6: {
+      case 6: 
+      case 7: {
+        this._karte.setElement(this._element.posY, this._element.posX, 1);
+        this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
+        editorStore.info("platziertes Element entfernt entfernt")
+        console.log("Element mit Wert '" + pointedElement + "' angeklick");
+        editorStore.setzeTuer(-1)
         break;
       }
     }
-
-    this._karte.liste[this._element.posY][this._element.posX].e == null;
-    this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
-    editorStore.info("Element entfernt")
   }
 
   undo = () => {
@@ -74,20 +86,46 @@ export class ElementEntfernenCommand implements ICommand {
     console.log("Entfernen UNDO ----- " + this._element.e);
     switch (this._element.e) {
       case 1: {
-        this._karte.setElement(this._element.posY, this._element.posX, 1, 9);
+        this._karte.setElement(this._element.posY, this._element.posX, 1);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
         break;
       }
       case 2: {
-        this._karte.setElement(this._element.posY, this._element.posX, 2, 9);
+        this._karte.setElement(this._element.posY, this._element.posX, 2);
         this._event.target.style = "background-color:rgba(37, 187, 31, 0.658);"
         editorStore.start(true);
         break;
       }
       case 3: {
-        this._karte.setElement(this._element.posY, this._element.posX, 3, 9);
+        this._karte.setElement(this._element.posY, this._element.posX, 3);
         this._event.target.style = "background-color:rgba(19, 30, 196, 0.658);"
         editorStore.ziel(true);
+        break;
+      }
+      case 4: {
+        this._karte.setElement(this._element.posY, this._element.posX, 4);
+        this._event.target.style.background = "no-repeat center url('../img/schluessel.png') rgba(255,211,155, 0.75)"
+        editorStore.setzeSchluessel(1)
+        break;
+      }
+      case 5: {
+        this._karte.setElement(this._element.posY, this._element.posX, 5);
+        this._event.target.style.background = "no-repeat center url('../img/npc.png') rgba(255,211,155, 0.75)"
+        editorStore.setzeNpc(1)
+        break;
+      }
+      case 6: {
+        this._karte.setElement(this._element.posY, this._element.posX, 6);
+        this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
+        this._event.target.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)"
+        editorStore.setzeTuer(1)
+        break;
+      }
+      case 7: {
+        this._karte.setElement(this._element.posY, this._element.posX, 6);
+        this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
+        this._event.target.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)"
+        editorStore.setzeTuer(1)
         break;
       }
     }

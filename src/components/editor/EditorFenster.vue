@@ -107,6 +107,7 @@ export default defineComponent({
      * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
      */
     const wegPunkt = (event: any) => {
+      
       if (editorStore.getters.istAktiv) {
         if (editorStore.getters.getElement === 2) {
           if (editorStore.getters.getStart) {
