@@ -1,5 +1,5 @@
 import { computed, reactive } from 'vue'
-import { Karte } from '@/components/EditorKomponenten/Karte';
+import { Karte } from '@/models/Karte';
 
 /**
  * State des Editors
