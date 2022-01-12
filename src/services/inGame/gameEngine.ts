@@ -74,6 +74,8 @@ const initScene = () => {
 
 
 const initLoader = () => {
+    const türID = 34;
+    const schlüsselID = 35;
 
     // TODO: Level-ID dynamisch bestimmen
 
@@ -111,9 +113,13 @@ const initLoader = () => {
                 // console.log(res)
                 res.scene.position.x = 4 * posX
                 res.scene.position.z = 4 * posY
-                if (mobiliarId == 35){
+                if (mobiliarId == schlüsselID){
                     res.scene.children[0].name = "Schlüssel";
-                    interactableList.push(res.scene);
+                    interactableList.push(res.scene.children[0]);
+                } else if (mobiliarId == türID){
+                    res.scene.children[0].name = "Tür";
+                    interactableList.push(res.scene.children[0]);
+                    collidableList.push(res.scene)
                 } else {
                     collidableList.push(res.scene)
                 }

@@ -22,7 +22,7 @@ export default defineComponent({
       initLoader();
       initCamera();
       initPlane();
-      initInteractionTestObject();
+      //initInteractionTestObject();
       initRaycaster();
       initRenderer();
       initControls();

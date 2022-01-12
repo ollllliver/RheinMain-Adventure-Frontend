@@ -73,7 +73,7 @@ import {Vector3, Raycaster} from 'three';
                         hatSchluessel = false
 
                         // öffne Tür
-                        interaktion.object.rotation.y = Math.PI / 2;
+                        interaktion.object.rotation.z = Math.PI / 2;
 
                         // entferne Tür aus interaktionsListe
                         const index = interaktionsListe.indexOf(interaktion.object);
