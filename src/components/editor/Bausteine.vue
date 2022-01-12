@@ -153,14 +153,14 @@ export default defineComponent({
     }
     #raumausrichtung {
         margin-right: -30px;
-        margin-left: 40px;
+        margin-left: 30px;
         display: inline-table;
     }
     #info {
         border-style: dotted;
         border-radius: 50px;
-        margin-left: -100px;
-        margin-right: 80px;
+        margin-left: -20px;
+        margin-right: 60px;
         width: 25px;
         padding: 2px;
         background-color: rgb(248, 251, 252);

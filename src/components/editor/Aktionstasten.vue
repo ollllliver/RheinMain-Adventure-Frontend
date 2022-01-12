@@ -34,7 +34,7 @@
 import { defineComponent } from 'vue'
 import {CommandStack} from '../../commands/CommandManager'
 import editorStore from "@/stores/editor";
-import router from '@/router';
+import router from '@/router/index'
 //import {ConcreteCommandTest} from '../../commands/Command'
 
 export default defineComponent({
@@ -64,21 +64,19 @@ export default defineComponent({
                     if(editorStore.getters.getSchluessel === editorStore.getters.getTuer) {
                         editorStore.info('Karte wird eingereicht. Schluessel='+ editorStore.getters.getSchluessel +' Tueren='+editorStore.getters.getTuer)
                         console.log(editorStore.getters.getGrid)
-                        let n = Math.floor(Math.random() * 120);
                         fetch("http://localhost:8080/api/levelEditor/speichern", {
-                        method: "POST",
-                        headers: {
-                            'Accept': 'application/json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({karte:editorStore.getters.getGrid.liste, name: n.toString()})}
+                            method: "POST",
+                            headers: {
+                                'Accept': 'application/json',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({karte:editorStore.getters.getGrid.liste, name: editorStore.getters.getLevelName, minSpieler: editorStore.getters.getMinSpieler, maxSpieler: editorStore.getters.getMaxSpieler})}
                         ).then(function(res) {
                             console.log("LEVEL GESPEICHERT");
                             console.log(res);
                             editorStore.default();
                             router.push("/editoruebersicht")
                         });
-                        
                     } else {
                         editorStore.info('Fuer jede Tuer muss ein Schluessel existieren. Aktuelle Anzahl Tueren='+editorStore.getters.getTuer+ ' Schluessel='+editorStore.getters.getSchluessel)
                     }
@@ -90,7 +88,7 @@ export default defineComponent({
             }
         }
         const test = () => {
-            console.log("test",editorStore.getters.getLevelName)
+            console.log("test",editorStore.getters.getLevelName, editorStore.getters.getMinSpieler, editorStore.getters.getMaxSpieler)
         }
         return {
             zurPruefung, test

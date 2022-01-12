@@ -30,7 +30,10 @@
       <div class="col" id ="bausteine">
         <Bausteine />
       </div>
-       
+       <!-- Level Eigenschaften --> 
+      <div class="col col-lg-2" id="eigenschaften">
+        <Leveleigenschaften/>
+      </div>
 
       <!-- Info Fenster -->
       <div class="col col-lg-2" id="infofenster">
@@ -45,14 +48,15 @@
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
-import Aktionstasten from '../components/editor/Aktionstasten.vue'
-import Bausteine from '../components/editor/Bausteine.vue'
-import Editorfenster from '../components/editor/EditorFenster.vue'
+import Aktionstasten from '../components/EditorKomponenten/Aktionstasten.vue'
+import Bausteine from '../components/EditorKomponenten/Bausteine.vue'
+import Editorfenster from '../components/EditorKomponenten/EditorFenster.vue'
+import Leveleigenschaften from "../components/EditorKomponenten/LevelEigenschaften.vue"
 import editorStore from '@/stores/editor'
 
 export default defineComponent({
   name: 'Editor',
-  components: { Aktionstasten, Bausteine, Editorfenster },
+  components: { Aktionstasten, Bausteine, Editorfenster, Leveleigenschaften },
   setup() {
     return { editorStore }
   }

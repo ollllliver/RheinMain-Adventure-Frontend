@@ -14,6 +14,8 @@ import { Karte } from '@/models/Karte';
  * tuer = Anzahl der Tueren
  * npc = Anzahl der NPC's
  * levelname = name der aktuellen Karte
+ * minSpieler = Anzahl min Spieler
+ * maxSpieler = Anzahl max Spieler
  */
 
 const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
@@ -30,7 +32,9 @@ const state = reactive({
     schluessel: 0,
     tuer: 0,
     npc: 0,
-    levelName: ""
+    levelName: "",
+    minSpieler: 0,
+    maxSpieler: 0
 })
 
 /**
@@ -72,7 +76,13 @@ const getters = reactive({
     }),
     getLevelName: computed(() => {
         return state.levelName
-    })
+    }),
+    getMinSpieler: computed(() => {
+        return state.minSpieler
+    }),
+    getMaxSpieler: computed(() => {
+        return state.maxSpieler
+    }),
 })
 
 /**
