@@ -128,16 +128,16 @@ export class ElementHinzufuegen implements ICommand {
                 
                 case 6: {
                     // Tür in Karte einfügen falls noch kein Element an dieser Stelle ist
-                    this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung);  
+                      
                     // Tür je nach Ausrichtung im Div platzieren
                     if(this._ausrichtung === 0) {
+                        this._karte.setElement(this._element.posY, this._element.posX, this._element.e);    
                         this._event.target.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)" 
                     }
                     if(this._ausrichtung === 1) {
+                        this._karte.setElement(this._element.posY, this._element.posX, 7);
                         this._event.target.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)" 
                     }
-                    //this._event.dataTransfer.getData("src")
-                    //this._event.target.style = "background-image url('../assets/tuer.png'); background-size:auto;"
                     editorStore.info("Tür platziert.")
                     editorStore.setzeTuer(1)
                     break;
@@ -232,20 +232,22 @@ export class ElementHinzufuegen implements ICommand {
             case 4: {
                 this._karte.setElement(this._element.posY, this._element.posX, 1);  
                 this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
-                editorStore.setzeTuer(-1)
+                editorStore.setzeSchluessel(-1)
                 break;
             }
             case 5: {
+                
                 this._karte.setElement(this._element.posY, this._element.posX, 1);  
                 this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
-                editorStore.setzeSchluessel(-1)
+                editorStore.setzeNpc(-1)
                 break;
             }
             case 6: {
                 this._karte.setElement(this._element.posY, this._element.posX, 1);  
                 this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
-                editorStore.setzeNpc(-1)
+                editorStore.setzeTuer(-1)
                 break;
+                
             }
         
             /*
