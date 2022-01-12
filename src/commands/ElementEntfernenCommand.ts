@@ -1,4 +1,4 @@
-import { Karte } from "@/components/EditorKomponenten/Karte";
+import { Karte } from "../models/Karte";
 import { ICommand } from "./CommandManager";
 import editorStore from '@/stores/editor';
 
