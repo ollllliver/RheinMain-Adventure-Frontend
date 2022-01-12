@@ -80,8 +80,6 @@ export class MyKeyboardControls {
                 
 
             }
-            spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
-
 
         };
 
@@ -222,12 +220,22 @@ export class MyKeyboardControls {
 
             // x rot, y gelb, z blau
 
-            if ((this.moveForward && !vorneCollision) || (this.moveBackward && !hintenCollision))
+            if ((this.moveForward && !vorneCollision) || (this.moveBackward && !hintenCollision)){
                 velocity.z -= direction.z * speed * delta;
-            if ((this.moveLeft&& !linksCollision ) || (this.moveRight&& !rechtsCollision ))
+                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+            }
+            if ((this.moveLeft&& !linksCollision ) || (this.moveRight&& !rechtsCollision )){
                 velocity.x -= direction.x * speed * delta;
-            if (this.moveUp || this.moveDown)
+                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+            }
+            if (this.moveUp || this.moveDown){
                 velocity.y -= direction.y * speed * delta;
+                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+            }
+            // if (velocity.y != 0 || velocity.x != 0 || velocity.y != 0){
+            //     spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+            // }
+
 
 
             // Nicht in Wand haengenbleiben, ist man halt ein Gummi Mensch

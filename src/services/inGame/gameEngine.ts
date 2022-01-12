@@ -1,7 +1,7 @@
 import * as Three from "three";
 import {GraphicLoader} from '@/services/inGame/GraphicLoader';
-import {MausSteuerung} from '@/services/inGame/MausSteuerung';
-import {TastaturSteuerung} from '@/services/inGame/TastaturSteuerung';
+import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
+import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import { Interactions } from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
@@ -33,8 +33,8 @@ const developer = false;
 let developerCamera: any;
 let controls: any;
 
-let mausSteuerung: MausSteuerung;
-let tastaturSteuerung: TastaturSteuerung;
+let mausSteuerung: MyMouseControls;
+let tastaturSteuerung: MyKeyboardControls;
 let interactions: Interactions;
 let interaktionText: any;
 
@@ -197,8 +197,8 @@ const initCamera = () => {
  * Initialisiert die Steuerung
  */
 const initControls = () => {
-    mausSteuerung = new MausSteuerung(camera, document); //init Maussteuerung
-    tastaturSteuerung = new TastaturSteuerung(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
+    mausSteuerung = new MyMouseControls(camera, document); //init Maussteuerung
+    tastaturSteuerung = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
 
     connect();
 }
