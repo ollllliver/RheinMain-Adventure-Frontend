@@ -1,5 +1,5 @@
 import { ICommand } from "./CommandManager";
-import {Karte} from '../components/EditorKomponenten/Karte'
+import {Karte} from '../models/Karte'
 import editorStore from '@/stores/editor'
 /*
  * Jeder Befehl bekommt seine eigene Klasse und implementiert das ICommand Interface
@@ -242,7 +242,8 @@ export class ElementHinzufuegen implements ICommand {
                 editorStore.setzeNpc(-1)
                 break;
             }
-            case 6: {
+            case 6:
+            case 7: {
                 this._karte.setElement(this._element.posY, this._element.posX, 1);  
                 this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
                 editorStore.setzeTuer(-1)
