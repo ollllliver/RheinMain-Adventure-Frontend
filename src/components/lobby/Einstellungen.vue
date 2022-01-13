@@ -54,7 +54,7 @@
 
     <div class="row">
       <!-- START BUTTON -->
-      <button class="m-4  col btn btn-primary" v-on:click="starten" :disabled="startbuttonUnsichtbar">
+      <button class="m-4  col btn btn-success" v-on:click="starten" :disabled="startbuttonUnsichtbar">
         SPIEL STARTEN
       </button>
       <h1 v-if="lobbystate.istGestartet" class="m-4 col">{{ lobbystate.countdown }}</h1>
