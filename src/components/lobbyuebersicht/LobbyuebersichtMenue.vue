@@ -2,8 +2,8 @@
     <div class="container">
       <!-- <h1>Übersicht</h1> -->
       <div class="m-3 d-flex justify-content-around">
-        <button class="btn btn-primary btn-success" v-on:click="neueLobby">Spiel hosten</button>
-        <button class="btn btn-primary btn-success" v-on:click="joinRandomLobby">Zufällige Lobby</button>
+        <button class="btn btn-success" v-on:click="neueLobby">Spiel hosten</button>
+        <button class="btn btn-success" v-on:click="joinRandomLobby">Zufällige Lobby</button>
       </div>
     </div>
 

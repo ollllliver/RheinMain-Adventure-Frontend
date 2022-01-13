@@ -26,7 +26,7 @@
       <div class="col">
         <div class="row">
           <h1 class="col"> Spieler</h1>
-          <button class="btn btn-primary col" v-on:click="leaveLobby">LEAVE LOBBY</button>
+          <button class="btn btn-success col" v-on:click="leaveLobby">LEAVE LOBBY</button>
         </div>
         <Teilnehmerliste class="row border border-secondary rounded px-4 mt-3" />
         <InviteCopy :link="link" class="row border border-secondary rounded px-4 mt-3" />
