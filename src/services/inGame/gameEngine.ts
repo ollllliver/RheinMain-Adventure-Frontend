@@ -9,6 +9,7 @@ import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/se
 import { Position, Spieler } from "@/models/Spieler";
 import { useLobbyStore } from "../lobby/LobbyStore";
 import userStore from '@/stores/user'
+import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
 
 
@@ -47,6 +48,8 @@ const direction = new Three.Vector3();
 const stompClient = gamebrokerStompclient;
 
 const {lobbystate} = useLobbyStore();
+
+const {unsubscribeChat, subscribeChat} = useChatStore();
 
 const mitspieler3dObjektListe = new Map();
 
@@ -217,6 +220,32 @@ const initControls = () => {
     interaktionText = document.getElementById("interaktionText");
 }
 
+/**
+* Initialisiert den InGame-Chat
+*/
+const initChat = () =>{
+    subscribeChat(lobbystate.lobbyID, ChatTyp.INGAME);
+
+    const chat = document.getElementById("Chat");
+    const chatButton = document.getElementById("ChatButton");
+
+    if(chat != null && chatButton != null){
+        const btn = document.createElement("button");
+        btn.id = "CloseButton";
+        btn.innerHTML = "x";
+        btn.onclick = function () {
+            closeChat(chat, chatButton);
+        };
+        chat.appendChild(btn);
+
+        chatButton.onclick = function (){
+            openChat(chat, chatButton);
+        };
+
+        closeChat(chat, chatButton);
+    }
+}
+
 const connect = () => {
     window.addEventListener('click', mausSteuerung.lock); //locked die Maus
 }
@@ -225,6 +254,7 @@ const disconnect = () => {
     mausSteuerung.dispose();
     tastaturSteuerung.disconnect();
     interactions.disconnect();
+    unsubscribeChat();
     window.removeEventListener('click', mausSteuerung.lock);
     console.log("Müsste disconnected sein")
 }
@@ -362,6 +392,16 @@ function zeigeInteraktionText(interaktion:any){
       }
   }
 
+  function openChat(chat:any, chatButton:any){
+    chat.style.display = "block";
+    chatButton.style.display = "none";
+  }
+
+  function closeChat(chat:any, chatButton:any){
+    chat.style.display = "none";
+    chatButton.style.display = "block";
+  }
+
   function setzeMitspielerAufPosition(spieler: Spieler){
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
     
@@ -381,6 +421,7 @@ export function useGameEngine(){
         initRenderer,
         initControls,
         initInteractions,
+        initChat,
         doAnimate,
         connect, disconnect,
         setContainer,
