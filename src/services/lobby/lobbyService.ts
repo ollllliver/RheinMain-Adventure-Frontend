@@ -29,6 +29,8 @@ const lobbystate = reactive({
     darfBeitreten: false,
     istPrivat: false,
     countdown: 10,
+    //TODO: any zu Karte oder Level ändern, sobald es im selben Branch ist.
+    gewaehlteKarte: {} as any,
 })
 
 /**
@@ -37,6 +39,11 @@ const lobbystate = reactive({
 const alleLobbiesState = reactive({
     lobbies: Array<Lobby>(),
     errormessage: ""
+})
+
+const alleKartenState = reactive({
+    //TODO: any zu Karte oder Level ändern, sobald es im selben Branch ist.
+    karten: {} as Array<any>,
 })
 
 // verwendete StompSubscriptions:
@@ -630,6 +637,56 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
 }
 
 /**
+ * Fragt im Backend per fetch das Ändern der gewählten Karte für die Lobby aus dem aktuellen lobbystate an.
+ * 
+ * @param neueKarte 
+ */
+ function changeKarte(neueKarte) {
+    console.log('change limit:', neueKarte);
+    fetch('/api/lobby/' + lobbystate.lobbyID + '/level', {
+        method: 'PATCH',
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(neueKarte)
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((json) => {
+        console.log(json);
+    }).catch((e) => {
+        console.log(e);
+    });
+}
+
+async function alleKartenLaden() {
+    fetch('/api/level/alle', {
+        method: 'GET'
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((level: Array<Lobby>) => {
+        console.log(level);
+        // verarbeite jsondata
+        console.log("alle level:", level);
+        alleKartenState.karten = level;
+    }).catch((e) => {
+        console.log(e);
+    });}
+
+/**
  * stellt mit dem returnobjekt gewisse objekte und functionen für die Views und Componenten zur Verfügung
  * 
  * @returns Return-Objekt mit den zur verfügung zu stellenden Objekten.
@@ -645,6 +702,7 @@ export function useLobbyStore() {
         // State-Variablen:
         alleLobbiesState: readonly(alleLobbiesState),
         lobbystate: readonly(lobbystate),
+        alleKartenState: readonly(alleKartenState),
 
         // Lobby Funktionen zum Informieren
         alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht,
@@ -653,9 +711,11 @@ export function useLobbyStore() {
         neueLobby, joinRandomLobby, leaveLobby, starteLobby, spielerEntfernen,
 
         // Funktionen zum ändern der Lobby Einstellungen:
-        einstellungsfunktionen: { changeLimit, changePrivacy, changeHost },
+        einstellungsfunktionen: { changeLimit, changePrivacy, changeHost, changeKarte },
 
         // Chat Funktionen:
         sendeChatNachricht, empfangeChatNachricht,
+
+        alleKartenLaden,
     }
 }

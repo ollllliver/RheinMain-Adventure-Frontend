@@ -10,6 +10,14 @@
         {{ lobbystate.spielerlimit }}
       </h3>
 
+      <!-- AUSWAHL - Karte -->
+      <div>
+        <label class="h3">Karte:&nbsp;</label>
+        <select class="h4" v-model="gewaehlteKarte" @change="changeKarte">
+          <option :text="karte.name" :value="karte" v-for="karte in kartenArray" :key="karte"></option>
+        </select>
+      </div>
+
       <!-- AUSWAHL - Spielerlimit -->
       <div>
         <label class="h3">Spielerlimit:&nbsp;</label>
@@ -66,13 +74,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watchEffect, ref } from "vue";
+import { defineComponent, watchEffect, ref, computed, onMounted } from "vue";
 import { useLobbyStore } from "@/services/lobby/lobbyService";
 import userStore from "@/stores/user";
 export default defineComponent({
   name: "Einstellungen",
   setup() {
-    const { lobbystate, starteLobby, einstellungsfunktionen } = useLobbyStore();
+    onMounted(() =>{
+      alleKartenLaden();
+    })
+
+    const { lobbystate, starteLobby, einstellungsfunktionen, alleKartenLaden, alleKartenState } = useLobbyStore();
     // DEFAULT max spielerlimit aktuell = 10
     const limitArray = ref(Array.from({ length: 10 }, (_, i) => i + 1));
     // das setzt spielerlimit immer auf das neuste lobbystate.spielerlimit
@@ -80,9 +92,15 @@ export default defineComponent({
     // watchEffect(() => limitArray.value = Array.from({length: lobbystate.karte.maxSpieler}, (_, i) => i + 1));
     // gibt es noch nicht -> ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+    const kartenArray = computed(() =>{
+      return alleKartenState.karten;
+    })
+
     let startbuttonUnsichtbar = ref(false);
 
     // ref's auf änderbare Einstellungen und watchEffects auf lobbystate parameter für den neusten Stand
+    const gewaehlteKarte = ref();
+    watchEffect(() => (gewaehlteKarte.value = lobbystate.gewaehlteKarte));
     const spielerlimit = ref();
     watchEffect(() => (spielerlimit.value = lobbystate.spielerlimit));
     const istPrivat = ref();
@@ -91,6 +109,9 @@ export default defineComponent({
     watchEffect(() => (host.value = lobbystate.host.name));
 
     // 3 FUNKTIONEN zum ändern der änderbare Einstellungen:
+    function changeKarte() {
+      einstellungsfunktionen["changeKarte"](gewaehlteKarte.value);
+    }
     function changeLimit() {
       einstellungsfunktionen["changeLimit"](spielerlimit.value);
     }
@@ -121,11 +142,14 @@ export default defineComponent({
       spielerlimit,
       changeLimit,
       limitArray,
+      kartenArray,
       istPrivat,
       changePrivacy,
       host,
       changeHost,
       startbuttonUnsichtbar,
+      gewaehlteKarte,
+      changeKarte,
     };
   },
 });
