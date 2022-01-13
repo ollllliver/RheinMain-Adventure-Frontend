@@ -28,7 +28,7 @@ const lobbystate = reactive({
     // dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird.
     darfBeitreten: false,
     istPrivat: false,
-    countdown: 10,
+    countdown: 5,
     //TODO: any zu Karte oder Level ändern, sobald es im selben Branch ist.
     gewaehlteKarte: {} as any,
 })
@@ -239,6 +239,7 @@ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string)
             alleLobbiesState.errormessage = 'Du wurdest leider rausgeschmissen. :(';
             router.push("/uebersicht");
         } else if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET){
+            lobbystate.istGestartet = true;
             starteTimer();
         } else {
             updateLobby(lobby_id);
@@ -347,6 +348,7 @@ async function updateLobby(lobby_id: string) {
         lobbystate.spielerlimit = jsondata.spielerlimit;
         lobbystate.host = jsondata.host;
         lobbystate.istPrivat = jsondata.istPrivat;
+        lobbystate.gewaehlteKarte = jsondata.gewaehlteKarte;
 
     }).catch((e) => {
         console.log(e);
@@ -651,7 +653,7 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify(neueKarte)
+        body: JSON.stringify(neueKarte.levelId)
     }).then((response) => {
         if (!response.ok) {
             console.log("error");

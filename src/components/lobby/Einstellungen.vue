@@ -52,21 +52,24 @@
         </select>
       </div>
 
+    <div class="row">
       <!-- START BUTTON -->
-      <button class="row btn btn-primary" v-on:click="starten" :disabled="startbuttonUnsichtbar">
+      <button class="m-4  col btn btn-primary" v-on:click="starten" :disabled="startbuttonUnsichtbar">
         SPIEL STARTEN
       </button>
+      <h1 v-if="lobbystate.istGestartet" class="m-4 col">{{ lobbystate.countdown }}</h1>
+    </div>
+
     </div>
     <div v-else>
       <h1 class="row">Einstellungen</h1>
-      <h3 class="row">Teilnehmer: {{ lobbystate.teilnehmerliste.length }} \{{ lobbystate.spielerlimit }}</h3>
-      <h3 class="row">istVoll: {{ lobbystate.istVoll }}</h3>
-      <h3 class="row">spielerlimit: {{ lobbystate.spielerlimit }}</h3>
-      <h3 class="row">istGestartet: {{ lobbystate.istGestartet }}</h3>
-      <h3 class="row">private Lobby: {{ lobbystate.istPrivat }}</h3>
-      <h3 class="row">host: {{ lobbystate.host.name }}</h3>
+      <h3 class="row">Teilnehmer: {{ lobbystate.teilnehmerliste.length }}/{{ lobbystate.spielerlimit }}</h3>
+      <h3 class="row">Karte: {{ lobbystate.gewaehlteKarte.name }}</h3>
+      <h3 v-if="lobbystate.istPrivat" class="row">Lobby: privat</h3>
+      <h3 v-else class="row">Lobby: öffentlich</h3>
+      <h3 class="row">Host: {{ lobbystate.host.name }}</h3>
+      <h1 v-if="lobbystate.istGestartet">{{ lobbystate.countdown }}</h1>
     </div>
-    <h1>{{ lobbystate.countdown }}</h1>
     <audio id="ticking">
       <source src="../../assets/sounds/ticking.mp3" type="audio/mpeg" />
     </audio>
