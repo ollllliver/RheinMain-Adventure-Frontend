@@ -5,7 +5,7 @@ import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import { Interactions } from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
-import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
+import { gamebrokerStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 import { Position, Spieler } from "@/models/Spieler";
 import { useLobbyStore } from "../lobby/LobbyStore";
 import userStore from '@/stores/user'
@@ -157,6 +157,7 @@ const initCamera = () => {
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
     subscribeToSpielerPositionenUpdater(stompClient);
+    subscribeToSchluesselUpdater(stompClient);
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
@@ -303,6 +304,7 @@ const doAnimate = () => {
 
     // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
     if(interactions.erkannteInteraktion){
+        
         zeigeInteraktionText(interactions.erkannteInteraktion)
     }else{
         verbergeInteraktionText()
@@ -369,8 +371,13 @@ function zeigeInteraktionText(interaktion:any){
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
+function setzteSchluesselAnz(anzSchluess: any){
+    console.log("Anzahl Schluessel" + anzSchluess)
+}
+
 export function useGameEngine(){
     return {
+        setzteSchluesselAnz,
         setzeMitspielerAufPosition,
         initScene,
         initLoader,
