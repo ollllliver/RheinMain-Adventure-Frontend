@@ -4,35 +4,23 @@
     <div v-if="alleLobbiesState.errormessage != ''" class="alert alert-danger" role="alert">
       {{alleLobbiesState.errormessage}}
     </div>
-    <div class="container">
-      <h1>Lobbyübersicht</h1>
-
-      <button class="btn btn-primary" v-on:click="neueLobby">Spiel hosten</button>
-      <button class="btn btn-primary" v-on:click="joinRandomLobby">
-        Zufällige Lobby
-      </button>
-    </div>
-    <div class="container">
-      <li :lobby="lobby" v-for="lobby in alleLobbiesState.lobbies" :key="lobby.lobbyID">
-        {{ lobby.lobbyID }}
-        <button v-on:click="connectToLobby(lobby.lobbyID)"> beitreten</button>
-      </li>
-    </div>
+    <LobbyuebersichtMenue/>
+    <Lobbyliste/>
   </div>
 </template>
 
 <script lang="ts">
+import Lobbyliste from "@/components/lobbyuebersicht/Lobbyliste.vue"
+import LobbyuebersichtMenue from "@/components/lobbyuebersicht/LobbyuebersichtMenue.vue"
 import { defineComponent, onMounted} from "vue";
 import { useLobbyStore } from "@/services/lobby/lobbyService";
 
 export default defineComponent({
   name: "LobbyuebersichtView",
-  components: {},
+  components: {Lobbyliste, LobbyuebersichtMenue},
   
   setup() {
-    const { alleLobbiesState, neueLobby,
-    joinRandomLobby, alleLobbiesladen,
-    connectToUebersicht, connectToLobby } = useLobbyStore();
+    const { alleLobbiesState, neueLobby, joinRandomLobby, alleLobbiesladen, connectToUebersicht } = useLobbyStore();
 
     onMounted(() => {
       connectToUebersicht();
@@ -40,9 +28,10 @@ export default defineComponent({
     });
 
     return {
+      Lobbyliste, LobbyuebersichtMenue,
       neueLobby,
       alleLobbiesState,
-      connectToLobby,joinRandomLobby,
+      joinRandomLobby,
     };
   },
 });
