@@ -54,9 +54,14 @@ let uebersichtSubscription: StompSubscription;
  *              Nicht gerade so, wie man es von typescript kennt. Klingt mehr nach javascript. aber gut...
  */
 async function connectToStomp(callb, param) {
-    // stompclient.onWebSocketError = () => { /* WS-Fehler */ }
-    // stompclient.onStompError = () => { /* STOMP-Fehler */ }
-    // stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
+
+    stompclient.onWebSocketError = () => { 
+        leaveLobby(); }
+    stompclient.onStompError = () => { 
+        leaveLobby();}
+    stompclient.onDisconnect = () => {
+        leaveLobby();
+    }
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
         callb(param)
@@ -157,6 +162,11 @@ async function connectToLobby(lobby_id: string) {
                 break;
             case NachrichtenCode.LOBBY_NICHT_GEFUNDEN:
                 alleLobbiesState.errormessage = "Wir haben die Lobby leider nicht mehr gefunden.";
+                router.push("/uebersicht");
+                break;
+
+            case NachrichtenCode.BEREITS_IN_ANDERER_LOBBY:
+                alleLobbiesState.errormessage = "Du bist bereits in einer anderen Lobby";
                 router.push("/uebersicht");
                 break;
 
@@ -453,8 +463,14 @@ async function neueLobby() {
         return response.json();
     }).then((jsondata) => {
         console.log(jsondata)
-        router.push("/lobby/" + jsondata.lobbyID);
-        return jsondata.lobbyID
+        const lobbymessage = jsondata as LobbyMessage;
+        if (lobbymessage.istFehler) {
+            alleLobbiesState.errormessage = "Du bist bereits in einer Lobby die ID lautet :" + lobbymessage.payload
+            router.push("/uebersicht");
+        } else {
+            router.push("/lobby/" + lobbymessage.payload);
+            return lobbymessage.payload
+        }
     }).catch((e) => {
         console.log(e);
     });
