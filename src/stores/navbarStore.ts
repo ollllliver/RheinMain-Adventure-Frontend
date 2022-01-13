@@ -1,6 +1,6 @@
 import { reactive } from "vue";
 
-export const navbarbar = reactive({
+export const navbar = reactive({
     title: "",
     buttonText: "",
     button: false,
