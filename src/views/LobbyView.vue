@@ -2,21 +2,6 @@
   <!-- die darfBeitreten ist dafür, wenn jemand per Link joint, aber nicht joinen darf,
   dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird. -->
   <div v-if="lobbystate.darfBeitreten">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container">
-        <a class="navbar-brand">Lobby {{ lobbystate.lobbyID }}</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav">
-            <li class="nav-item">
-              <a class="nav-link disabled" href="#">Disabled Button</a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </nav>
     <!-- Eorror Balken, wenn errormessage vorliegt-->
     <div v-if="lobbystate.errormessage != ''" class="alert alert-danger" role="alert">
       {{lobbystate.errormessage}}
@@ -26,7 +11,7 @@
       <div class="col">
         <div class="row">
           <h1 class="col"> Spieler</h1>
-          <button class="btn btn-primary col" v-on:click="leaveLobby">LEAVE LOBBY</button>
+          <button class="btn btn-success col" v-on:click="leaveLobby">LEAVE LOBBY</button>
         </div>
         <Teilnehmerliste class="row border border-secondary rounded px-4 mt-3" />
         <InviteCopy :link="link" class="row border border-secondary rounded px-4 mt-3" />
