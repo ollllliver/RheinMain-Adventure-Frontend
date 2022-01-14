@@ -97,7 +97,7 @@ export default defineComponent({
       */
     };
     onMounted(() => {
-      console.log(liste);
+      //console.log(liste);
     });
 
     /**
@@ -153,6 +153,7 @@ export default defineComponent({
         }
       } else {
         editorStore.info("Bitte wähle erst ein Baustein aus!");
+        console.log("baustein auswaehlen")
       }
     };
     return {

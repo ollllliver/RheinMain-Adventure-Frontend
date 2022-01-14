@@ -1,7 +1,7 @@
 <template>
   <!-- Aktionstasten: Buttons zum Auslösen verschiedener Aktionen (speichern/löschen/redo/undo/...) -->
   <div>
-    <button class="btn btn-outline-secondary" @click="zurPruefung()">zur Prüfung einreichen</button>
+    <button class="btn btn-outline-secondary" @click="zurPruefung()" name="pruef">zur Prüfung einreichen</button>
     <button class="btn btn-outline-secondary" @click="test()">später beenden</button>
     <button class="btn btn-outline-secondary">abbrechen</button>
     <button class="btn btn-outline-secondary" v-on:click="allesEntfernen">alles entfernen</button>
@@ -14,7 +14,6 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { CommandStack } from "../../commands/CommandManager";
-import { ElementEntfernenCommand } from "@/commands/ElementEntfernenCommand";
 import editorStore from "@/stores/editor";
 
 export default defineComponent({
@@ -22,6 +21,7 @@ export default defineComponent({
   methods: {
     undo() {
       // letzten Befehl vom Stack rückgängig machen
+      console.log("undo")
       CommandStack.getInstance().undo();
     },
     redo() {
@@ -35,6 +35,7 @@ export default defineComponent({
     const liste = karte.liste;
     // Karte nach Prüfung ob Start/Ziel und Raum platziert wurde loggen (vorerst)
     const zurPruefung = () => {
+      console.log("pruef")
       if (editorStore.getters.getZiel === true) {
         if (editorStore.getters.getStart === true) {
           /*
@@ -82,7 +83,7 @@ export default defineComponent({
         CommandStack.getInstance().getStack().pop()
       }
       editorStore.default()
-      console.log(editorStore.getters.getGrid)
+      //console.log(editorStore.getters.getGrid)
       /*console.log(CommandStack.getInstance().getStack()[1])
       for (let i = 0; i < editorStore.getters.getStackindex; i++) {
         
