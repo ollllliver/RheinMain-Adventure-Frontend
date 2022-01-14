@@ -28,6 +28,7 @@ export function subscribeToSchluesselUpdater(stompclient: Client): void{
     stompclient.onConnect = async () => {
         stompclient.subscribe(DEST, (message) => {
             const anzSchluess: any = message.body;
+            console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
             setzteSchluesselAnz(anzSchluess)
             
         });

@@ -83,7 +83,7 @@ import { useLobbyStore } from '../lobby/LobbyStore';
                     hatSchluessel = true
                     interaktion.object.parent.remove(interaktion.object);
                     console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/schluessel');
-                    this.DEST = "/topic/spiel/" + this.lobbyID + '/schluessel';
+                    this.DEST = "/topic/spiel/" + this.lobbyID + '/key';
                     this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
                     break;
                 case "Tür":
