@@ -22,7 +22,7 @@
             <th>{{ lobby.gewaehlteKarte.name }}</th>
             <th>{{ lobby.host.name }}</th>
             <th>{{ lobby.teilnehmerliste.length }}/{{ lobby.spielerlimit }}</th>
-            <td class="list-group-item list-group-item-action list-group-item-success btn rounded-0" v-on:click="connectToLobby(lobby.lobbyID)"> beitreten</td>
+            <td class="list-group-item list-group-item-action list-group-item-success btn rounded-0" v-on:click="redirectToLobby(lobby.lobbyID)"> beitreten</td>
           </tr>
         </tbody>
       </table>
@@ -33,6 +33,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import { useLobbyStore } from "@/services/lobby/lobbyService";
+import router from "@/router";
 
 export default defineComponent({
   name: "Lobbyliste",
@@ -43,9 +44,12 @@ export default defineComponent({
     function refresh(){
       alleLobbiesladen();
     }
+    function redirectToLobby(id){
+      router.push("/lobby/"+ id);
+    }
     console.log(alleLobbiesState)
     return {
-      alleLobbiesState,connectToLobby, refresh,
+      alleLobbiesState,connectToLobby, refresh, redirectToLobby,
     };
   },
 });
