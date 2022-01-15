@@ -6,7 +6,7 @@
     <!-- <div>
         {{navbar.title}}
     </div> -->
-    <tr>
+    <!-- <tr>
         <td class="btn" @click="router.push('/')">
             Home
         </td>
@@ -22,7 +22,7 @@
         <td class="btn" @click="router.push('/instructions')">
             Anleitung
         </td>
-    </tr>
+    </tr> -->
     <button class="btn btn-success my-2 my-sm-0" type="submit">Logout</button>
   </nav>
 </template>
