@@ -51,7 +51,7 @@ const mitspieler3dObjektListe = new Map();
 
 let startPosition: Position;
 
-function setContainer(element: HTMLElement|null){
+function setContainer(element: HTMLElement | null) {
     container = element
 }
 
@@ -67,58 +67,65 @@ const initScene = () => {
 };
 
 /**
- * Initialisiert Loader Klasse
+ * Initialisiert Loader Klasse, lädt Raum
  */
-
-
-
 const initLoader = () => {
 
     // TODO: Level-ID dynamisch bestimmen
 
     // const { lobbystate } = useLobbyStore()
-    // const levelId : number = lobbystate.levelID
+    // const levelId : string = lobbystate.levelID
 
     fetch(`http://${window.location.hostname}:3000/api/level/1/0`, {
-    method: 'GET',
+        method: 'GET',
     }).then((response) => {
-    if (!response.ok) {
-        console.log("error");
-        return;
-    }
-    return response.json();
+        if (!response.ok) {
+            console.log("Fehler beim Abfragen der Level+Raum Kombo. Antwort war nicht 200 OK :(");
+            return;
+        }
+        return response.json();
 
     }).then((RaumMobiliarListe) => {
-        console.log(RaumMobiliarListe);
-        console.log("Jetzt wird iteriert")
+        console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.")
         RaumMobiliarListe.forEach(function (raumMobiliar) {
-            // console.log(raumMobiliar)
+            console.log(raumMobiliar);
             const posX = raumMobiliar.positionX;
             const posY = raumMobiliar.positionY;
-            console.log(raumMobiliar);
-            if (raumMobiliar.raumMobiliarId == 43){
-                startPosition = new Position(posX, spieler.height *3, posY);
+
+            // Startposition ermitteln und hier festlegen. Ginge auch per fetch auf
+            // /api/level/startposition/{levelID}/{raumindex}, so ist es aber stabiler und schneller
+            if (raumMobiliar.mobiliar.mobiliartyp == "EINGANG") {
+                startPosition = new Position(posX, spieler.height * 3, posY);
             }
-            
+
             // Idee von Olli:
             // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platzieren
             // Davor müsste man zu begin ein Set des Mobiliars erstellen
 
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
+            console.log("GLTF-Datei für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
             loader.ladeDatei(`http://${window.location.hostname}:3000/api/level/` + mobiliarId).then((res: any) => {
-                // console.log(res)
+
+                // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
                 res.scene.position.x = 4 * posX
                 res.scene.position.z = 4 * posY
                 collidableList.push(res.scene)
+
+                // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
+                if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
+                    res.scene.children[0].name = raumMobiliar.mobiliar.name;
+                    interactableList.push(res.scene);
+                }
+
                 scene.add(res.scene)
             });
         });
-        console.log("Fertig iteriert")
+        console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
 
         camera.position.set(startPosition.x, startPosition.y, startPosition.z);
 
-        lobbystate.teilnehmerliste.forEach( function (spieler){
-            if (spieler.name!=userStore.state.benutzername){
+        lobbystate.teilnehmerliste.forEach(function (spieler) {
+            if (spieler.name != userStore.state.benutzername) {
                 loader.ladeDatei('/assets/blender/player.gltf').then((spieler3D: any) => {
 
                     const objektInScene = spieler3D.scene;
@@ -127,10 +134,10 @@ const initLoader = () => {
 
                     objektInScene.position.x = 1 * startPosition.x;
                     objektInScene.position.z = 1 * startPosition.z;
-    
+
                     mitspieler3dObjektListe.set(spieler.name, objektInScene);
                 });
-            } 
+            }
         });
 
     });
@@ -147,19 +154,19 @@ const initCamera = () => {
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
-    camera.position.set(0, spieler.height *3, 0);
+    camera.position.set(0, spieler.height * 3, 0);
     // camera.position.set(-2, spieler.height * 3, -5);
     camera.lookAt(new Three.Vector3(-2, spieler.height * 3, 0));
 
     // Developer Kamera Main (camera2)
     if (developer) {
-    developerCamera = new Three.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
-    developerCamera.position.set(-50, 50, -50);
-    developerCamera.lookAt(new Three.Vector3(0, spieler.height, 0));
+        developerCamera = new Three.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
+        developerCamera.position.set(-50, 50, -50);
+        developerCamera.lookAt(new Three.Vector3(0, spieler.height, 0));
 
-    // Axes Helper (x,y,z)
-    const axesHelper = new Three.AxesHelper(30);
-    scene.add(axesHelper)
+        // Axes Helper (x,y,z)
+        const axesHelper = new Three.AxesHelper(30);
+        scene.add(axesHelper)
 
     }
 
@@ -176,15 +183,15 @@ const initCamera = () => {
 };
 
 /**
-* Passe Spielanzeige an die groeße des Browserfensters an
-*/
- window.addEventListener('resize', () =>{
+ * Passe Spielanzeige an die groeße des Browserfensters an
+ */
+window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
 
     renderer.setSize(window.innerWidth, window.innerHeight)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-  })
+})
 
 /**
  * Initialisiert die Steuerung
@@ -197,9 +204,9 @@ const initControls = () => {
 }
 
 /**
-* Initialisiert die Interaktionen
-*/
- const initInteractions = () => {
+ * Initialisiert die Interaktionen
+ */
+const initInteractions = () => {
     interactions = new Interactions(interactableList, cameraCollidable, document);
     interaktionText = document.getElementById("interaktionText");
 }
@@ -225,32 +232,6 @@ const initPlane = () => {
     meshPlane.position.x = 0
     scene.add(meshPlane);
 };
-
-const initInteractionTestObject = () => {
-    // erzeuge Schluessel
-    loader.ladeDatei('/assets/blender/key.gltf').then((key: any) => {
-        const keyModel = key.scene;
-        keyModel.children[0].name = "Schlüssel";
-        keyModel.position.x = -5;
-        keyModel.position.y = 0.5;
-        keyModel.position.z = -3;
-        scene.add(keyModel);
-        interactableList.push(keyModel);
-    }).catch((e)=>
-    console.log('ERROR:',e));
-
-    // erzeuge Tuer
-    const geometry = new Three.BoxGeometry(0.1, 2, 1);
-    const material = new Three.MeshNormalMaterial();
-    const door = new Three.Mesh(geometry, material);
-    door.name = "Tür"
-    door.position.x = -5;
-    door.position.y = 1;
-    door.position.z = 3;
-    scene.add(door);
-    interactableList.push(door)
-  };
-
 
 const initRaycaster = () => {
     raycaster = new Three.Raycaster(new Three.Vector3(), new Three.Vector3(0, -1, 0), 0, 10);
@@ -289,9 +270,9 @@ const doAnimate = () => {
     interactions.update(camera) //Interaktionen
 
     // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
-    if(interactions.erkannteInteraktion){
+    if (interactions.erkannteInteraktion) {
         zeigeInteraktionText(interactions.erkannteInteraktion)
-    }else{
+    } else {
         verbergeInteraktionText()
     }
 
@@ -299,30 +280,30 @@ const doAnimate = () => {
 
     // developer sicht
     if (developer) {
-    // Developer Kamera (Uebersicht)
-    renderer.setClearColor(0x000000, 0);
-    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-    renderer.render(scene, developerCamera);
-    scene.add(cameraCollidable);
+        // Developer Kamera (Uebersicht)
+        renderer.setClearColor(0x000000, 0);
+        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+        renderer.render(scene, developerCamera);
+        scene.add(cameraCollidable);
 
-    // BoxHelper (geladene Objekte, erstmal nur IntroLevel)
-    const boxHelper = new Three.BoxHelper(collidableList[0], new Three.MeshBasicMaterial(0xff0000))
-    scene.add(boxHelper)
+        // BoxHelper (geladene Objekte, erstmal nur IntroLevel)
+        const boxHelper = new Three.BoxHelper(collidableList[0], new Three.MeshBasicMaterial(0xff0000))
+        scene.add(boxHelper)
 
-    // Hauptkamera (POV)
-    renderer.clearDepth();
-    renderer.setScissorTest(true);
-    renderer.setScissor(30, 30, window.innerWidth / 4, window.innerHeight / 4);
-    renderer.setViewport(30, 30, window.innerWidth / 4, window.innerHeight / 4);
-    renderer.setClearColor(0x222222, 1);
+        // Hauptkamera (POV)
+        renderer.clearDepth();
+        renderer.setScissorTest(true);
+        renderer.setScissor(30, 30, window.innerWidth / 4, window.innerHeight / 4);
+        renderer.setViewport(30, 30, window.innerWidth / 4, window.innerHeight / 4);
+        renderer.setClearColor(0x222222, 1);
 
-    //controls.target.copy(camera.position);
+        //controls.target.copy(camera.position);
 
-    renderer.render(scene, camera);
+        renderer.render(scene, camera);
 
-    renderer.setScissorTest(false);
+        renderer.setScissorTest(false);
     } else { // standard pov sicht
-    renderer.render(scene, camera);
+        renderer.render(scene, camera);
     }
 
 
@@ -335,35 +316,34 @@ const doAnimate = () => {
 
 };
 
-function zeigeInteraktionText(interaktion:any){
-    if(interaktionText != null /*&& interaktionText.style.display == "none"*/){
+function zeigeInteraktionText(interaktion: any) {
+    if (interaktionText != null /*&& interaktionText.style.display == "none"*/) {
         interaktionText.textContent = "[E] Interagiere mit " + interaktion.object.name
         interaktionText.style.display = "block"
-      }
-  }
+    }
+}
 
-  function verbergeInteraktionText(){
-    if(interaktionText != null /*&& interaktionText.style.display != "none"*/){
+function verbergeInteraktionText() {
+    if (interaktionText != null /*&& interaktionText.style.display != "none"*/) {
         interaktionText.textContent = ""
         interaktionText.style.display = "none"
-      }
-  }
+    }
+}
 
-  function setzeMitspielerAufPosition(spieler: Spieler){
+function setzeMitspielerAufPosition(spieler: Spieler) {
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
-    
+
     objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
-export function useGameEngine(){
+export function useGameEngine() {
     return {
         setzeMitspielerAufPosition,
         initScene,
         initLoader,
         initCamera,
         initPlane,
-        initInteractionTestObject,
         initRaycaster,
         initRenderer,
         initControls,

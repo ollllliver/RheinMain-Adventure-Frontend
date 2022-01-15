@@ -6,14 +6,27 @@
 
 <script lang="ts">
 import {defineComponent, onMounted} from "vue";
-import { useGameEngine } from "@/services/inGame/gameEngine";
+import {useGameEngine} from "@/services/inGame/gameEngine";
 
 
 export default defineComponent({
   name: "RenderDemo",
   setup() {
 
-    const {initScene, initLoader, initCamera, initPlane, initInteractionTestObject, initRaycaster, initRenderer, initControls, initInteractions, doAnimate, connect, disconnect, setContainer} = useGameEngine();
+    const {
+      initScene,
+      initLoader,
+      initCamera,
+      initPlane,
+      initRaycaster,
+      initRenderer,
+      initControls,
+      initInteractions,
+      doAnimate,
+      connect,
+      disconnect,
+      setContainer
+    } = useGameEngine();
     
 
     onMounted(() => {
@@ -22,7 +35,6 @@ export default defineComponent({
       initLoader();
       initCamera();
       initPlane();
-      initInteractionTestObject();
       initRaycaster();
       initRenderer();
       initControls();
