@@ -8,30 +8,22 @@ import {SpielerLokal} from '@/models/SpielerLokal';
 import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 import { Position, Spieler } from "@/models/Spieler";
 import { useLobbyStore } from "../lobby/LobbyStore";
+import { Camera } from "three/src/cameras/Camera";
 import userStore from '@/stores/user'
 
 
 
 let container: any;
-let camera: any;
+let camera: Camera;
 let cameraCollidable: any;
 let scene: any;
 let renderer: any;
 let meshPlane: any;
-let meshCube: any;
-let raycaster: any;
 const loader = new GraphicLoader();
-// let moveForward = false;
-// let moveBackward = false;
-// let moveLeft = false;
-// let moveRight = false;
-// let moveUp = false;
-// let moveDown = false;
 const collidableList: Array<any> = [];
 const interactableList: Array<any> = [];
 const developer = false;
 let developerCamera: any;
-let controls: any;
 
 let mausSteuerung: MyMouseControls;
 let tastaturSteuerung: MyKeyboardControls;
@@ -70,9 +62,6 @@ const initScene = () => {
 /**
  * Initialisiert Loader Klasse
  */
-
-
-
 const initLoader = () => {
     const türID = 34;
     const schlüsselID = 35;
@@ -206,7 +195,7 @@ const initControls = () => {
     mausSteuerung = new MyMouseControls(camera, document); //init Maussteuerung
     tastaturSteuerung = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
 
-    connect();
+    //connect();
 }
 
 /**
@@ -217,16 +206,35 @@ const initControls = () => {
     interaktionText = document.getElementById("interaktionText");
 }
 
+/**
+ * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
+ */
 const connect = () => {
-    window.addEventListener('click', mausSteuerung.lock); //locked die Maus
+    window.addEventListener('click', mausSteuerung.lock); //locked die Maus     
+        tastaturSteuerung.connect();
+        mausSteuerung.connect();
+        console.log("gameEninge.connect: verbunden")
+
+        const pauseFenster = document.getElementById('pause');
+        if (pauseFenster != null){ pauseFenster.style.display = "none";}
+    
 }
 
+/**
+ * Trennt die Verbindung zu den Eingabe-Controllern und öffnet das Spielunterbrechungsfenster
+ */
 const disconnect = () => {
     mausSteuerung.dispose();
     tastaturSteuerung.disconnect();
     interactions.disconnect();
     window.removeEventListener('click', mausSteuerung.lock);
-    console.log("Müsste disconnected sein")
+    console.log("gameEninge.disconnect: getrennt")
+
+    const pauseFenster = document.getElementById('pause');
+    if (pauseFenster != null){ pauseFenster.style.display = "";}
+
+    
+
 }
 
 const initPlane = () => {
@@ -265,9 +273,9 @@ const initInteractionTestObject = () => {
   };
 
 
-const initRaycaster = () => {
-    raycaster = new Three.Raycaster(new Three.Vector3(), new Three.Vector3(0, -1, 0), 0, 10);
-}
+// const initRaycaster = () => {
+//     raycaster = new Three.Raycaster(new Three.Vector3(), new Three.Vector3(0, -1, 0), 0, 10);
+// }
 
 const initRenderer = () => {
 
@@ -283,7 +291,6 @@ const initRenderer = () => {
     // controls = new OrbitControls(developerCamera, renderer.domElement);
     // controls.minDistance = 50;
     // controls.maxDistance = 300;
-
 
 };
 
@@ -340,6 +347,7 @@ const doAnimate = () => {
 
 
     //wohin damit?
+    //übertragt die Postition der Kamera an die Positionen des lokalen Spielers
     spieler.position.x = camera.position.x.toFixed(2);
     spieler.position.y = camera.position.y.toFixed(2);
     spieler.position.z = camera.position.z.toFixed(2);
@@ -377,7 +385,6 @@ export function useGameEngine(){
         initCamera,
         initPlane,
         initInteractionTestObject,
-        initRaycaster,
         initRenderer,
         initControls,
         initInteractions,

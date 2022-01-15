@@ -22,6 +22,7 @@ export class MyKeyboardControls {
     cameraCollidable: any;
     collidableList: any;
     rayCaster: any;
+    connect: () => void;
     disconnect: () => void;
 
 
@@ -77,8 +78,6 @@ export class MyKeyboardControls {
                 case 'ShiftLeft':
                     this.moveDown = true;
                     break;
-                
-
             }
 
         };
@@ -118,20 +117,29 @@ export class MyKeyboardControls {
                 case 'ShiftLeft':
                     this.moveDown = false;
                     break;
+                case 'Escape':
+                    console.log("MyKeyboardControls.onKeyUp: ESCAPE GEDRÜCKT")
+                    break;
 
             }
         }
 
-        const connect = () => {
+        /**
+         * Listener für 'keydown' und 'keyup' werden gesetzet
+         */
+        this.connect = () => {
             this.domElement.addEventListener('keydown', onKeyDown),
             this.domElement.addEventListener('keyup', onKeyUp)
-            console.log("keyboard controls connected")
+            console.log("MyKeyboardControls.connect: Tastatursteuerung connected")
         };
 
+        /**
+         * Listener für 'keydown' und 'keyup' werden entfernt
+         */
         this.disconnect = () => {
             this.domElement.removeEventListener('keydown', onKeyDown),
             this.domElement.removeEventListener('keyup', onKeyUp)
-            console.log("keyboard controls disconnected")
+            console.log("MyKeyboardControls.disconnect: Tastatursteuerung disconnected")
         };
 
         const collisionDetection = (blickVektor:any, originPoint: any) => {
@@ -222,19 +230,19 @@ export class MyKeyboardControls {
 
             if ((this.moveForward && !vorneCollision) || (this.moveBackward && !hintenCollision)){
                 velocity.z -= direction.z * speed * delta;
-                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+                // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
             if ((this.moveLeft&& !linksCollision ) || (this.moveRight&& !rechtsCollision )){
                 velocity.x -= direction.x * speed * delta;
-                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+                // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
             if (this.moveUp || this.moveDown){
                 velocity.y -= direction.y * speed * delta;
+                // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+            }
+            if (velocity.z != 0 || velocity.x != 0 || velocity.y != 0){ //solange der Spieler eine Geschwindigkeit hat, wird die Spielerposition geupdated
                 spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
-            // if (velocity.y != 0 || velocity.x != 0 || velocity.y != 0){
-            //     spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
-            // }
 
 
 
@@ -245,6 +253,5 @@ export class MyKeyboardControls {
                 velocity.x += direction.x * speed * delta;
 
         };
-        connect();
     }
 }
