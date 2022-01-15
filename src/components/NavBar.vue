@@ -1,8 +1,7 @@
 <template>
   <nav class="navbar navbar-light p-3 border-bottom border-success" style="background-color: #BDD3B9;">
     <a class="navbar-brand" href="#">
-        <img src="favicon.ico" width="30" height="30" class="d-inline-block align-top" alt="">
-        RheinMain-Adventure
+        <img src="/assets/RMA_Logo.png" height="40" class="d-inline-block align-top" alt="">
     </a>
     <!-- <div>
         {{navbar.title}}
