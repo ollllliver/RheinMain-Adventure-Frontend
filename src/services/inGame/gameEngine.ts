@@ -5,11 +5,12 @@ import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import { Interactions } from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
-import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
+import { gamebrokerStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 import { Position, Spieler } from "@/models/Spieler";
 import { useLobbyStore } from "../lobby/LobbyStore";
 import { Camera } from "three/src/cameras/Camera";
 import userStore from '@/stores/user'
+import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
 
 
@@ -39,6 +40,8 @@ const direction = new Three.Vector3();
 const stompClient = gamebrokerStompclient;
 
 const {lobbystate} = useLobbyStore();
+
+const {unsubscribeChat, subscribeChat} = useChatStore();
 
 const mitspieler3dObjektListe = new Map();
 
@@ -146,6 +149,7 @@ const initCamera = () => {
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
     subscribeToSpielerPositionenUpdater(stompClient);
+    subscribeToSchluesselUpdater(stompClient);
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
@@ -207,6 +211,32 @@ const initControls = () => {
 }
 
 /**
+* Initialisiert den InGame-Chat
+*/
+const initChat = () =>{
+    subscribeChat(lobbystate.lobbyID, ChatTyp.INGAME);
+
+    const chat = document.getElementById("Chat");
+    const chatButton = document.getElementById("ChatButton");
+
+    if(chat != null && chatButton != null){
+        const btn = document.createElement("button");
+        btn.id = "CloseButton";
+        btn.innerHTML = "x";
+        btn.onclick = function () {
+            closeChat(chat, chatButton);
+        };
+        chat.appendChild(btn);
+
+        chatButton.onclick = function (){
+            openChat(chat, chatButton);
+        };
+
+        closeChat(chat, chatButton);
+    }
+}
+
+/**
  * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
  */
 const connect = () => {
@@ -227,6 +257,7 @@ const disconnect = () => {
     mausSteuerung.dispose();
     tastaturSteuerung.disconnect();
     interactions.disconnect();
+    unsubscribeChat();
     window.removeEventListener('click', mausSteuerung.lock);
     console.log("gameEninge.disconnect: getrennt")
 
@@ -310,6 +341,7 @@ const doAnimate = () => {
 
     // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
     if(interactions.erkannteInteraktion){
+        
         zeigeInteraktionText(interactions.erkannteInteraktion)
     }else{
         verbergeInteraktionText()
@@ -370,6 +402,16 @@ function zeigeInteraktionText(interaktion:any){
       }
   }
 
+  function openChat(chat:any, chatButton:any){
+    chat.style.display = "block";
+    chatButton.style.display = "none";
+  }
+
+  function closeChat(chat:any, chatButton:any){
+    chat.style.display = "none";
+    chatButton.style.display = "block";
+  }
+
   function setzeMitspielerAufPosition(spieler: Spieler){
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
     
@@ -377,8 +419,13 @@ function zeigeInteraktionText(interaktion:any){
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
+function setzteSchluesselAnz(anzSchluess: any){
+    console.log("Anzahl Schluessel" + anzSchluess)
+}
+
 export function useGameEngine(){
     return {
+        setzteSchluesselAnz,
         setzeMitspielerAufPosition,
         initScene,
         initLoader,
@@ -388,6 +435,7 @@ export function useGameEngine(){
         initRenderer,
         initControls,
         initInteractions,
+        initChat,
         doAnimate,
         connect, disconnect,
         setContainer,

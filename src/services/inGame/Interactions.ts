@@ -14,6 +14,8 @@ import { useLobbyStore } from '../lobby/LobbyStore';
     rayCaster: any
     stompclient:Client
     lobbyID:any
+    DEST:string
+
     update: (cameraPosition: any) => void
     disconnect: () => void
 
@@ -22,6 +24,7 @@ import { useLobbyStore } from '../lobby/LobbyStore';
 
         const interaktionReichweite = 2
         let hatSchluessel = false
+        
 
         this.domElement = domElement
         this.cameraCollidable = cameraCollidable
@@ -30,6 +33,8 @@ import { useLobbyStore } from '../lobby/LobbyStore';
         const { lobbystate } = useLobbyStore();
         this.lobbyID = lobbystate.lobbyID;
         this.stompclient = client;
+        this.DEST = ""
+         
 
         /**
 		 * Wird ausgelöst wenn eine Taste gedrückt wird
@@ -62,6 +67,8 @@ import { useLobbyStore } from '../lobby/LobbyStore';
             const collisionResult = this.rayCaster.intersectObjects(interaktionsListe)
 
             if (collisionResult.length > 0){
+                
+                console.log("ERKANNTE INTERAKTION: " + collisionResult[0].object)
                 return collisionResult[0]
             }
 
@@ -70,10 +77,14 @@ import { useLobbyStore } from '../lobby/LobbyStore';
 
         const interagiere = (interaktion:any) => {
             //TODO: Überprüfung nicht anhand vom Namen machen & hatSchluessel in eigene Inventar Klasse
+            
             switch (interaktion.object.name) {
                 case "Schlüssel":
                     hatSchluessel = true
                     interaktion.object.parent.remove(interaktion.object);
+                    console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/schluessel');
+                    this.DEST = "/topic/spiel/" + this.lobbyID + '/key';
+                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
                     break;
                 case "Tür":
                     if(hatSchluessel){
@@ -87,6 +98,9 @@ import { useLobbyStore } from '../lobby/LobbyStore';
                         if (index > -1) {
                             interaktionsListe.splice(index, 1);
                         }
+                        console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/tuer');
+                        this.DEST = "/topic/spiel/" + this.lobbyID + '/tuer';
+                        this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
                     }else{
                         //TODO: "Du benötigst einen Schlüssel" - Meldung
                     }
@@ -94,9 +108,7 @@ import { useLobbyStore } from '../lobby/LobbyStore';
 
                     
             }
-
-            const DEST_POS = "/topic/spiel/" + this.lobbyID + '/interagieren';
-            this.stompclient.publish({destination: DEST_POS, body: interaktion.object.name, skipContentLengthHeader: true,});
+            
             
         }
 

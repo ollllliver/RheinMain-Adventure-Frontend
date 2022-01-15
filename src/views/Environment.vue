@@ -1,6 +1,5 @@
 <template>
-  <div>
-    <!-- <h1>Render Demo</h1> -->
+  <div class="canvas">
     <Demo />
   </div>
 </template>
