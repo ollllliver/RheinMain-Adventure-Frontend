@@ -2,14 +2,13 @@ import * as Three from "three";
 import {GraphicLoader} from '@/services/inGame/GraphicLoader';
 import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
-import { Interactions } from '@/services/inGame/Interactions';
+import {Interactions} from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
-import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
-import { Position, Spieler } from "@/models/Spieler";
-import { useLobbyStore } from "../lobby/lobbyService";
+import {gamebrokerStompclient, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
+import {Position, Spieler} from "@/models/Spieler";
+import {useLobbyStore} from "../lobby/lobbyService";
 import userStore from '@/stores/user'
-
 
 
 let container: any;
@@ -108,8 +107,8 @@ const initLoader = () => {
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
             loader.ladeDatei(`http://${window.location.hostname}:3000/api/level/` + mobiliarId).then((res: any) => {
                 // console.log(res)
-                res.scene.position.x = 1 * posX
-                res.scene.position.z = 1 * posY
+                res.scene.position.x = 4 * posX
+                res.scene.position.z = 4 * posY
                 collidableList.push(res.scene)
                 scene.add(res.scene)
             });
