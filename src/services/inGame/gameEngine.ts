@@ -350,6 +350,11 @@ function zeigeInteraktionText(interaktion:any){
       }
   }
 
+  /**
+   * Setzt das Mitspieler 3d Objekt eines Mitspielers auf die richtige Position.
+   * 
+   * @param spieler neu zu Positionierender Mitspieler.
+   */
   function setzeMitspielerAufPosition(spieler: Spieler){
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
     

@@ -10,6 +10,11 @@ import { useGameEngine } from './gameEngine';
 
 const {setzeMitspielerAufPosition} = useGameEngine();
 
+/**
+ * Schribt sich bei STOMP auf das Topic /topic/spiel/{lobbyID} ein
+ * 
+ * @param stompclient 
+ */
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
     const DEST = "/topic/spiel/" + lobbystate.lobbyID;
     stompclient.onConnect = async () => {
