@@ -1,4 +1,6 @@
-import {Raycaster, Vector3} from 'three';
+import { Client } from '@stomp/stompjs';
+import {Vector3, Raycaster} from 'three';
+import { useLobbyStore } from '../lobby/lobbyService';
 
 /**
  * Verarbeitet Interaktionsmoeglichkeiten
@@ -10,19 +12,29 @@ export class Interactions {
     interaktionsListe: any
     erkannteInteraktion: any
     rayCaster: any
+    stompclient:Client
+    lobbyID:any
+    DEST:string
+
     update: (cameraPosition: any) => void
     disconnect: () => void
 
 
-    constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document) {
+    constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document, client:Client) {
 
         const interaktionReichweite = 2
         let hatSchluessel = false
+        
 
         this.domElement = domElement
         this.cameraCollidable = cameraCollidable
         this.interaktionsListe = interaktionsListe
         this.erkannteInteraktion = null
+        const { lobbystate } = useLobbyStore();
+        this.lobbyID = lobbystate.lobbyID;
+        this.stompclient = client;
+        this.DEST = ""
+         
 
         /**
          * Wird ausgelöst wenn eine Taste gedrückt wird
@@ -54,7 +66,9 @@ export class Interactions {
 
             const collisionResult = this.rayCaster.intersectObjects(interaktionsListe)
 
-            if (collisionResult.length > 0) {
+            if (collisionResult.length > 0){
+                
+                console.log("ERKANNTE INTERAKTION: " + collisionResult[0].object)
                 return collisionResult[0]
             }
 
@@ -63,28 +77,39 @@ export class Interactions {
 
         const interagiere = (interaktion: any) => {
             //TODO: Überprüfung nicht anhand vom Namen machen & hatSchluessel in eigene Inventar Klasse
+            
             switch (interaktion.object.name) {
                 case "Schlüssel":
                     hatSchluessel = true
                     interaktion.object.parent.remove(interaktion.object);
+                    console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/schluessel');
+                    this.DEST = "/topic/spiel/" + this.lobbyID + '/key';
+                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
                     break;
                 case "Tür":
                     if (hatSchluessel) {
                         hatSchluessel = false
 
                         // öffne Tür
-                        interaktion.object.rotation.y = Math.PI / 2;
+                        interaktion.object.rotation.z = Math.PI / 2;
 
                         // entferne Tür aus interaktionsListe
                         const index = interaktionsListe.indexOf(interaktion.object);
                         if (index > -1) {
                             interaktionsListe.splice(index, 1);
                         }
-                    } else {
+                        console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/tuer');
+                        this.DEST = "/topic/spiel/" + this.lobbyID + '/tuer';
+                        this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
+                    }else{
                         //TODO: "Du benötigst einen Schlüssel" - Meldung
                     }
                     break;
+
+                    
             }
+            
+            
         }
 
         this.update = (camera: any) => {

@@ -1,39 +1,32 @@
 import * as Three from "three";
 import {GraphicLoader} from '@/services/inGame/GraphicLoader';
-import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
-import {Interactions} from '@/services/inGame/Interactions';
+import {MyMouseControls} from '@/services/inGame/MyMouseControls';
+import { Interactions } from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
-import {gamebrokerStompclient, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
-import {Position, Spieler} from "@/models/Spieler";
-import {useLobbyStore} from "../lobby/lobbyService";
+import { gamebrokerStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
+import { Position, Spieler } from "@/models/Spieler";
+import { useLobbyStore } from "../lobby/lobbyService";
+import { Camera } from "three/src/cameras/Camera";
 import userStore from '@/stores/user'
+import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
 
 let container: any;
-let camera: any;
+let camera: Camera;
 let cameraCollidable: any;
 let scene: any;
 let renderer: any;
 let meshPlane: any;
-let meshCube: any;
-let raycaster: any;
 const loader = new GraphicLoader();
-// let moveForward = false;
-// let moveBackward = false;
-// let moveLeft = false;
-// let moveRight = false;
-// let moveUp = false;
-// let moveDown = false;
 const collidableList: Array<any> = [];
 const interactableList: Array<any> = [];
 const developer = false;
 let developerCamera: any;
-let controls: any;
 
-let mouseControls: MyMouseControls;
-let keyControls: MyKeyboardControls;
+let mausSteuerung: MyMouseControls;
+let tastaturSteuerung: MyKeyboardControls;
 let interactions: Interactions;
 let interaktionText: any;
 
@@ -46,6 +39,8 @@ const direction = new Three.Vector3();
 const stompClient = gamebrokerStompclient;
 
 const {lobbystate} = useLobbyStore();
+
+const {unsubscribeChat, subscribeChat} = useChatStore();
 
 const mitspieler3dObjektListe = new Map();
 
@@ -70,6 +65,8 @@ const initScene = () => {
  * Initialisiert Loader Klasse, lädt Raum
  */
 const initLoader = () => {
+    const türID = 34;
+    const schlüsselID = 35;
 
     // TODO: Level-ID dynamisch bestimmen
 
@@ -97,7 +94,8 @@ const initLoader = () => {
             if (raumMobiliar.mobiliar.mobiliartyp == "EINGANG") {
                 startPosition = new Position(posX, spieler.height * 3, posY);
             }
-
+ 
+            
             // Idee von Olli:
             // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platzieren
             // Davor müsste man zu begin ein Set des Mobiliars erstellen
@@ -114,9 +112,14 @@ const initLoader = () => {
                 // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
                 if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
                     res.scene.children[0].name = raumMobiliar.mobiliar.name;
-                    interactableList.push(res.scene);
+                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL'){
+                        //Tür und Schlüssel bestehen aus mehreren Objekten,
+                        //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
+                        interactableList.push(res.scene.children[0]); 
+                    } else {
+                        interactableList.push(res.scene);
+                    }
                 }
-
                 scene.add(res.scene)
             });
         });
@@ -151,6 +154,7 @@ const initCamera = () => {
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
     subscribeToSpielerPositionenUpdater(stompClient);
+    subscribeToSchluesselUpdater(stompClient);
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
@@ -197,30 +201,76 @@ window.addEventListener('resize', () => {
  * Initialisiert die Steuerung
  */
 const initControls = () => {
-    mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
-    keyControls = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
+    mausSteuerung = new MyMouseControls(camera, document); //init Maussteuerung
+    tastaturSteuerung = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
 
-    connect();
+    //connect();
 }
 
 /**
- * Initialisiert die Interaktionen
- */
-const initInteractions = () => {
-    interactions = new Interactions(interactableList, cameraCollidable, document);
+* Initialisiert die Interaktionen
+*/
+ const initInteractions = () => {
+    interactions = new Interactions(interactableList, cameraCollidable, document, stompClient);
     interaktionText = document.getElementById("interaktionText");
 }
 
-const connect = () => {
-    window.addEventListener('click', mouseControls.lock); //locked die Maus
+/**
+* Initialisiert den InGame-Chat
+*/
+const initChat = () =>{
+    subscribeChat(lobbystate.lobbyID, ChatTyp.INGAME);
+
+    const chat = document.getElementById("Chat");
+    const chatButton = document.getElementById("ChatButton");
+
+    if(chat != null && chatButton != null){
+        const btn = document.createElement("button");
+        btn.id = "CloseButton";
+        btn.innerHTML = "x";
+        btn.onclick = function () {
+            closeChat(chat, chatButton);
+        };
+        chat.appendChild(btn);
+
+        chatButton.onclick = function (){
+            openChat(chat, chatButton);
+        };
+
+        closeChat(chat, chatButton);
+    }
 }
 
+/**
+ * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
+ */
+const connect = () => {
+    window.addEventListener('click', mausSteuerung.lock); //locked die Maus     
+        tastaturSteuerung.connect();
+        mausSteuerung.connect();
+        console.log("gameEninge.connect: verbunden")
+
+        const pauseFenster = document.getElementById('pause');
+        if (pauseFenster != null){ pauseFenster.style.display = "none";}
+    
+}
+
+/**
+ * Trennt die Verbindung zu den Eingabe-Controllern und öffnet das Spielunterbrechungsfenster
+ */
 const disconnect = () => {
-    mouseControls.dispose();
-    keyControls.disconnect();
+    mausSteuerung.dispose();
+    tastaturSteuerung.disconnect();
     interactions.disconnect();
-    window.removeEventListener('click', mouseControls.lock);
-    console.log("Müsste disconnected sein")
+    unsubscribeChat();
+    window.removeEventListener('click', mausSteuerung.lock);
+    console.log("gameEninge.disconnect: getrennt")
+
+    const pauseFenster = document.getElementById('pause');
+    if (pauseFenster != null){ pauseFenster.style.display = "";}
+
+    
+
 }
 
 const initPlane = () => {
@@ -233,9 +283,35 @@ const initPlane = () => {
     scene.add(meshPlane);
 };
 
-const initRaycaster = () => {
-    raycaster = new Three.Raycaster(new Three.Vector3(), new Three.Vector3(0, -1, 0), 0, 10);
-}
+const initInteractionTestObject = () => {
+    // erzeuge Schluessel
+    loader.ladeDatei('/assets/blender/key.gltf').then((key: any) => {
+        const keyModel = key.scene;
+        keyModel.children[0].name = "Schlüssel";
+        keyModel.position.x = -5;
+        keyModel.position.y = 0.5;
+        keyModel.position.z = -3;
+        scene.add(keyModel);
+        interactableList.push(keyModel);
+    }).catch((e)=>
+    console.log('ERROR:',e));
+
+    // erzeuge Tuer
+    const geometry = new Three.BoxGeometry(0.1, 2, 1);
+    const material = new Three.MeshNormalMaterial();
+    const door = new Three.Mesh(geometry, material);
+    door.name = "Tür"
+    door.position.x = -5;
+    door.position.y = 1;
+    door.position.z = 3;
+    scene.add(door);
+    interactableList.push(door)
+  };
+
+
+// const initRaycaster = () => {
+//     raycaster = new Three.Raycaster(new Three.Vector3(), new Three.Vector3(0, -1, 0), 0, 10);
+// }
 
 const initRenderer = () => {
 
@@ -252,7 +328,6 @@ const initRenderer = () => {
     // controls.minDistance = 50;
     // controls.maxDistance = 300;
 
-
 };
 
 const doAnimate = () => {
@@ -265,12 +340,12 @@ const doAnimate = () => {
     velocity.z -= velocity.z * 10.0 * delta;
     velocity.y -= velocity.y * 10.0 * delta;
 
-    mouseControls.update(velocity, delta); //Maus Steuerung
-    keyControls.update(camera, velocity, delta) //Tastatur Steuerung
+    mausSteuerung.update(velocity, delta); //Maus Steuerung
+    tastaturSteuerung.update(camera, velocity, delta) //Tastatur Steuerung
     interactions.update(camera) //Interaktionen
 
     // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
-    if (interactions.erkannteInteraktion) {
+    if(interactions.erkannteInteraktion){
         zeigeInteraktionText(interactions.erkannteInteraktion)
     } else {
         verbergeInteraktionText()
@@ -308,6 +383,7 @@ const doAnimate = () => {
 
 
     //wohin damit?
+    //übertragt die Postition der Kamera an die Positionen des lokalen Spielers
     spieler.position.x = camera.position.x.toFixed(2);
     spieler.position.y = camera.position.y.toFixed(2);
     spieler.position.z = camera.position.z.toFixed(2);
@@ -330,24 +406,40 @@ function verbergeInteraktionText() {
     }
 }
 
-function setzeMitspielerAufPosition(spieler: Spieler) {
+  function openChat(chat:any, chatButton:any){
+    chat.style.display = "block";
+    chatButton.style.display = "none";
+  }
+
+  function closeChat(chat:any, chatButton:any){
+    chat.style.display = "none";
+    chatButton.style.display = "block";
+  }
+
+  function setzeMitspielerAufPosition(spieler: Spieler){
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
 
     objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
-export function useGameEngine() {
+function setzteSchluesselAnz(anzSchluess: any){
+    console.log("Anzahl Schluessel" + anzSchluess)
+}
+
+export function useGameEngine(){
     return {
+        setzteSchluesselAnz,
         setzeMitspielerAufPosition,
         initScene,
         initLoader,
         initCamera,
         initPlane,
-        initRaycaster,
+        initInteractionTestObject,
         initRenderer,
         initControls,
         initInteractions,
+        initChat,
         doAnimate,
         connect, disconnect,
         setContainer,

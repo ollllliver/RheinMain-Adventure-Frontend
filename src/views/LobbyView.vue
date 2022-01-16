@@ -24,6 +24,7 @@
 <script lang="ts">
 import { defineComponent, onMounted} from "vue";
 import { useLobbyStore } from "@/services/lobby/lobbyService";
+import { useChatStore } from "@/services/ChatStore";
 import InviteCopy from "@/components/lobby/InviteCopy.vue";
 import Chat from "@/components/lobby/Chat.vue";
 import Einstellungen from "@/components/lobby/Einstellungen.vue";
@@ -36,7 +37,8 @@ export default defineComponent({
     lobby_id: { type: String, required: true },
   },
   setup(props) {
-    const { lobbystate, connectToLobby, leaveLobby, sendeChatNachricht, empfangeChatNachricht} = useLobbyStore();
+    const { lobbystate, connectToLobby, leaveLobby} = useLobbyStore();
+    const { sendeChatNachricht, empfangeChatNachricht} = useChatStore();
 
     window.addEventListener('beforeunload',function(e){
       leaveLobby();

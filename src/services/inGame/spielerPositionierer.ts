@@ -8,7 +8,7 @@ const { lobbystate } = useLobbyStore();
 import userStore from '@/stores/user'
 import { useGameEngine } from './gameEngine';
 
-const {setzeMitspielerAufPosition} = useGameEngine();
+const {setzeMitspielerAufPosition, setzteSchluesselAnz } = useGameEngine();
 
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
     const DEST = "/topic/spiel/" + lobbystate.lobbyID;
@@ -19,6 +19,18 @@ export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
             if (spieler.name!= userStore.state.benutzername){
                 setzeMitspielerAufPosition(spieler)
             }
+        });
+    }
+}
+
+export function subscribeToSchluesselUpdater(stompclient: Client): void{
+    const DEST = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
+    stompclient.onConnect = async () => {
+        stompclient.subscribe(DEST, (message) => {
+            const anzSchluess: any = message.body;
+            console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
+            setzteSchluesselAnz(anzSchluess)
+            
         });
     }
 }
