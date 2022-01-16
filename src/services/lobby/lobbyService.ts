@@ -241,6 +241,9 @@ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string)
         } else if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET){
             lobbystate.istGestartet = true;
             starteTimer();
+        } else if (lobbymessage.typ == NachrichtenCode.BEENDE_SPIEL) {
+            lobbystate.istGestartet = false;
+            router.push("/lobby/" + lobbystate.lobbyID);
         } else {
             updateLobby(lobby_id);
             lobbystate.errormessage = '';
@@ -383,6 +386,7 @@ async function joinRandomLobby() {
 
 }
 
+// starteSpiel?
 async function starteLobby() {
 
     console.log("Fetch auf: /api/lobby/{lobbyId}/start")
@@ -406,6 +410,12 @@ async function starteLobby() {
         .catch((e) => {
             console.log(e);
         });
+}
+
+function beendeSpiel() {
+    const destination = "/topic/lobby/" + lobbystate.lobbyID;
+    console.log(destination);
+    stompclient.publish({destination: destination, body: JSON.stringify({typ: NachrichtenCode.BEENDE_SPIEL, istFehler: false, payload: "Kehre zurück zur Lobby"} as LobbyMessage)})
 }
 
 /**
@@ -710,7 +720,7 @@ export function useLobbyStore() {
         alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht,
 
         // Lobby Funktionen zum Ändern
-        neueLobby, joinRandomLobby, leaveLobby, starteLobby, spielerEntfernen,
+        neueLobby, joinRandomLobby, leaveLobby, starteLobby, beendeSpiel, spielerEntfernen,
 
         // Funktionen zum ändern der Lobby Einstellungen:
         einstellungsfunktionen: { changeLimit, changePrivacy, changeHost, changeKarte },

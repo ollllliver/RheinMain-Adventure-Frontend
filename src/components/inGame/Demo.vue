@@ -2,16 +2,24 @@
   <div id="container">
     <h2 id="interaktionText"></h2>
   </div>
+  <div>
+    <button class="btn btn-default" @click="beenden">
+      SPIEL BEENDEN
+    </button>
+  </div>
 </template>
 
 <script lang="ts">
 import {defineComponent, onMounted} from "vue";
 import {useGameEngine} from "@/services/inGame/gameEngine";
+import {useLobbyStore} from "@/services/lobby/lobbyService";
 
 
 export default defineComponent({
   name: "RenderDemo",
   setup() {
+
+    const {beendeSpiel} = useLobbyStore();
 
     const {
       initScene,
@@ -43,7 +51,11 @@ export default defineComponent({
 
     });
 
-    return {connect, disconnect}
+    function beenden () {
+      beendeSpiel();
+    }
+
+    return {connect, disconnect, beenden}
 
   },
   beforeUnmount() {
