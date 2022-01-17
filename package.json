@@ -7,7 +7,7 @@
     "build": "vue-cli-service build",
     "test": "jest",
     "lint": "vue-cli-service lint",
-    "doc": "jsdoc -c jsdoc.json"
+    "doc": "jsdoc -c jsdoc.json",
     "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint"
   },
