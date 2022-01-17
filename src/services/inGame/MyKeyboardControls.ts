@@ -106,7 +106,7 @@ export class MyKeyboardControls {
                     break;
                 case 'Escape':
                     console.log("MyKeyboardControls.onKeyUp: ESCAPE")
-                    useGameEngine().disconnect();
+                    useGameEngine().disconnectController();
                     break;
 
             }
@@ -218,18 +218,18 @@ export class MyKeyboardControls {
 
             if ((spieler.moveForward && !vorneCollision) || (spieler.moveBackward && !hintenCollision)){
                 velocity.z -= direction.z * speed * delta;
-                // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
             if ((spieler.moveLeft&& !linksCollision ) || (spieler.moveRight&& !rechtsCollision )){
                 velocity.x -= direction.x * speed * delta;
-                // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
             if (spieler.moveUp || spieler.moveDown){
                 velocity.y -= direction.y * speed * delta;
-                // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
             if (velocity.z != 0 || velocity.x != 0 || velocity.y != 0){ //solange der Spieler eine Geschwindigkeit hat, wird die Spielerposition geupdated
-                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+                //spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
                 //TODO update Velocity an Backend
             }
 

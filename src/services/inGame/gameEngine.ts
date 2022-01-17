@@ -5,7 +5,7 @@ import {MyMouseControls} from '@/services/inGame/MyMouseControls';
 import { Interactions } from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
-import { gamebrokerStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
+import { gamebrokerStompclient, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 import { Position, Spieler } from "@/models/Spieler";
 import { useLobbyStore } from "../lobby/lobbyService";
 import { Camera } from "three/src/cameras/Camera";
@@ -156,7 +156,7 @@ const initCamera = () => {
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
     subscribeToSpielerPositionenUpdater(stompClient);
-    subscribeToSchluesselUpdater(stompClient);
+    //subscribeToSchluesselUpdater(stompClient);
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
@@ -259,16 +259,23 @@ const connect = () => {
  * Trennt die Verbindung zu den Eingabe-Controllern und öffnet das Spielunterbrechungsfenster
  */
 const disconnect = () => {
-    mausSteuerung.dispose();
-    tastaturSteuerung.disconnect();
+    disconnectController();
     interactions.disconnect();
     unsubscribeChat();
     window.removeEventListener('click', mausSteuerung.lock);
     console.log("gameEninge.disconnect: getrennt")
 
+    
+
+}
+
+const disconnectController = () => {
+
+    mausSteuerung.dispose();
+    tastaturSteuerung.disconnect();
+
     const pauseFenster = document.getElementById('pause');
     if (pauseFenster != null){ pauseFenster.style.display = "";}
-
 }
 
 const initPlane = () => {
@@ -451,7 +458,7 @@ export function useGameEngine(){
         initChat,
         startAnimate,
         stopAnimate,
-        connect, disconnect,
+        connect, disconnect, disconnectController,
         setContainer,
         scene
     }

@@ -11,27 +11,36 @@ import { useGameEngine } from './gameEngine';
 const {setzeMitspielerAufPosition, setzteSchluesselAnz } = useGameEngine();
 
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
-    const DEST = "/topic/spiel/" + lobbystate.lobbyID;
+    const DEST_POSITION = "/topic/spiel/" + lobbystate.lobbyID;
+    const DEST_SCHLUESSEL = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
+
     stompclient.onConnect = async () => {
-        stompclient.subscribe(DEST, (message) => {
+        stompclient.subscribe(DEST_POSITION, (message) => {
+            console.log("##### irgendwas bekommen ####ç")
             const spieler: Spieler = JSON.parse(message.body);
-            console.log(`Neue Position von ${spieler.name}:`, spieler.eigenschaften.position);
-            if (spieler.name!= userStore.state.benutzername){
+            //console.log(`Neue Position von ${spieler.name}:`, spieler.eigenschaften.position);
+            if (spieler.name != userStore.state.benutzername){
                 setzeMitspielerAufPosition(spieler)
-                
             }
+        });
+        stompclient.subscribe(DEST_SCHLUESSEL, (message) => {
+            const anzSchluess: any = message.body;
+            console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
+            setzteSchluesselAnz(anzSchluess)
         });
     }
 }
 
-export function subscribeToSchluesselUpdater(stompclient: Client): void{
-    const DEST = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
-    stompclient.onConnect = async () => {
-        stompclient.subscribe(DEST, (message) => {
-            const anzSchluess: any = message.body;
-            console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
-            setzteSchluesselAnz(anzSchluess)
-            
-        });
-    }
-}
+
+//Wenn die Methode aufgerufen hat war subscribeToSpielerPositionenUpdater nicht mehr subscribed
+
+// export function subscribeToSchluesselUpdater(stompclient: Client): void{
+//     const DEST_SCHLUESSEL = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
+//     stompclient.onConnect = async () => {
+//         stompclient.subscribe(DEST, (message) => {
+//             const anzSchluess: any = message.body;
+//             console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
+//             setzteSchluesselAnz(anzSchluess)
+//         });
+//     }
+// }
