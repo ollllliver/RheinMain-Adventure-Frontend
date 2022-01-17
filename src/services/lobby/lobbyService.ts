@@ -11,6 +11,7 @@ import {ChatNachricht} from '@/messaging/ChatNachricht';
 
 const wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
 const stompclient = new Client({brokerURL: wsurl});
+const countdownDuration = 5;
 
 /**
  * lobbystate ist ein reactive, das zu einer Lobby essentielle Infos hält + errormessage
@@ -28,9 +29,10 @@ const lobbystate = reactive({
     // dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird.
     darfBeitreten: false,
     istPrivat: false,
-    countdown: 5,
+    countdown: countdownDuration,
     //TODO: any zu Karte oder Level ändern, sobald es im selben Branch ist.
     gewaehlteKarte: {} as any,
+    subscriptionStatus: false
 })
 
 /**
@@ -81,6 +83,7 @@ async function connectToStomp(callb, param) {
  * connectToUebersicht subscribt sich mit zu Not selbst connectetem Stompclient mit der Function subscribeToUebersicht()
  */
 function connectToUebersicht() {
+    lobbystate.subscriptionStatus = false;
     if (!stompclient.connected) {
         connectToStomp(subscribeToUebersicht, null);
     }
@@ -213,14 +216,17 @@ async function connectToLobby(lobby_id: string) {
 function subscribeToLobby(lobby_id: string) {
     const DEST = "/topic/lobby/" + lobby_id;
     const DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
-    lobbySubscription = stompclient.subscribe(DEST, (message) => {
-        const lobbymessage = JSON.parse(message.body) as LobbyMessage;
-        empfangeLobbyMessageLobby(lobbymessage, lobby_id);
-    });
-    lobbyChatSubscription = stompclient.subscribe(DEST_CHAT, (message) => {
-        const chatmessage = JSON.parse(message.body) as ChatNachricht;
-        empfangeChatNachricht(chatmessage);
-    });
+    if (lobbystate.subscriptionStatus != true) {
+        lobbystate.subscriptionStatus = true;
+        lobbySubscription = stompclient.subscribe(DEST, (message) => {
+            const lobbymessage = JSON.parse(message.body) as LobbyMessage;
+            empfangeLobbyMessageLobby(lobbymessage, lobby_id);
+        });
+        lobbyChatSubscription = stompclient.subscribe(DEST_CHAT, (message) => {
+            const chatmessage = JSON.parse(message.body) as ChatNachricht;
+            empfangeChatNachricht(chatmessage);
+        });
+    }
 }
 
 /**
@@ -265,6 +271,7 @@ function starteTimer(delay = 1000) {
       }, delay);
     } else {
       router.push("/environment");
+      lobbystate.countdown = countdownDuration;
     }
   }
 
