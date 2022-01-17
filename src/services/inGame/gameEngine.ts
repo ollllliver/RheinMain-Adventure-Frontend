@@ -11,6 +11,7 @@ import { useLobbyStore } from "../lobby/LobbyStore";
 import { Camera } from "three/src/cameras/Camera";
 import userStore from '@/stores/user'
 import { ChatTyp, useChatStore } from "@/services/ChatStore";
+import { reactive } from "vue";
 
 
 
@@ -30,7 +31,8 @@ let mausSteuerung: MyMouseControls;
 let tastaturSteuerung: MyKeyboardControls;
 let interactions: Interactions;
 let interaktionText: any;
-let anzSchluessel: any;
+let anzSchluesselText: any;
+let warnungText:any
 
 let spieler: SpielerLokal
 
@@ -42,6 +44,10 @@ const stompClient = gamebrokerStompclient;
 
 const {lobbystate} = useLobbyStore();
 
+const gamestate = reactive({
+    anzSchluessel: 0,
+})
+
 const {unsubscribeChat, subscribeChat} = useChatStore();
 
 const mitspieler3dObjektListe = new Map();
@@ -51,6 +57,8 @@ let startPosition: Position;
 function setContainer(element: HTMLElement|null){
     container = element
 }
+
+
 
 const initScene = () => {
     scene = new Three.Scene();
@@ -209,7 +217,7 @@ const initControls = () => {
  const initInteractions = () => {
     interactions = new Interactions(interactableList, cameraCollidable, document, stompClient);
     interaktionText = document.getElementById("interaktionText");
-    anzSchluessel = document.getElementById("SchluesselAnzeige")
+    anzSchluesselText = document.getElementById("SchluesselAnzeigeText");
 }
 
 /**
@@ -406,6 +414,11 @@ function zeigeInteraktionText(interaktion:any){
       }
   }
 
+  function keineSchluesselWarnung(){
+    warnungText.textContent = "Du hast keinen Schlüssel"
+    warnungText.style.display = "block"
+  }
+
   function openChat(chat:any, chatButton:any){
     chat.style.display = "block";
     chatButton.style.display = "none";
@@ -424,13 +437,15 @@ function zeigeInteraktionText(interaktion:any){
 }
 
 function setzteSchluesselAnz(anzSchluess: any){
-    anzSchluessel.textContent = "Anzahl Schlüssel beträgt" + anzSchluess
-    anzSchluessel.style.display = "block"
+    gamestate.anzSchluessel = anzSchluess
+    anzSchluesselText.textContent = "Anzahl Schlüssel beträgt" + anzSchluess
+    anzSchluesselText.style.display = "block"
 }
 
 export function useGameEngine(){
     return {
         setzteSchluesselAnz,
+        keineSchluesselWarnung,
         setzeMitspielerAufPosition,
         initScene,
         initLoader,
@@ -444,6 +459,7 @@ export function useGameEngine(){
         doAnimate,
         connect, disconnect,
         setContainer,
-        scene
+        scene,
+        gamestate
     }
 }

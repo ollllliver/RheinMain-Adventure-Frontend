@@ -8,7 +8,7 @@ const { lobbystate } = useLobbyStore();
 import userStore from '@/stores/user'
 import { useGameEngine } from './gameEngine';
 
-const {setzeMitspielerAufPosition, setzteSchluesselAnz } = useGameEngine();
+const {setzeMitspielerAufPosition, setzteSchluesselAnz, keineSchluesselWarnung } = useGameEngine();
 
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
     const DEST = "/topic/spiel/" + lobbystate.lobbyID;
@@ -28,8 +28,17 @@ export function subscribeToSchluesselUpdater(stompclient: Client): void{
     stompclient.onConnect = async () => {
         stompclient.subscribe(DEST, (message) => {
             const anzSchluess: any = message.body;
-            console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
-            setzteSchluesselAnz(anzSchluess)
+            if (anzSchluess != 0){
+                
+                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
+                setzteSchluesselAnz(anzSchluess); 
+
+            }else{
+                console.log("KEINE SCHLÜSSEL");
+                keineSchluesselWarnung();
+                
+            }
+            
             
         });
     }

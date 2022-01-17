@@ -3,7 +3,8 @@
     <Pause id="pause"/>
     <div id="container">
       <h2 id="interaktionText"></h2>
-      <h2 id="SchluesselAnzeige"></h2>
+      <h2 id="SchluesselAnzeigeText"></h2>
+      <h2 id="warnungText"></h2>
     </div> 
     <div class="GameChat">
       <button type="button" id="ChatButton">Chat</button>
