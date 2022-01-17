@@ -17,7 +17,6 @@ export class SpielerLokal extends Spieler{
     DEST = "/topic/spiel";
 
     _euler = new Euler(0, 0, 0, 'YXZ');
-    _vector = new Vector3();  
 
     camera: Camera;
     
@@ -49,18 +48,25 @@ export class SpielerLokal extends Spieler{
      */
     
     moveRight(distance:number) {
+        //const distance = -delta * this.velocity.x;
 
         this._vector.setFromMatrixColumn(this.camera.matrix, 0);
 
         this.camera.position.addScaledVector(this._vector, distance);
     }
 
+    move(delta:number) {
+        this.moveRight(-this.velocity.x * delta)
+        this.moveForward(-this.velocity.z * delta)
+    }
+
+
     /**
      * Beweget die Kamera nach vorne
      * @param distance Wert wie weit die Kamera sich nach vorne bewegt
      */
     moveForward(distance:number) {
-
+        //const distance = -delta*this.velocity.z;
         // bewegt  parallel zur xz-achse
 
         this._vector.setFromMatrixColumn(this.camera.matrix, 0);

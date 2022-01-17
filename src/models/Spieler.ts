@@ -1,10 +1,15 @@
+import { Euler, Vector3, EventDispatcher } from 'three';
 export class Spieler {
 
     name: string;
     height: number;
     speed: number;
-    velocity: number;
-    position: Position;
+    velocity: typeof Vector3;
+    position: typeof Vector3;
+    model: any;
+
+    _vector = new Vector3();  
+
     
     // forward: boolean;
     // backward: boolean;
@@ -13,13 +18,13 @@ export class Spieler {
     // up: boolean;
     // down: boolean;
 
-    eigenschaften: {position: Position};
+    eigenschaften: {position: typeof Vector3, velocity: typeof Vector3};
     constructor(){ 
         this.name = "default";
         this.height = .5;
         this.speed = .1;
-        this.velocity = 0;
-        this.position = { x:0, y:0, z:0 };
+        this.velocity = new Vector3(0,0,0);
+        this.position = new Vector3(0,0,0);
 
         // this.forward = false;
         // this.backward = false;
@@ -67,15 +72,30 @@ export class Spieler {
     //     return this.moveBackward; 
     //  }
 
-    setPosition(pos: Position): void{
-        this.eigenschaften.position = pos;
+    // setPosition(pos: Position): void{
+    //     this.eigenschaften.position = pos;
+    // }
+
+    setVelocity(vel: typeof Vector3): void{
+        this.eigenschaften.velocity = vel;
+    }
+
+    setModel(model: any){
+        this.model = model;
+    }
+
+    moveForward(distance: number){
+        this._vector.setFromMatrixColumn(this.position.matrix, 0);
+        this.position.addScaledVector(this._vector, distance);
     }
 
 
 }
 
 class SpielerEigenschaften{
-    position = new Position(0,0,0);
+    //position = new Position(0,0,0);
+    position = new Vector3(0,0,0);
+    velocity = new Vector3(0,0,0);
     statusListe: any;
 }
 

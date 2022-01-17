@@ -24,7 +24,7 @@ const loader = new GraphicLoader();
 const collidableList: Array<any> = [];
 const interactableList: Array<any> = [];
 const developer = false;
-const geschwindigkeit = 10.0;
+const geschwindigkeit = 5.0; //je niedriger desto schneller
 
 let developerCamera: any;
 
@@ -36,7 +36,7 @@ let interaktionText: any;
 let spieler: SpielerLokal
 
 let prevTime = performance.now();
-const velocity = new Three.Vector3();
+//const velocity = new Three.Vector3();
 const direction = new Three.Vector3();
 
 let requestID: number;
@@ -47,7 +47,7 @@ const {lobbystate} = useLobbyStore();
 
 const {unsubscribeChat, subscribeChat} = useChatStore();
 
-const mitspieler3dObjektListe = new Map();
+const mitspieler3dObjektListe = new Map<string,any>();
 
 let startPosition: Position;
 
@@ -136,14 +136,14 @@ const initLoader = () => {
             if (spieler.name != userStore.state.benutzername) {
                 loader.ladeDatei('/assets/blender/player.gltf').then((spieler3D: any) => {
 
-                    const objektInScene = spieler3D.scene;
+                    spieler.setModel(spieler3D.scene);
 
-                    scene.add(objektInScene)
+                    scene.add(spieler.model)
 
-                    objektInScene.position.x = 1 * startPosition.x;
-                    objektInScene.position.z = 1 * startPosition.z;
+                    spieler.model.position.x = 1 * startPosition.x;
+                    spieler.model.position.z = 1 * startPosition.z;
 
-                    mitspieler3dObjektListe.set(spieler.name, objektInScene);
+                    mitspieler3dObjektListe.set(spieler.name, spieler.model);
                 });
             }
         });
@@ -344,10 +344,10 @@ const startAnimate = () => {
     doAnimate();
 }
 
-const updateVelocity = (velocity: typeof Three.Vector3, delta:number ) => {
-    velocity.x -= velocity.x * geschwindigkeit * delta;
-    velocity.z -= velocity.z * geschwindigkeit * delta;
-    velocity.y -= velocity.y * geschwindigkeit * delta;
+const updateVelocity = (s: Spieler, delta:number ) => {
+    s.velocity.x -= s.velocity.x * geschwindigkeit * delta;
+    s.velocity.z -= s.velocity.z * geschwindigkeit * delta;
+    s.velocity.y -= s.velocity.y * geschwindigkeit * delta;
 }
 
 
@@ -359,11 +359,11 @@ const doAnimate = () => {
     prevTime = time;
     //entweder hier oder in MyKeyboardControl
 
-    updateVelocity(velocity, delta);
+    updateVelocity(spieler, delta);
     
     
-    mausSteuerung.update(velocity, delta); //Maus Steuerung
-    tastaturSteuerung.update(camera, velocity, delta) //Tastatur Steuerung
+    mausSteuerung.update(spieler.velocity, delta); //Maus Steuerung
+    tastaturSteuerung.update(camera, spieler.velocity, delta) //Tastatur Steuerung
     interactions.update(camera) //Interaktionen
     
 
@@ -404,9 +404,11 @@ const doAnimate = () => {
 
     //wohin damit?
     //übertragt die Postition der Kamera an die Positionen des lokalen Spielers
-    spieler.position.x = camera.position.x.toFixed(2);
-    spieler.position.y = camera.position.y.toFixed(2);
-    spieler.position.z = camera.position.z.toFixed(2);
+    // spieler.position.x = camera.position.x.toFixed(2);
+    // spieler.position.y = camera.position.y.toFixed(2);
+    // spieler.position.z = camera.position.z.toFixed(2);
+
+    //spieler.velocity = camera.velocity;
 
     renderer.render(scene, camera);
 
@@ -436,8 +438,12 @@ function verbergeInteraktionText() {
     chatButton.style.display = "block";
   }
 
-  function setzeMitspielerAufPosition(spieler: Spieler){
+  function setzeMitspielerAufPosition(spieler: Spieler, delta:number){
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
+
+    //spieler.moveForward(-spieler.position * delta);
+
+    //objektInScene.translateZ(-spieler.position.z * delta);
 
     objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;

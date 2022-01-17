@@ -70,8 +70,7 @@ class MyMouseControls extends EventDispatcher {
 				this.dispatchEvent(_unlockEvent);
 
 				this.isLocked = false;
-				const { disconnect } = useGameEngine()
-				disconnect(); //gameEngine.disconnect
+				useGameEngine().disconnectController();
 				// console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
 
 			}
@@ -152,8 +151,9 @@ class MyMouseControls extends EventDispatcher {
 		 * Nimmt die Bewegungsgeschwindigkeit und aktualisiert die Bewegungen
 		 */
 		this.update = (velocity: typeof Vector3, delta: number) => {
-			spieler.moveRight(-velocity.x * delta);
-			spieler.moveForward(-velocity.z * delta)
+			// spieler.moveRight(delta);
+			// spieler.moveForward(delta)
+			spieler.move(delta);
 			//this.getObject().position.y += (velocity.y * delta);
 		};
 
