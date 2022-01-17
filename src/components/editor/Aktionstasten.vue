@@ -31,8 +31,8 @@ export default defineComponent({
   },
 
   setup() {
-    var karte = editorStore.getters.getGrid;
-    const liste = karte.liste;
+    
+    
     // Karte nach Prüfung ob Start/Ziel und Raum platziert wurde loggen (vorerst)
     const zurPruefung = () => {
       console.log("pruef")

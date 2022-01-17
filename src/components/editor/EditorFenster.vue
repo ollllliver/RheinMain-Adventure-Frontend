@@ -24,14 +24,66 @@ import { CommandStack } from "../../commands/CommandManager";
 import { ElementHinzufuegenCommand } from "../../commands/ElementHinzufuegenCommand";
 import { ElementEntfernenCommand } from "../../commands/ElementEntfernenCommand";
 import editorStore from "@/stores/editor";
+import { Karte } from "@/models/Karte";
 
 export default defineComponent({
   name: "Editorfenster",
   setup() {
-    // Kartenklasse mit liste als Array aus editorStore
-    var karte = editorStore.getters.getGrid;
-    const liste = karte.liste;
 
+    // Kartenklasse mit liste als Array aus editorStore
+    var karte: Karte;
+    var liste: any[][];
+    karte = editorStore.getters.getGrid;
+    liste = karte.liste;
+    
+    onMounted(() => {
+      
+      if(editorStore.getters.getLevelName !== "") {
+        // aktuelle Liste von db
+        // durch liste iterieren und grid fuellen wenn bearbeitet
+        
+        let reihe = document.getElementsByClassName("reihe")
+
+        for (let y = 0 ; y < 14; y++) {
+          for(let x = 0; x < 22; x++) {
+            let spalte = reihe[y].getElementsByClassName("element")
+            let element = spalte[x] as HTMLDivElement
+            switch (liste[y][x].e) {
+              case 1:
+                element.style.backgroundColor = "#ffd39bBF"
+                break;
+              case 2:
+                editorStore.start(true)
+                element.style.backgroundColor = "#25bb1fA6"
+                break;
+              case 3:
+                editorStore.ziel(true)
+                element.style.backgroundColor = "#131ec4A6"
+                break;
+              case 4:
+                editorStore.setzeSchluessel(1)
+                element.style.background = "no-repeat center url('../img/schluessel.png') rgba(255,211,155, 0.75)"
+                break;
+              case 5:
+                editorStore.setzeNpc(1)
+                element.style.background = "no-repeat center url('../img/npc.png') rgba(255,211,155, 0.75)"
+                break;
+              case 6:
+                editorStore.setzeTuer(1)
+                element.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)"
+                break;
+              case 7: 
+                editorStore.setzeTuer(1)
+                element.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)"
+                break;
+            }
+          }
+        }
+      }    
+      console.log(liste);
+    });
+
+    
     /**
      * bei drop (Drag-and-Drop) Raum auf der Karte platzieren
      * wenn Raum auf platzierte Stelle passt
@@ -96,9 +148,7 @@ export default defineComponent({
       }
       */
     };
-    onMounted(() => {
-      //console.log(liste);
-    });
+    
 
     /**
      * Wegpunkt markieren:
