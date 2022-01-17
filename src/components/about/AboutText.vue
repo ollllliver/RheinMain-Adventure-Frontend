@@ -1,6 +1,11 @@
 <template>
   <div>
     <h2>Über dieses Projekt</h2>
+
+    <div class="d-flex flex-wrap">
+      <img src="@/assets/img/logos/hsrm.png" alt="" class="logo" />
+      <h3 class="p-2 m-0">Hochschule Rheinmain - Softwaretechnik Projekt 2021/22</h3>
+    </div>
     <p>
       Im Rahmen des Moduls Softwaretechnik-Projekt im Wintersemester 2021/22
       wurde in einem Team bestehend aus 11 Personen ein Webgame entwickelt.
@@ -32,7 +37,8 @@
     </div>
     <p>
       Zur Planung und Dokumentation unserer Arbeit verwendeten wir
-      <a href="https://www.taiga.io/" class="link-success">Taiga</a>. TODO:
+      <a href="https://www.taiga.io/" class="link-success">Taiga</a>. Taiga ist ein kostenloses Open-Source-Projektmanagementsystem
+      TODO:
       Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
       eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
       voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet

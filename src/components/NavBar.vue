@@ -4,20 +4,22 @@
         <img src="/assets/RMA_Logo.png" height="40" alt="">
     </a>
     <div>
+        <b class="dropdown" style="color: red;"> TODO: </b>
         <!-- TODO: Benutzernamen reinschreiben -->
         <div class="btn-success dropdown">
-          <button class="dropbtn">BENUTZERNAME</button>
+          <button class="dropbtn" v-text="benutzername"></button>
           <div class="dropdown-content">
-            <button class="grey-btn w-100" @click="router.push('/')">Home</button>
+            <!-- <button class="grey-btn w-100" @click="router.push('/')">Home</button>
             <button class="grey-btn w-100" @click="router.push('/uebersicht')">Spiele</button>
             <button class="grey-btn w-100" @click="router.push('/editoruebersicht')">Editor</button>
             <button class="grey-btn w-100" @click="router.push('/instructions')">Anleitung</button>
-            <button class="grey-btn w-100" @click="router.push('/about')">About</button>
+            <button class="grey-btn w-100" @click="router.push('/about')">About</button> -->
             <button class="red-btn w-100" @click="router.push('/logout')">Logout</button>
           </div>
         </div>
+        <b class="dropdown" style="color: red;"> ODER </b>
         <!-- TODO: Entweder Oder einblenden! -->
-        <div class="btn-success dropdown">
+        <!-- <div class="btn-success dropdown">
           <button class="dropbtn">Menü</button>
           <div class="dropdown-content">
             <button class="grey-btn w-100" @click="router.push('/')">Home</button>
@@ -25,7 +27,8 @@
             <button class="grey-btn w-100" @click="router.push('/about')">About</button>
             <button class="dropbtn w-100" @click="router.push('/login')">Login</button>
           </div>
-        </div>
+        </div> -->
+        <button class="dropbtn" @click="router.push('/login')">Login</button>
     </div>
 
 
@@ -43,6 +46,7 @@ export default defineComponent({
     return {
         navbar,
         router,
+        benutzername: 'BENUTZERNAME',
     };
   },
 });
