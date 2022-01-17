@@ -1,17 +1,61 @@
 <template>
-  <div>
-    <svg width="80%" viewBox="-10 -10 1020 620">
+  <div class="container">
+    <svg class="p-5" width="100%" viewBox="-10 -10 1420 820">
+
         <!-- Rahmen -->
-        <polyline class="wand path" points="0,0 1000,0 1000,600 0,600 10,100"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 0,800 0,100"/>
+
         <!-- Mauern -->
         <polyline class="wand path" points="0,0 100,0 100,100 300,100 300,200 500,200 500,100"/>
         <polyline class="wand path" points="0,0 400,0 400,100"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 0,800 0,200 200,200"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 1200,800 1200,500 500,500 500,300 100,300 100,500 400,500 400,400 200,400"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 1200,800 1200,500 500,500 500,700 300,700 300,600 100,600 100,700"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 1200,800 1200,500 500,500 500,700 300,700 300,600 400,600"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 1200,800 1200,500 500,500 500,700 800,700 800,600 600,600"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 200,800 200,700"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 900,800 900,600 1100,600 1100,700"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 1000,800 1000,700"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,800 1200,800 1200,700 1300,700"/>
+        <polyline class="wand path" points="0,0 1400,0 1400,500 1400,500 1300,500 1300,600"/>
+        <polyline class="wand path" points="0,0 600,0 600,400 800,400"/>
+        <polyline class="wand path" points="0,0 600,0 600,200 700,200"/>
+        <polyline class="wand path" points="0,0 900,0 900,100 700,100"/>
+        <polyline class="wand path" points="0,0 1200,0 1200,200 800,200"/>
+        <polyline class="wand path" points="0,0 1200,0 1200,200 1000,200 1000,100 1100,100"/>
+        <polyline class="wand path" points="0,0 1200,0 1200,200 900,200 900,300 700,300"/>
+        <polyline class="wand path" points="0,0 1200,0 1200,200 900,200 900,400 1200,400 1200,300 1000,300"/>
+        <polyline class="wand path" points="0,0 1200,0 1200,200 900,200 900,400 1300,400 1300,100"/>
 
-        <!-- Wege -->
-        <a id="a" href="/#/about" class="about">
+        <!-- HOME -->
+        <a href="/" class="link">
             <text href="#" x="120" y="75" >Home</text>
         </a>
-        <polyline id="b" class="wand" points="50,50 50,150 250,150 250,250 550,250 550,50 450,50 450,150 350,150 350,150 350,50 300,50"/>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,50 450,50 450,150 350,150 350,150 350,50 320,50"/>
+
+        <!-- ABOUT -->
+        <a href="/#/about" class="link">
+            <text href="#" x="990" y="375" >About</text>
+        </a>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1350,450 1350,50 1250,50 1250,250 950,250 950,350 980,350"/>
+
+        <!-- HOWTO -->
+        <a href="/#/instructions" class="link">
+            <text href="#" x="570" y="675" >HowTo</text>
+        </a>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,750 150,750 150,650 250,650 250,750 850,750 850,550 550,550 550,650 565,650"/>
+
+        <!-- EDITORÜBERSICH -->
+        <a v-if="angemeldet" href="/#/editoruebersicht" class="link">
+            <text href="#" x="200" y="475" >Editor</text>
+        </a>
+        <polyline v-if="angemeldet" class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,550 450,550 450,350 150,350 150,450 190,450"/>
+
+        <!-- PLAY -->
+        <a v-if="angemeldet" href="/#/uebersicht" class="link">
+            <text href="#" x="750" y="75" >Play</text>
+        </a>
+        <polyline v-if="angemeldet" class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 850,450 850,350 650,350 650,250 750,250 750,150 650,150 650,50 740,50"/>
 
     </svg>
 
@@ -27,19 +71,21 @@ export default defineComponent({
 
   props: {},
   setup() {
-    return {};
+    
+    // TODO: wenn angemeldet dann angemeldet auf true
+    return {angemeldet: true};
   },
 });
 </script>
 
 <style>
 .wand {
-  fill:none;stroke:black;stroke-width:10;
+  fill:none;stroke: #6d9466;stroke-width: 8;
 }
 .path {
-  stroke-dasharray: 400%;
-  stroke-dashoffset: 400%;
-  animation: dash 1s linear forwards;
+  stroke-dasharray: 500%;
+  stroke-dashoffset: 500%;
+  animation: dash 2s linear forwards;
 }
 @keyframes dash {
   to {
@@ -47,18 +93,27 @@ export default defineComponent({
   }
 }
 
-.about + polyline{
-    display: none;
+.link{
+  text-decoration: none;
 }
 
-.about:hover + polyline{
+.link + polyline{
+  display: none;
+  fill:none;
+  stroke-width:10;
+  stroke: #eeb258;
+}
+
+.link:hover + polyline{
   display: inline;
   stroke-dasharray: 400%;
   stroke-dashoffset: 400%;
-  animation: dash 2s linear forwards;
+  animation: dash 1s linear forwards;
 }
 
 text{
     font-size: 4em;
+    font-weight: 700;
 }
+
 </style>

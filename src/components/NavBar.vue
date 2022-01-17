@@ -6,7 +6,7 @@
     <div>
         <!-- TODO: Benutzernamen reinschreiben -->
         <div class="btn-success dropdown">
-          <button class="dropbtn">Menü</button>
+          <button class="dropbtn">BENUTZERNAME</button>
           <div class="dropdown-content">
             <button class="grey-btn w-100" @click="router.push('/')">Home</button>
             <button class="grey-btn w-100" @click="router.push('/uebersicht')">Spiele</button>
@@ -18,7 +18,7 @@
         </div>
         <!-- TODO: Entweder Oder einblenden! -->
         <div class="btn-success dropdown">
-          <button class="dropbtn">BENUTZERNAME</button>
+          <button class="dropbtn">Menü</button>
           <div class="dropdown-content">
             <button class="grey-btn w-100" @click="router.push('/')">Home</button>
             <button class="grey-btn w-100" @click="router.push('/instructions')">Anleitung</button>
