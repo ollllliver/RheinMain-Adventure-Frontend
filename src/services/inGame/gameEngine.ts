@@ -30,6 +30,7 @@ let mausSteuerung: MyMouseControls;
 let tastaturSteuerung: MyKeyboardControls;
 let interactions: Interactions;
 let interaktionText: any;
+let anzSchluessel: any;
 
 let spieler: SpielerLokal
 
@@ -208,6 +209,7 @@ const initControls = () => {
  const initInteractions = () => {
     interactions = new Interactions(interactableList, cameraCollidable, document, stompClient);
     interaktionText = document.getElementById("interaktionText");
+    anzSchluessel = document.getElementById("SchluesselAnzeige")
 }
 
 /**
@@ -255,8 +257,8 @@ const connect = () => {
  */
 const disconnect = () => {
     mausSteuerung.dispose();
-    tastaturSteuerung.disconnect();
-    interactions.disconnect();
+    //tastaturSteuerung.disconnect();
+    //interactions.disconnect();
     unsubscribeChat();
     window.removeEventListener('click', mausSteuerung.lock);
     console.log("gameEninge.disconnect: getrennt")
@@ -388,6 +390,8 @@ const doAnimate = () => {
 
 };
 
+
+
 function zeigeInteraktionText(interaktion:any){
     if(interaktionText != null /*&& interaktionText.style.display == "none"*/){
         interaktionText.textContent = "[E] Interagiere mit " + interaktion.object.name
@@ -420,7 +424,8 @@ function zeigeInteraktionText(interaktion:any){
 }
 
 function setzteSchluesselAnz(anzSchluess: any){
-    console.log("Anzahl Schluessel" + anzSchluess)
+    anzSchluessel.textContent = "Anzahl Schlüssel beträgt" + anzSchluess
+    anzSchluessel.style.display = "block"
 }
 
 export function useGameEngine(){
