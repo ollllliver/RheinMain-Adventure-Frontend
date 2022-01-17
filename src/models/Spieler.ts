@@ -6,12 +6,12 @@ export class Spieler {
     velocity: number;
     position: Position;
     
-    moveForward: boolean;
-    moveBackward: boolean;
-    moveLeft: boolean;
-    moveRight: boolean;
-    moveUp: boolean;
-    moveDown: boolean;
+    // forward: boolean;
+    // backward: boolean;
+    // left: boolean;
+    // right: boolean;
+    // up: boolean;
+    // down: boolean;
 
     eigenschaften: {position: Position};
     constructor(){ 
@@ -21,51 +21,57 @@ export class Spieler {
         this.velocity = 0;
         this.position = { x:0, y:0, z:0 };
 
-        this.moveForward = false;
-        this.moveBackward = false;
-        this.moveLeft = false;
-        this.moveRight = false;
-        this.moveUp = false;
-        this.moveDown = false;
+        // this.forward = false;
+        // this.backward = false;
+        // this.left = false;
+        // this.right = false;
+        // this.up = false;
+        // this.down = false;
 
         this.eigenschaften = new SpielerEigenschaften;
     }
 
-    setMoveBackward(bool: boolean){
-        this.moveBackward = bool; 
-     }
+    // public moveRight(distance:number){
+    //     return; //TODO
+    // }
 
-    getMoveBackward(){
-       return this.moveBackward; 
-    }
+    // setMoveBackward(bool: boolean){
+    //     this.moveBackward = bool; 
+    //  }
 
-    setMoveForward(bool: boolean){
-        this.moveForward = bool; 
-     }
+    // getMoveBackward(){
+    //    return this.moveBackward; 
+    // }
 
-    getMoveForward(){
-       return this.moveForward; 
-    }
+    // setMoveForward(bool: boolean){
+    //     this.moveForward = bool; 
+    //  }
 
-    setMoveLeft(bool: boolean){
-        this.moveBackward = bool; 
-     }
+    // getMoveForward(){
+    //    return this.moveForward; 
+    // }
 
-    getMoveLeft(){
-        return this.moveBackward; 
-     }
+    // setMoveLeft(bool: boolean){
+    //     this.moveBackward = bool; 
+    //  }
 
-    setMoveRight(bool: boolean){
-        this.moveBackward = bool; 
-     }
+    // getMoveLeft(){
+    //     return this.moveBackward; 
+    //  }
 
-    getMoveRight(){
-        return this.moveBackward; 
-     }
+    // setMoveRight(bool: boolean){
+    //     this.moveBackward = bool; 
+    //  }
+
+    // getMoveRight(){
+    //     return this.moveBackward; 
+    //  }
 
     setPosition(pos: Position): void{
         this.eigenschaften.position = pos;
     }
+
+
 }
 
 class SpielerEigenschaften{

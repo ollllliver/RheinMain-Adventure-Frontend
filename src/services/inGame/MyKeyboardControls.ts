@@ -8,6 +8,7 @@ const direction = new Vector3();
 
 /**
  * Verwertet Tastatureingaben
+ * Hier wird nur die Velocity des Spielers geändert, nicht die Position!
  */
 export class MyKeyboardControls {
 
@@ -18,6 +19,12 @@ export class MyKeyboardControls {
     rayCaster: any;
     connect: () => void;
     disconnect: () => void;
+    moveForward: boolean;
+    moveBackward: boolean;
+    moveLeft: boolean;
+    moveRight: boolean;
+    moveUp: boolean;
+    moveDown: boolean;
 
 
     constructor(collidableList: any, cameraCollidable: typeof Mesh, domElement: Document, spieler: SpielerLokal) {
@@ -27,6 +34,13 @@ export class MyKeyboardControls {
         this.domElement = domElement;
         this.cameraCollidable = cameraCollidable;
         this.collidableList = collidableList;
+
+        this.moveForward = false;
+        this.moveBackward = false;
+        this.moveLeft = false;
+        this.moveRight = false;
+        this.moveUp = false;
+        this.moveDown = false;
 
         /**
 		 * Wird ausgelöst wenn eine Taste gedrückt wird
@@ -38,32 +52,32 @@ export class MyKeyboardControls {
 
                 case 'ArrowUp':
                 case 'KeyW':
-                    spieler.moveForward = true;
+                    this.moveForward = true;
                     break;
 
                 case 'ArrowLeft':
                 case 'KeyA':
-                    spieler.moveLeft = true;
+                    this.moveLeft = true;
                     break;
 
                 case 'ArrowDown':
                 case 'KeyS':
-                    spieler.moveBackward = true;
+                    this.moveBackward = true;
                     break;
 
                 case 'ArrowRight':
                 case 'KeyD':
-                    spieler.moveRight = true;
+                    this.moveRight = true;
                     break;
 
                 case 'Space':
-                    spieler.moveUp = true;
+                    this.moveUp = true;
                     // if ( canJump === true ) velocity.y += 350;
                     // canJump = false;
                     break;
 
                 case 'ShiftLeft':
-                    spieler.moveDown = true;
+                    this.moveDown = true;
                     break;
             }
 
@@ -79,30 +93,30 @@ export class MyKeyboardControls {
 
                 case 'ArrowUp':
                 case 'KeyW':
-                    spieler.moveForward = false;
+                    this.moveForward = false;
                     break;
 
                 case 'ArrowLeft':
                 case 'KeyA':
-                    spieler.moveLeft = false;
+                    this.moveLeft = false;
                     break;
 
                 case 'ArrowDown':
                 case 'KeyS':
-                    spieler.moveBackward = false;
+                    this.moveBackward = false;
                     break;
 
                 case 'ArrowRight':
                 case 'KeyD':
-                    spieler.moveRight = false;
+                    this.moveRight = false;
                     break;
                 case 'Space':
-                    spieler.moveUp = false;
+                    this.moveUp = false;
                     // if ( canJump === true ) velocity.y += 350;
                     // canJump = false;
                     break;
                 case 'ShiftLeft':
-                    spieler.moveDown = false;
+                    this.moveDown = false;
                     break;
                 case 'Escape':
                     console.log("MyKeyboardControls.onKeyUp: ESCAPE")
@@ -151,9 +165,10 @@ export class MyKeyboardControls {
 
         this.update = (camera: any, velocity: any, delta: number) => {
 
-            direction.z = Number(spieler.moveForward) - Number(spieler.moveBackward);
-            direction.x = Number(spieler.moveRight) - Number(spieler.moveLeft);
-            direction.y = Number(spieler.moveDown) - Number(spieler.moveUp);
+            //Die Richtung in die sich der Spieler bewegt
+            direction.z = Number(this.moveForward) - Number(this.moveBackward);
+            direction.x = Number(this.moveRight) - Number(this.moveLeft);
+            direction.y = Number(this.moveDown) - Number(this.moveUp);
             direction.normalize(); // this ensures consistent movements in all directions
 
             const speed = 50.0; //geschwindigkeit der camera
@@ -216,29 +231,31 @@ export class MyKeyboardControls {
 
             // x rot, y gelb, z blau
 
-            if ((spieler.moveForward && !vorneCollision) || (spieler.moveBackward && !hintenCollision)){
+            if ((this.moveForward && !vorneCollision) || (this.moveBackward && !hintenCollision)){
                 velocity.z -= direction.z * speed * delta;
                 spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
-            if ((spieler.moveLeft&& !linksCollision ) || (spieler.moveRight&& !rechtsCollision )){
+            if ((this.moveLeft&& !linksCollision ) || (this.moveRight&& !rechtsCollision )){
                 velocity.x -= direction.x * speed * delta;
                 spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
-            if (spieler.moveUp || spieler.moveDown){
+            if (this.moveUp || this.moveDown){
                 velocity.y -= direction.y * speed * delta;
                 spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
-            if (velocity.z != 0 || velocity.x != 0 || velocity.y != 0){ //solange der Spieler eine Geschwindigkeit hat, wird die Spielerposition geupdated
-                //spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
-                //TODO update Velocity an Backend
-            }
+           
 
 
             // Nicht in Wand haengenbleiben, ist man halt ein Gummi Mensch
-            if ((spieler.moveForward && vorneCollision) || (spieler.moveBackward && hintenCollision))
+            if ((this.moveForward && vorneCollision) || (this.moveBackward && hintenCollision))
                 velocity.z += direction.z * speed * delta;
-            if ((spieler.moveLeft&& linksCollision ) || (spieler.moveRight&& rechtsCollision ))
-                velocity.x += direction.x * speed * delta;
+            if ((this.moveLeft&& linksCollision ) || (this.moveRight&& rechtsCollision ))
+                velocity.x += direction.x * speed * delta;//#endregion
+
+            // if (velocity.z != 0 || velocity.x != 0 || velocity.y != 0){ //solange der Spieler eine Geschwindigkeit hat, wird die Spielerposition geupdated
+            //     spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+            //     //TODO update Velocity an Backend
+            // }
 
         };
 

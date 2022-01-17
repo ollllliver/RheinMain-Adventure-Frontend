@@ -1,3 +1,4 @@
+import { SpielerLokal } from '@/models/SpielerLokal';
 import { Euler, Vector3, EventDispatcher } from 'three';
 import { Camera } from "three/src/cameras/Camera";
 import { useGameEngine } from './gameEngine';
@@ -16,7 +17,7 @@ const _PI_2 = Math.PI / 2;
  */
 class MyMouseControls extends EventDispatcher {
 
-	constructor(camera: Camera, owner: Document) {
+	constructor(spieler: SpielerLokal, owner: Document) {
 
 		super();
 
@@ -42,14 +43,14 @@ class MyMouseControls extends EventDispatcher {
 			const movementX = event.movementX;
 			const movementY = event.movementY;
 
-			_euler.setFromQuaternion(camera.quaternion);
+			_euler.setFromQuaternion(spieler.camera.quaternion);
 
 			_euler.y -= movementX * 0.002;
 			_euler.x -= movementY * 0.002;
 
 			_euler.x = Math.max(_PI_2 - this.maxPolarAngle, Math.min(_PI_2 - this.minPolarAngle, _euler.x));
 
-			camera.quaternion.setFromEuler(_euler);
+			spieler.camera.quaternion.setFromEuler(_euler);
 
 			this.dispatchEvent(_changeEvent);
 
@@ -114,7 +115,7 @@ class MyMouseControls extends EventDispatcher {
 
 		this.getObject = function () { // retaining this method for backward compatibility
 
-			return camera;
+			return spieler.camera;
 
 		};
 
@@ -124,7 +125,7 @@ class MyMouseControls extends EventDispatcher {
 
 			return function (v) {
 
-				return v.copy(direction).applyQuaternion(camera.quaternion);
+				return v.copy(direction).applyQuaternion(spieler.camera.quaternion);
 
 			};
 
@@ -132,41 +133,11 @@ class MyMouseControls extends EventDispatcher {
 
 
 		/**
-		 * Beweget die Kamera nach vorne
-		 * @param distance Wert wie weit die Kamera sich nach vorne bewegt
-		 */
-		this.moveForward = function (distance:number) {
-
-			// bewegt  parallel zur xz-achse
-
-			_vector.setFromMatrixColumn(camera.matrix, 0);
-
-			_vector.crossVectors(camera.up, _vector);
-
-			camera.position.addScaledVector(_vector, distance);
-
-		};
-
-		/**
-		 * Beweget die Kamera nach rechts
-		 * @param distance Wert wie weit die Kamera sich nach rechts bewegt
-		 */
-		this.moveRight = function (distance:number) {
-
-			_vector.setFromMatrixColumn(camera.matrix, 0);
-
-			camera.position.addScaledVector(_vector, distance);
-
-		};
-
-		/**
 		 * "Lockt" die Maus 
 		 */
 		this.lock = () => {
 			this.domElement.requestPointerLock();
 			console.log("mouse controls: lock")
-
-
 		};
 
 		/**
@@ -178,12 +149,12 @@ class MyMouseControls extends EventDispatcher {
 		};
 
 		/**
-		 * Aktualisiert die Bewegungen
+		 * Nimmt die Bewegungsgeschwindigkeit und aktualisiert die Bewegungen
 		 */
 		this.update = (velocity: typeof Vector3, delta: number) => {
-			this.moveRight(-velocity.x * delta);
-			this.moveForward(-velocity.z * delta);
-			this.getObject().position.y += (velocity.y * delta);
+			spieler.moveRight(-velocity.x * delta);
+			spieler.moveForward(-velocity.z * delta)
+			//this.getObject().position.y += (velocity.y * delta);
 		};
 
 		this.connect();

@@ -14,14 +14,23 @@ export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
     const DEST_POSITION = "/topic/spiel/" + lobbystate.lobbyID;
     const DEST_SCHLUESSEL = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
 
+    
+    
+
     stompclient.onConnect = async () => {
+
+        let prevTime = performance.now();
+
         stompclient.subscribe(DEST_POSITION, (message) => {
-            console.log("##### irgendwas bekommen ####ç")
             const spieler: Spieler = JSON.parse(message.body);
             //console.log(`Neue Position von ${spieler.name}:`, spieler.eigenschaften.position);
             if (spieler.name != userStore.state.benutzername){
+                const time = performance.now();
+                const delta = (performance.now() - prevTime) / 1000;
                 setzeMitspielerAufPosition(spieler)
+                prevTime = time;
             }
+            
         });
         stompclient.subscribe(DEST_SCHLUESSEL, (message) => {
             const anzSchluess: any = message.body;

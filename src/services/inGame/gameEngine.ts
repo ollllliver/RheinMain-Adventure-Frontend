@@ -13,6 +13,7 @@ import userStore from '@/stores/user'
 import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
 
+
 let container: any;
 let camera: Camera;
 let cameraCollidable: typeof Three.Mesh;
@@ -23,6 +24,8 @@ const loader = new GraphicLoader();
 const collidableList: Array<any> = [];
 const interactableList: Array<any> = [];
 const developer = false;
+const geschwindigkeit = 10.0;
+
 let developerCamera: any;
 
 let mausSteuerung: MyMouseControls;
@@ -153,16 +156,15 @@ const initLoader = () => {
  */
 const initCamera = () => {
 
-    stompClient.activate();
-    spieler = new SpielerLokal(stompClient);
-    subscribeToSpielerPositionenUpdater(stompClient);
+    
     //subscribeToSchluesselUpdater(stompClient);
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
-    camera.position.set(0, spieler.height * 3, 0);
-    // camera.position.set(-2, spieler.height * 3, -5);
-    camera.lookAt(new Three.Vector3(-2, spieler.height * 3, 0));
+
+    stompClient.activate();
+    spieler = new SpielerLokal(stompClient, camera);
+    subscribeToSpielerPositionenUpdater(stompClient);
 
     // Developer Kamera Main (camera2)
     if (developer) {
@@ -202,7 +204,7 @@ window.addEventListener('resize', () => {
  * Initialisiert die Steuerung
  */
 const initControls = () => {
-    mausSteuerung = new MyMouseControls(camera, document); //init Maussteuerung
+    mausSteuerung = new MyMouseControls(spieler, document); //init Maussteuerung
     tastaturSteuerung = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
 
     //connect();
@@ -264,9 +266,6 @@ const disconnect = () => {
     unsubscribeChat();
     window.removeEventListener('click', mausSteuerung.lock);
     console.log("gameEninge.disconnect: getrennt")
-
-    
-
 }
 
 const disconnectController = () => {
@@ -345,20 +344,28 @@ const startAnimate = () => {
     doAnimate();
 }
 
+const updateVelocity = (velocity: typeof Three.Vector3, delta:number ) => {
+    velocity.x -= velocity.x * geschwindigkeit * delta;
+    velocity.z -= velocity.z * geschwindigkeit * delta;
+    velocity.y -= velocity.y * geschwindigkeit * delta;
+}
+
 
 const doAnimate = () => {
     requestAnimationFrame(doAnimate);
 
     const time = performance.now();
-    const delta = (time - prevTime) / 1000;   //delta um die 0,017s bei 60 fps
+    const delta = (time - prevTime) / 1000;   //delta ca. 0,017s wenn 60 fps
+    prevTime = time;
     //entweder hier oder in MyKeyboardControl
-    velocity.x -= velocity.x * 10.0 * delta;
-    velocity.z -= velocity.z * 10.0 * delta;
-    velocity.y -= velocity.y * 10.0 * delta;
 
+    updateVelocity(velocity, delta);
+    
+    
     mausSteuerung.update(velocity, delta); //Maus Steuerung
     tastaturSteuerung.update(camera, velocity, delta) //Tastatur Steuerung
     interactions.update(camera) //Interaktionen
+    
 
     // Interaktionstext anzeigen, wenn eine Interaktion moeglich ist
     if(interactions.erkannteInteraktion){
@@ -366,8 +373,6 @@ const doAnimate = () => {
     } else {
         verbergeInteraktionText()
     }
-
-    prevTime = time;
 
     // developer sicht
     if (developer) {
@@ -396,7 +401,6 @@ const doAnimate = () => {
     } else { // standard pov sicht
         renderer.render(scene, camera);
     }
-
 
     //wohin damit?
     //übertragt die Postition der Kamera an die Positionen des lokalen Spielers
