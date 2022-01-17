@@ -24,7 +24,7 @@ export default defineComponent({
   components: { Pause, Chat},
   setup() {
 
-    const {initScene, initLoader, initCamera, initPlane, initRenderer, initControls, initInteractions, initChat, doAnimate, connect, disconnect, setContainer} = useGameEngine();
+    const {initScene, initLoader, initCamera, initPlane, initRenderer, initControls, initInteractions, initChat, startAnimate, stopAnimate, connect, disconnect, setContainer} = useGameEngine();
     const { sendeChatNachricht, empfangeChatNachricht} = useChatStore();
 
     onMounted(() => {
@@ -38,15 +38,15 @@ export default defineComponent({
       initControls();
       initInteractions();
       initChat();
-      doAnimate();
+      startAnimate();
 
     });
 
-    return {connect, disconnect, sendeChatNachricht, empfangeChatNachricht}
+    return {connect, disconnect, stopAnimate, sendeChatNachricht, empfangeChatNachricht}
 
   },
   beforeUnmount() {
-
+    this.stopAnimate();
     this.disconnect();
     console.log("unmounted")
   },

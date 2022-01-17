@@ -15,9 +15,10 @@ export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
     stompclient.onConnect = async () => {
         stompclient.subscribe(DEST, (message) => {
             const spieler: Spieler = JSON.parse(message.body);
-            // console.log(`Neue Position von ${spieler.name}:`, spieler.eigenschaften.position);
+            console.log(`Neue Position von ${spieler.name}:`, spieler.eigenschaften.position);
             if (spieler.name!= userStore.state.benutzername){
                 setzeMitspielerAufPosition(spieler)
+                
             }
         });
     }

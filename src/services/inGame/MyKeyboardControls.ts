@@ -1,6 +1,7 @@
-import { Euler, Vector3, EventDispatcher, Raycaster } from 'three';
+import { Euler, Vector3, EventDispatcher, Raycaster, Mesh} from 'three';
 import { SpielerLokal } from '../../models/SpielerLokal';
 import { Camera } from "three/src/cameras/Camera";
+import { useGameEngine } from "@/services/inGame/gameEngine";
 
 
 const direction = new Vector3();
@@ -11,33 +12,19 @@ const direction = new Vector3();
 export class MyKeyboardControls {
 
     domElement: Document
-    moveForward: boolean
-    moveBackward: boolean;
-    moveLeft: boolean;
-    moveRight: boolean;
-    moveUp: boolean;
-    moveDown: boolean;
-    canJump: boolean;
-    update: (cameraPosition: any, velocity: any, delta: number) => void;
-    cameraCollidable: any;
+    update: (cameraPosition: any, velocity: typeof Vector3, delta: number) => void;
+    cameraCollidable: typeof Mesh;
     collidableList: any;
     rayCaster: any;
     connect: () => void;
     disconnect: () => void;
 
 
-    constructor(collidableList: any, cameraCollidable: any, domElement: Document, spieler: SpielerLokal) {
+    constructor(collidableList: any, cameraCollidable: typeof Mesh, domElement: Document, spieler: SpielerLokal) {
 
         const velocity = new Vector3();
 
-        this.moveForward = false;
         this.domElement = domElement;
-        this.moveBackward = false;
-        this.moveLeft = false;
-        this.moveRight = false;
-        this.moveUp = false;
-        this.moveDown = false;
-        this.canJump = false;
         this.cameraCollidable = cameraCollidable;
         this.collidableList = collidableList;
 
@@ -51,32 +38,32 @@ export class MyKeyboardControls {
 
                 case 'ArrowUp':
                 case 'KeyW':
-                    this.moveForward = true;
+                    spieler.moveForward = true;
                     break;
 
                 case 'ArrowLeft':
                 case 'KeyA':
-                    this.moveLeft = true;
+                    spieler.moveLeft = true;
                     break;
 
                 case 'ArrowDown':
                 case 'KeyS':
-                    this.moveBackward = true;
+                    spieler.moveBackward = true;
                     break;
 
                 case 'ArrowRight':
                 case 'KeyD':
-                    this.moveRight = true;
+                    spieler.moveRight = true;
                     break;
 
                 case 'Space':
-                    this.moveUp = true;
+                    spieler.moveUp = true;
                     // if ( canJump === true ) velocity.y += 350;
                     // canJump = false;
                     break;
 
                 case 'ShiftLeft':
-                    this.moveDown = true;
+                    spieler.moveDown = true;
                     break;
             }
 
@@ -92,33 +79,34 @@ export class MyKeyboardControls {
 
                 case 'ArrowUp':
                 case 'KeyW':
-                    this.moveForward = false;
+                    spieler.moveForward = false;
                     break;
 
                 case 'ArrowLeft':
                 case 'KeyA':
-                    this.moveLeft = false;
+                    spieler.moveLeft = false;
                     break;
 
                 case 'ArrowDown':
                 case 'KeyS':
-                    this.moveBackward = false;
+                    spieler.moveBackward = false;
                     break;
 
                 case 'ArrowRight':
                 case 'KeyD':
-                    this.moveRight = false;
+                    spieler.moveRight = false;
                     break;
                 case 'Space':
-                    this.moveUp = false;
+                    spieler.moveUp = false;
                     // if ( canJump === true ) velocity.y += 350;
                     // canJump = false;
                     break;
                 case 'ShiftLeft':
-                    this.moveDown = false;
+                    spieler.moveDown = false;
                     break;
                 case 'Escape':
-                    console.log("MyKeyboardControls.onKeyUp: ESCAPE GEDRÜCKT")
+                    console.log("MyKeyboardControls.onKeyUp: ESCAPE")
+                    useGameEngine().disconnect();
                     break;
 
             }
@@ -130,7 +118,7 @@ export class MyKeyboardControls {
         this.connect = () => {
             this.domElement.addEventListener('keydown', onKeyDown),
             this.domElement.addEventListener('keyup', onKeyUp)
-            console.log("MyKeyboardControls.connect: Tastatursteuerung connected")
+            // console.log("MyKeyboardControls.connect: Tastatursteuerung connected")
         };
 
         /**
@@ -139,7 +127,7 @@ export class MyKeyboardControls {
         this.disconnect = () => {
             this.domElement.removeEventListener('keydown', onKeyDown),
             this.domElement.removeEventListener('keyup', onKeyUp)
-            console.log("MyKeyboardControls.disconnect: Tastatursteuerung disconnected")
+            // console.log("MyKeyboardControls.disconnect: Tastatursteuerung disconnected")
         };
 
         const collisionDetection = (blickVektor:any, originPoint: any) => {
@@ -163,9 +151,9 @@ export class MyKeyboardControls {
 
         this.update = (camera: any, velocity: any, delta: number) => {
 
-            direction.z = Number(this.moveForward) - Number(this.moveBackward);
-            direction.x = Number(this.moveRight) - Number(this.moveLeft);
-            direction.y = Number(this.moveDown) - Number(this.moveUp);
+            direction.z = Number(spieler.moveForward) - Number(spieler.moveBackward);
+            direction.x = Number(spieler.moveRight) - Number(spieler.moveLeft);
+            direction.y = Number(spieler.moveDown) - Number(spieler.moveUp);
             direction.normalize(); // this ensures consistent movements in all directions
 
             const speed = 50.0; //geschwindigkeit der camera
@@ -228,30 +216,31 @@ export class MyKeyboardControls {
 
             // x rot, y gelb, z blau
 
-            if ((this.moveForward && !vorneCollision) || (this.moveBackward && !hintenCollision)){
+            if ((spieler.moveForward && !vorneCollision) || (spieler.moveBackward && !hintenCollision)){
                 velocity.z -= direction.z * speed * delta;
                 // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
-            if ((this.moveLeft&& !linksCollision ) || (this.moveRight&& !rechtsCollision )){
+            if ((spieler.moveLeft&& !linksCollision ) || (spieler.moveRight&& !rechtsCollision )){
                 velocity.x -= direction.x * speed * delta;
                 // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
-            if (this.moveUp || this.moveDown){
+            if (spieler.moveUp || spieler.moveDown){
                 velocity.y -= direction.y * speed * delta;
                 // spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
             if (velocity.z != 0 || velocity.x != 0 || velocity.y != 0){ //solange der Spieler eine Geschwindigkeit hat, wird die Spielerposition geupdated
                 spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+                //TODO update Velocity an Backend
             }
 
 
-
             // Nicht in Wand haengenbleiben, ist man halt ein Gummi Mensch
-            if ((this.moveForward && vorneCollision) || (this.moveBackward && hintenCollision))
+            if ((spieler.moveForward && vorneCollision) || (spieler.moveBackward && hintenCollision))
                 velocity.z += direction.z * speed * delta;
-            if ((this.moveLeft&& linksCollision ) || (this.moveRight&& rechtsCollision ))
+            if ((spieler.moveLeft&& linksCollision ) || (spieler.moveRight&& rechtsCollision ))
                 velocity.x += direction.x * speed * delta;
 
         };
+
     }
 }

@@ -15,8 +15,8 @@ import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
 let container: any;
 let camera: Camera;
-let cameraCollidable: any;
-let scene: any;
+let cameraCollidable: typeof Three.Mesh;
+let scene: typeof Three.Scene;
 let renderer: any;
 let meshPlane: any;
 const loader = new GraphicLoader();
@@ -35,6 +35,8 @@ let spieler: SpielerLokal
 let prevTime = performance.now();
 const velocity = new Three.Vector3();
 const direction = new Three.Vector3();
+
+let requestID: number;
 
 const stompClient = gamebrokerStompclient;
 
@@ -124,7 +126,7 @@ const initLoader = () => {
             });
         });
         console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
-
+    
         camera.position.set(startPosition.x, startPosition.y, startPosition.z);
 
         lobbystate.teilnehmerliste.forEach(function (spieler) {
@@ -142,8 +144,8 @@ const initLoader = () => {
                 });
             }
         });
-
     });
+    
 };
 
 /**
@@ -182,7 +184,6 @@ const initCamera = () => {
     cameraCollidable = new Three.Mesh(cubeGeometry, wireMaterial);
     cameraCollidable.position.set(0, spieler.height / 2, 0);
     cameraCollidable.lookAt(new Three.Vector3(0, spieler.height, 0))
-
 
 };
 
@@ -252,7 +253,6 @@ const connect = () => {
 
         const pauseFenster = document.getElementById('pause');
         if (pauseFenster != null){ pauseFenster.style.display = "none";}
-    
 }
 
 /**
@@ -268,8 +268,6 @@ const disconnect = () => {
 
     const pauseFenster = document.getElementById('pause');
     if (pauseFenster != null){ pauseFenster.style.display = "";}
-
-    
 
 }
 
@@ -330,11 +328,22 @@ const initRenderer = () => {
 
 };
 
+const stopAnimate = () => {
+    cancelAnimationFrame(requestID);
+    console.log("gameEngine.stopAnimate(): Animation erfolgreich gestoppt.");
+}
+
+const startAnimate = () => {
+    requestID = requestAnimationFrame(doAnimate);
+    doAnimate();
+}
+
+
 const doAnimate = () => {
     requestAnimationFrame(doAnimate);
 
     const time = performance.now();
-    const delta = (time - prevTime) / 1000;
+    const delta = (time - prevTime) / 1000;   //delta um die 0,017s bei 60 fps
     //entweder hier oder in MyKeyboardControl
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
@@ -440,7 +449,8 @@ export function useGameEngine(){
         initControls,
         initInteractions,
         initChat,
-        doAnimate,
+        startAnimate,
+        stopAnimate,
         connect, disconnect,
         setContainer,
         scene

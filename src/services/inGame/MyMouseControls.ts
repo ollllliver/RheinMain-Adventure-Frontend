@@ -62,7 +62,7 @@ class MyMouseControls extends EventDispatcher {
 				this.dispatchEvent(_lockEvent);
 
 				this.isLocked = true;
-				console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
+				// console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
 
 			} else {
 
@@ -71,7 +71,7 @@ class MyMouseControls extends EventDispatcher {
 				this.isLocked = false;
 				const { disconnect } = useGameEngine()
 				disconnect(); //gameEngine.disconnect
-				console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
+				// console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
 
 			}
 			
@@ -88,7 +88,7 @@ class MyMouseControls extends EventDispatcher {
 			this.domElement.ownerDocument.addEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.addEventListener('pointerlockchange', onPointerlockChange);
 			this.domElement.ownerDocument.addEventListener('pointerlockerror', onPointerlockError);
-			console.log("### MyMouseControls.connect: mouse controls connected")
+			// console.log("### MyMouseControls.connect: mouse controls connected")
 
 
 		};
@@ -101,7 +101,7 @@ class MyMouseControls extends EventDispatcher {
 			this.domElement.ownerDocument.removeEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.removeEventListener('pointerlockchange', onPointerlockChange);
 			this.domElement.ownerDocument.removeEventListener('pointerlockerror', onPointerlockError);
-			console.log("### MyMouseControls.disconnect: mouse controls disconnected")
+			// console.log("### MyMouseControls.disconnect: mouse controls disconnected")
 
 
 		};
@@ -135,7 +135,7 @@ class MyMouseControls extends EventDispatcher {
 		 * Beweget die Kamera nach vorne
 		 * @param distance Wert wie weit die Kamera sich nach vorne bewegt
 		 */
-		this.moveForward = function (distance:any) {
+		this.moveForward = function (distance:number) {
 
 			// bewegt  parallel zur xz-achse
 
@@ -151,7 +151,7 @@ class MyMouseControls extends EventDispatcher {
 		 * Beweget die Kamera nach rechts
 		 * @param distance Wert wie weit die Kamera sich nach rechts bewegt
 		 */
-		this.moveRight = function (distance:any) {
+		this.moveRight = function (distance:number) {
 
 			_vector.setFromMatrixColumn(camera.matrix, 0);
 
@@ -180,15 +180,13 @@ class MyMouseControls extends EventDispatcher {
 		/**
 		 * Aktualisiert die Bewegungen
 		 */
-		this.update = (velocity: any, delta: number) => {
+		this.update = (velocity: typeof Vector3, delta: number) => {
 			this.moveRight(-velocity.x * delta);
 			this.moveForward(-velocity.z * delta);
 			this.getObject().position.y += (velocity.y * delta);
 		};
 
 		this.connect();
-
-
 
 	}
 
