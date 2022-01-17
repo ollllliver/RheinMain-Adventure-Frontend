@@ -28,52 +28,125 @@
         <polyline class="wand path" points="0,0 1200,0 1200,200 900,200 900,400 1300,400 1300,100"/>
 
         <!-- HOME -->
-        <a href="/" class="link">
+        <a href="/" class="POI">
             <text href="#" x="120" y="75" >Home</text>
         </a>
         <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,50 450,50 450,150 350,150 350,150 350,50 320,50"/>
 
         <!-- ABOUT -->
-        <a href="/#/about" class="link">
+        <a href="/#/about" class="POI">
             <text href="#" x="990" y="375" >About</text>
         </a>
         <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1350,450 1350,50 1250,50 1250,250 950,250 950,350 980,350"/>
 
         <!-- HOWTO -->
-        <a href="/#/instructions" class="link">
+        <a href="/#/instructions" class="POI">
             <text href="#" x="570" y="675" >HowTo</text>
         </a>
         <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,750 150,750 150,650 250,650 250,750 850,750 850,550 550,550 550,650 565,650"/>
 
         <!-- EDITORÜBERSICH -->
-        <a v-if="angemeldet" href="/#/editoruebersicht" class="link">
+        <a v-if="angemeldet" href="/#/editoruebersicht" class="POI">
             <text href="#" x="200" y="475" >Editor</text>
         </a>
         <polyline v-if="angemeldet" class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,550 450,550 450,350 150,350 150,450 190,450"/>
 
         <!-- PLAY -->
-        <a v-if="angemeldet" href="/#/uebersicht" class="link">
+        <a v-if="angemeldet" href="/#/uebersicht" class="POI">
             <text href="#" x="750" y="75" >Play</text>
         </a>
         <polyline v-if="angemeldet" class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 850,450 850,350 650,350 650,250 750,250 750,150 650,150 650,50 740,50"/>
 
+        <!-- ITEMS -->
+        <!-- Key -->
+        <image :class="key" @click="keyClick" x="1010" y="110" width="80" height="80" href="@/assets/img/maze-items/key.svg" alt=""/>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 850,450 850,350 650,350 650,250 750,250 750,150 950,150 950,50 1150,50 1150,150 1100,150"/>
+
+        <!-- Closed Door -->
+        <image :class="cDoor" @click="cDoorClick" x="1310" y="710" width="80" height="80" href="@/assets/img/maze-items/closed-door.svg" alt=""/>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1250,450 1250,650 1350,650 1350,700"/>
+        
+        <!-- Open Door -->
+        <image :class="oDoor" @click="oDoorClick" x="1310" y="710" width="80" height="80" href="@/assets/img/maze-items/opened-door.svg" alt=""/>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1250,450 1250,650 1350,650 1350,700"/>
+        
+        <!-- Tupel -->
+        <image class="POI" @click="tupelClick" x="860" y="620" width="180" height="180" href="@/assets/img/maze-items/tupel.svg" alt=""/>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,750 150,750 150,650 250,650 250,750 850,750 850,550 1150,550 1150,750 1050,750 1050,650 1000,650"/>
+        
     </svg>
 
+    <div :class="popup">
+      <span class="helper"></span>
+      <div>
+        <div class="popupCloseButton" @click="hidePopup">&times;</div>
+        <b>Tupel hat eine Frage!</b>
+        <p>Was ist 7 mal sieben?</p>
+        <div class='d-flex justify-content-around'>
+          <button class="btn btn-secondary" @click='antwortClick'>49</button>
+          <button class="btn btn-secondary" @click='antwortClick'>Feiner Sand</button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, ref } from "vue";
 
 export default defineComponent({
   name: "MazeMenue",
 
   props: {},
   setup() {
+    const key = ref('shown POI');
+    const cDoor = ref('shown POI');
+    const oDoor = ref('hidden POI');
+    const popup = ref('hidden POI');
+    let tupel = false;
     
+    function keyClick(){
+      key.value = 'hidden POI';
+    }
+
+    function cDoorClick(){
+      if (key.value == 'hidden POI' && tupel){
+        cDoor.value = 'hidden POI';
+        oDoor.value = 'shown POI';
+      }
+    }
+
+    function oDoorClick(){
+      console.log('GESCHAFFT! JEY!')
+    }
+    function tupelClick(){
+      if (!tupel){
+        popup.value = 'popup';
+      }
+    }
+
+    function hidePopup() {
+      popup.value = 'hidden';
+    }
+
+    function antwortClick() {
+      hidePopup();
+      tupel = true;
+    }
+
     // TODO: wenn angemeldet dann angemeldet auf true
-    return {angemeldet: true};
+    return {
+      angemeldet: true,
+      key, cDoor, oDoor,
+      keyClick,
+      cDoorClick,
+      oDoorClick,
+      tupelClick,
+      hidePopup,
+      antwortClick,
+      popup,
+      };
   },
 });
 </script>
@@ -93,18 +166,18 @@ export default defineComponent({
   }
 }
 
-.link{
+.POI{
   text-decoration: none;
 }
 
-.link + polyline{
+.POI + polyline{
   display: none;
   fill:none;
   stroke-width:10;
   stroke: #eeb258;
 }
 
-.link:hover + polyline{
+.POI:hover + polyline{
   display: inline;
   stroke-dasharray: 400%;
   stroke-dashoffset: 400%;
@@ -115,5 +188,63 @@ text{
     font-size: 4em;
     font-weight: 700;
 }
+
+.hidden{
+  display: none;
+}
+
+/* ######### Popup box ######### */
+.popup{
+    background:rgba(0,0,0,.4);
+    cursor:pointer;
+    height:100%;
+    position:fixed;
+    text-align:center;
+    top:0;
+    left: 0;
+    width:100%;
+    z-index:10000;
+}
+.popup .helper{
+    display:inline-block;
+    height:100%;
+    vertical-align:middle;
+}
+.popup > div {
+    background-color: #fff;
+    box-shadow: 10px 10px 60px #555;
+    display: inline-block;
+    height: auto;
+    max-width: 551px;
+    min-height: 100px;
+    vertical-align: middle;
+    width: 60%;
+    position: relative;
+    border-radius: 8px;
+    padding: 15px 5%;
+}
+
+.popupCloseButton {
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: 50px;
+    cursor: pointer;
+    display: inline-block;
+    font-family: arial;
+    font-weight: bold;
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    font-size: 30px;
+    line-height: 30px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+.popupCloseButton:hover {
+    background-color: #ccc;
+    color: red;
+}
+/* ######### Popup box ######### */
 
 </style>
