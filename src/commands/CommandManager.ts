@@ -52,7 +52,6 @@ class CommandStack {
      */
     undo = () => {
         if (this.index > 0) {
-            console.log(this.index)
             this.index--;
             const cmd: ICommand = this.stack[this.index];
             cmd.undo();

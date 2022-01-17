@@ -171,6 +171,7 @@ export default defineComponent({
             return;
           }
         }
+        
         if (editorStore.getters.getEntfernen) {
           let storeElement = liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e;
           if (storeElement !== 0) {

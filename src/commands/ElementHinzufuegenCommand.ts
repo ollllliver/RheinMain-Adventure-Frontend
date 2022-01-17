@@ -174,7 +174,7 @@ export class ElementHinzufuegenCommand implements ICommand {
     this._state -= 1
     // Element aus der Karte wieder auf 0 setzten (0 = Wand)
     // Hintergrund des divs auf Wand setzen
-    console.log("Platzieren UNDO ----- " + this._element.e);
+    
     switch (this._element.e) {
       // bei Weg, Start oder Ziel
       case 1: {

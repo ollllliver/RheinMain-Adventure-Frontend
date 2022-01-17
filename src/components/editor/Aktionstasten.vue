@@ -21,7 +21,6 @@ export default defineComponent({
   methods: {
     undo() {
       // letzten Befehl vom Stack rückgängig machen
-      console.log("undo")
       CommandStack.getInstance().undo();
     },
     redo() {
@@ -35,7 +34,6 @@ export default defineComponent({
     
     // Karte nach Prüfung ob Start/Ziel und Raum platziert wurde loggen (vorerst)
     const zurPruefung = () => {
-      console.log("pruef")
       if (editorStore.getters.getZiel === true) {
         if (editorStore.getters.getStart === true) {
           /*
