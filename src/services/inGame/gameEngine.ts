@@ -232,17 +232,19 @@ const initInteractions = () => {
 }
 
 /**
- * Trennt die Verbindung zu den Eingabe-Controllern und öffnet das Spielunterbrechungsfenster
+ *  und öffnet das Spielunterbrechungsfenster
  */
-const disconnect = () => {
+const disconnect = () => { //nur aufrufen wenn man die Seite verlässt
     disconnectController();
     interactions.disconnect();
     //unsubscribeChat();
     window.removeEventListener('click', mouseControls.lock);
     console.log("gameEninge.disconnect: getrennt")
 }
-
-const disconnectController = () => {
+/**
+ * Trennt die Verbindung zu den Eingabe-Controllern (Maus und Tastatursteuerung)
+ */
+const disconnectController = () => { //Getrennt von disconnect, da man die interactions sonst verliert
 
     mouseControls.dispose();
     keyControls.disconnect();
