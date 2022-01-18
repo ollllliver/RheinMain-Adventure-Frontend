@@ -267,7 +267,10 @@ const disconnect = () => {
     mausSteuerung.dispose();
     //tastaturSteuerung.disconnect();
     //interactions.disconnect();
-    unsubscribeChat();
+
+    //TODO: unsubscirben wenn man das Spiel wirklich verlaesst
+    //unsubscribeChat();
+
     window.removeEventListener('click', mausSteuerung.lock);
     console.log("gameEninge.disconnect: getrennt")
 
