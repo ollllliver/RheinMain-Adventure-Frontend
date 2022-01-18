@@ -27,7 +27,8 @@ export default defineComponent({
       initRenderer,
       initControls,
       initInteractions,
-      doAnimate,
+      startAnimate,
+      stopAnimate,
       connect,
       disconnect,
       setContainer
@@ -44,15 +45,15 @@ export default defineComponent({
       initRenderer();
       initControls();
       initInteractions();
-      doAnimate();
+      startAnimate();
 
     });
 
-    return {connect, disconnect}
+    return {connect, disconnect, stopAnimate}
 
   },
   beforeUnmount() {
-
+    this.stopAnimate();
     this.disconnect();
     console.log("unmounted")
   },

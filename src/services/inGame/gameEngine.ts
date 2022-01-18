@@ -31,6 +31,8 @@ const interactableList: Array<any> = [];
 const developer = false;
 let developerCamera: any;
 let controls: any;
+let requestID: number;
+
 
 let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
@@ -114,9 +116,14 @@ const initLoader = () => {
                 // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
                 if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
                     res.scene.children[0].name = raumMobiliar.mobiliar.name;
-                    interactableList.push(res.scene);
+                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL'){
+                        //Tür und Schlüssel bestehen aus mehreren Objekten,
+                        //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
+                        interactableList.push(res.scene.children[0]); 
+                    } else {
+                        interactableList.push(res.scene);
+                    }
                 }
-
                 scene.add(res.scene)
             });
         });
@@ -337,6 +344,16 @@ const doAnimate = () => {
 
 };
 
+const stopAnimate = () => {
+    cancelAnimationFrame(requestID);
+    console.log("gameEngine.stopAnimate(): Animation erfolgreich gestoppt.");
+}
+
+const startAnimate = () => {
+    requestID = requestAnimationFrame(doAnimate);
+    doAnimate();
+}
+
 function zeigeInteraktionText(interaktion: any) {
     if (interaktionText != null /*&& interaktionText.style.display == "none"*/) {
         interaktionText.textContent = "[E] Interagiere mit " + interaktion.object.name
@@ -369,7 +386,8 @@ export function useGameEngine() {
         initRenderer,
         initControls,
         initInteractions,
-        doAnimate,
+        startAnimate,
+        stopAnimate,
         connect, disconnect, disconnectController,
         setContainer,
         scene
