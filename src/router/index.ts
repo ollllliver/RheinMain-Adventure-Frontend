@@ -4,6 +4,7 @@ import LobbyView from '@/views/LobbyView.vue'
 import Register from "@/views/Register.vue";
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
 import Editor from "@/views/Editor.vue";
+import AboutView from "@/views/AboutView.vue";
 
 // Routen der Anwendung
 
@@ -46,6 +47,12 @@ const routes: Array<RouteRecordRaw> = [
         path: '/editor',
         name: 'Editor',
         component: Editor
+    },
+
+    {
+        path: '/about',
+        name: 'About',
+        component: AboutView
     }
 ]
 
