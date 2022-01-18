@@ -418,8 +418,8 @@ function zeigeInteraktionText(interaktion:any){
   }
 
   function keineSchluesselWarnung(){
-    warnungText.textContent = "Du hast keinen Schlüssel"
-    warnungText.style.display = "block"
+    anzSchluesselText.textContent = "Du hast keinen Schlüssel"
+    anzSchluesselText.style.display = "block"
   }
 
   function openChat(chat:any, chatButton:any){
