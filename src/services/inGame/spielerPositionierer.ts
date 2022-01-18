@@ -28,12 +28,14 @@ export function subscribeToSchluesselUpdater(stompclient: Client): void{
     stompclient.onConnect = async () => {
         stompclient.subscribe(DEST, (message) => {
             const anzSchluess: any = message.body;
+            //Jenachdem wie viele Schluessel eingesammelt wurden:
             if (anzSchluess != 0){
-                
+                //entweder SchluesselCOunter hochzaehler...
                 console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
                 setzteSchluesselAnz(anzSchluess); 
 
             }else{
+                //... oder keine Schluessel meldung
                 console.log("KEINE SCHLÜSSEL");
                 keineSchluesselWarnung();
                 

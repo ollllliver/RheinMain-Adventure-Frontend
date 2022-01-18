@@ -85,14 +85,15 @@ import { useGameEngine } from './gameEngine';
             
             
             switch (interaktion.object.name) {
+                //Jenachdem womit man interagiert wird eine StompNachricht an eine andere DEST gepublisht
                 case "Schlüssel":
                     interaktion.object.parent.remove(interaktion.object);
                     console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/schluessel');
                     this.DEST = "/topic/spiel/" + this.lobbyID + '/key';
+                    //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/key
                     this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
                     break;
                 case "Tür":
-                    console.log("ANzahl SSSSSSSSSSSSSSSS: " + gamestate.anzSchluessel)
                     if(gamestate.anzSchluessel !=  0){
                         // öffne Tür
                         interaktion.object.rotation.z = Math.PI / 2;
@@ -106,6 +107,7 @@ import { useGameEngine } from './gameEngine';
                     
                     console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/tuer');
                     this.DEST = "/topic/spiel/" + this.lobbyID + '/tuer';
+                    //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/tuer
                     this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
                     break;
 
