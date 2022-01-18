@@ -29,6 +29,12 @@ const loader = new GraphicLoader();
 const collidableList: Array<any> = [];
 const interactableList: Array<any> = [];
 const developer = false;
+const minimap = true;
+const minimapWidth = 250;
+const minimapHeight = 250;
+const minimapZoom = 30;
+let minimapCamera: any;
+let minimapDot: any;
 let developerCamera: any;
 let controls: any;
 
@@ -170,6 +176,19 @@ const initCamera = () => {
 
     }
 
+    // Minimap Kamera
+    if(minimap){
+        minimapCamera = new Three.PerspectiveCamera();
+        minimapCamera.position.set(spieler.position.x, minimapZoom, spieler.position.z);
+        minimapCamera.lookAt(new Three.Vector3(0, 0, 0));
+
+        // roter Punkt auf Karte
+        const geometry = new Three.SphereGeometry(0.01, 15, 15);
+        const material = new Three.MeshBasicMaterial( { color: new Three.Color("rgb(255, 0, 0)") } );
+        minimapDot = new Three.Mesh( geometry, material );
+        minimapDot.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
+        scene.add(minimapDot);
+    }
 
     // Kamera Collision objekt init
 
@@ -306,14 +325,35 @@ const doAnimate = () => {
         renderer.render(scene, camera);
     }
 
+    if(minimap){
+        // Haupt-Ansicht
+        renderer.setClearColor(0x000000, 0);
+        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+        renderer.render(scene, camera);
+
+        // Minimap-Ansicht
+        minimapCamera.position.set(spieler.position.x, minimapZoom, spieler.position.z);
+        //minimapCamera.rotation.set(minimapCamera.rotation.x, minimapCamera.rotation.y, camera.rotation.z);
+
+        minimapDot.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
+
+        renderer.clearDepth();
+        renderer.setScissorTest(true);
+        renderer.setScissor(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
+        renderer.setViewport(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
+        renderer.setClearColor(0x222222, 1);
+
+        renderer.render(scene, minimapCamera);
+
+        renderer.setScissorTest(false);
+    }else{
+        renderer.render(scene, camera);
+    }
 
     //wohin damit?
     spieler.position.x = camera.position.x.toFixed(2);
     spieler.position.y = camera.position.y.toFixed(2);
     spieler.position.z = camera.position.z.toFixed(2);
-
-    renderer.render(scene, camera);
-
 };
 
 function zeigeInteraktionText(interaktion: any) {
