@@ -1,19 +1,38 @@
 <template>
-  <div id="container">
-    <h2 id="interaktionText"></h2>
+  <div>
+    <Pause id="pause"/>
+    <div id="container">
+      <h2 id="interaktionText"></h2>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import {defineComponent, onMounted} from "vue";
 import { useGameEngine } from "@/services/inGame/gameEngine";
+import Pause from "./Pause.vue";
 
 
 export default defineComponent({
   name: "RenderDemo",
+  components: {Pause},
   setup() {
 
-    const {initScene, initLoader, initCamera, initPlane, initInteractionTestObject, initRaycaster, initRenderer, initControls, initInteractions, doAnimate, connect, disconnect, setContainer} = useGameEngine();
+    const {
+      initScene,
+      initLoader,
+      initCamera,
+      initPlane,
+      initRaycaster,
+      initRenderer,
+      initControls,
+      initInteractions,
+      startAnimate,
+      stopAnimate,
+      connect,
+      disconnect,
+      setContainer
+    } = useGameEngine();
     
 
     onMounted(() => {
@@ -22,20 +41,19 @@ export default defineComponent({
       initLoader();
       initCamera();
       initPlane();
-      initInteractionTestObject();
       initRaycaster();
       initRenderer();
       initControls();
       initInteractions();
-      doAnimate();
+      startAnimate();
 
     });
 
-    return {connect, disconnect}
+    return {connect, disconnect, stopAnimate}
 
   },
   beforeUnmount() {
-
+    this.stopAnimate();
     this.disconnect();
     console.log("unmounted")
   },
@@ -45,4 +63,22 @@ export default defineComponent({
 </script>
 
 <style scoped>
+
+ #pause {
+  --gap: 15px;
+
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  padding: var(--gap);
+  background: rgba(0, 0, 0, 0.5);
+  font-family: sans-serif;
+ }
+
 </style>
