@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <svg class="p-5" width="100%" viewBox="-10 -10 1420 820">
+    <svg class="p-1" width="50%"  viewBox="-10 -10 1420 820">
 
         <!-- Rahmen -->
         <polyline class="wand path" points="0,0 1400,0 1400,800 0,800 0,100"/>
@@ -158,7 +158,7 @@ export default defineComponent({
 .path {
   stroke-dasharray: 500%;
   stroke-dashoffset: 500%;
-  animation: dash 2s linear forwards;
+  animation: dash 1.5s linear forwards;
 }
 @keyframes dash {
   to {
