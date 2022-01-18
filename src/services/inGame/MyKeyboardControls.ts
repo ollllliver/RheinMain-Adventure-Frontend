@@ -22,6 +22,7 @@ export class MyKeyboardControls {
     cameraCollidable: any;
     collidableList: any;
     rayCaster: any;
+    connect: () => void;
     disconnect: () => void;
 
 
@@ -80,7 +81,6 @@ export class MyKeyboardControls {
                 
 
             }
-            spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
 
 
         };
@@ -124,16 +124,22 @@ export class MyKeyboardControls {
             }
         }
 
-        const connect = () => {
+         /**
+         * Listener für 'keydown' und 'keyup' werden gesetzet
+         */
+          this.connect = () => {
             this.domElement.addEventListener('keydown', onKeyDown),
             this.domElement.addEventListener('keyup', onKeyUp)
-            console.log("keyboard controls connected")
+            // console.log("MyKeyboardControls.connect: Tastatursteuerung connected")
         };
 
+        /**
+         * Listener für 'keydown' und 'keyup' werden entfernt
+         */
         this.disconnect = () => {
             this.domElement.removeEventListener('keydown', onKeyDown),
             this.domElement.removeEventListener('keyup', onKeyUp)
-            console.log("keyboard controls disconnected")
+            // console.log("MyKeyboardControls.disconnect: Tastatursteuerung disconnected")
         };
 
         const collisionDetection = (blickVektor:any, originPoint: any) => {
@@ -236,7 +242,11 @@ export class MyKeyboardControls {
             if ((this.moveLeft&& linksCollision ) || (this.moveRight&& rechtsCollision ))
                 velocity.x += direction.x * speed * delta;
 
+            //Wenn der Spieler keine Geschwindikeit mehr => er nicht mehr am Laufen ist
+            if (velocity.x != 0 && velocity.z != 0 && velocity.y){
+                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+            }
+
         };
-        connect();
     }
 }

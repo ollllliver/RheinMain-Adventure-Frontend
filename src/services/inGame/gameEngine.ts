@@ -211,16 +211,37 @@ const initInteractions = () => {
     interaktionText = document.getElementById("interaktionText");
 }
 
-const connect = () => {
-    window.addEventListener('click', mouseControls.lock); //locked die Maus
+/**
+ * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
+ */
+ const connect = () => {
+    window.addEventListener('click', mouseControls.lock); //locked die Maus     
+        keyControls.connect();
+        mouseControls.connect();
+        console.log("gameEninge.connect: verbunden")
+
+        const pauseFenster = document.getElementById('pause');
+        if (pauseFenster != null){ pauseFenster.style.display = "none";}
 }
 
+/**
+ * Trennt die Verbindung zu den Eingabe-Controllern und öffnet das Spielunterbrechungsfenster
+ */
 const disconnect = () => {
+    disconnectController();
+    interactions.disconnect();
+    //unsubscribeChat();
+    window.removeEventListener('click', mouseControls.lock);
+    console.log("gameEninge.disconnect: getrennt")
+}
+
+const disconnectController = () => {
+
     mouseControls.dispose();
     keyControls.disconnect();
-    interactions.disconnect();
-    window.removeEventListener('click', mouseControls.lock);
-    console.log("Müsste disconnected sein")
+
+    const pauseFenster = document.getElementById('pause');
+    if (pauseFenster != null){ pauseFenster.style.display = "";}
 }
 
 const initPlane = () => {
@@ -349,7 +370,7 @@ export function useGameEngine() {
         initControls,
         initInteractions,
         doAnimate,
-        connect, disconnect,
+        connect, disconnect, disconnectController,
         setContainer,
         scene
     }
