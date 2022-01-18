@@ -34,7 +34,7 @@ const minimapWidth = 250;
 const minimapHeight = 250;
 const minimapZoom = 30;
 let minimapCamera: any;
-let minimapDot: any;
+let minimapMarker: any;
 let developerCamera: any;
 let controls: any;
 
@@ -185,9 +185,9 @@ const initCamera = () => {
         // roter Punkt auf Karte
         const geometry = new Three.SphereGeometry(0.01, 15, 15);
         const material = new Three.MeshBasicMaterial( { color: new Three.Color("rgb(255, 0, 0)") } );
-        minimapDot = new Three.Mesh( geometry, material );
-        minimapDot.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
-        scene.add(minimapDot);
+        minimapMarker = new Three.Mesh( geometry, material );
+        minimapMarker.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
+        scene.add(minimapMarker);
     }
 
     // Kamera Collision objekt init
@@ -326,17 +326,32 @@ const doAnimate = () => {
     }
 
     if(minimap){
-        // Haupt-Ansicht
+        // Hauptansicht:
+
+        // Render-Einstellungen der Hauptansicht
         renderer.setClearColor(0x000000, 0);
         renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.render(scene, camera);
 
-        // Minimap-Ansicht
+
+
+        // Minimapansicht:
+
+        // aktualisiere Position der Karte
         minimapCamera.position.set(spieler.position.x, minimapZoom, spieler.position.z);
-        //minimapCamera.rotation.set(minimapCamera.rotation.x, minimapCamera.rotation.y, camera.rotation.z);
 
-        minimapDot.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
+        // aktualisiere Rotation der Karte
+        const vector = new Three.Vector3();
+        vector.setFromMatrixColumn(camera.matrix, 0);
+        vector.crossVectors(camera.up, vector);
+        const spher = new Three.Spherical();
+        spher.setFromVector3(vector);
+        minimapCamera.rotation.set(minimapCamera.rotation.x, minimapCamera.rotation.y, spher.theta + Math.PI);
 
+        // aktualisiere Position des Markers
+        minimapMarker.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
+
+        // Render-Einstellungen der Minimapansicht
         renderer.clearDepth();
         renderer.setScissorTest(true);
         renderer.setScissor(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
