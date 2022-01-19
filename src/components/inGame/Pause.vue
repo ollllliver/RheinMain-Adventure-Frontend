@@ -7,7 +7,7 @@
             <div class="fenster__bottom">
                 <button class="button" @click="weiter">Weiter</button><br>
                 <button class="button" @click="verlassen">Verlassen</button><br>
-                <button class="button" @click="einstellungen">Einstellungen</button>
+                <!-- <button class="button" @click="einstellungen">Einstellungen</button> -->
             </div>
     </div>
 
