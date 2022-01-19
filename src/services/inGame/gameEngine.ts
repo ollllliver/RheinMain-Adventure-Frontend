@@ -29,6 +29,12 @@ const loader = new GraphicLoader();
 const collidableList: Array<any> = [];
 const interactableList: Array<any> = [];
 const developer = false;
+const minimap = true;
+const minimapWidth = 250;
+const minimapHeight = 250;
+const minimapCamYPos = 30;
+let minimapCamera: any;
+let minimapMarker: any;
 let developerCamera: any;
 let controls: any;
 let requestID: number;
@@ -177,6 +183,23 @@ const initCamera = () => {
 
     }
 
+    // Minimap Kamera
+    if(minimap){
+        // initialisiere Kamera der Minimap
+        minimapCamera = new Three.OrthographicCamera();
+        minimapCamera.layers.enable(1);
+        minimapCamera.zoom = 0.1;
+        minimapCamera.position.set(spieler.eigenschaften.position.x, minimapCamYPos, spieler.eigenschaften.position.z);
+        minimapCamera.lookAt(new Three.Vector3(0, 0, 0));
+        minimapCamera.updateProjectionMatrix();
+
+        // initialisiere roten Punkt auf der Minimap
+        const geometry = new Three.SphereGeometry(0.5, 15, 15);
+        const material = new Three.MeshBasicMaterial( { color: new Three.Color("rgb(255, 0, 0)") } );
+        minimapMarker = new Three.Mesh( geometry, material );
+        minimapMarker.layers.set(1);
+        scene.add(minimapMarker);
+    }
 
     // Kamera Collision objekt init
 
@@ -336,13 +359,56 @@ const doAnimate = () => {
         renderer.render(scene, camera);
     }
 
+    if(minimap){
+        // Hauptansicht:
+
+        // Render-Einstellungen der Hauptansicht
+        renderer.setClearColor(0x000000, 0);
+        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+        renderer.render(scene, camera);
+
+
+
+        // Minimapansicht:
+
+        // aktualisiere Position der Karte
+        minimapCamera.position.set(spieler.eigenschaften.position.x, minimapCamYPos, spieler.eigenschaften.position.z);
+
+        // aktualisiere Rotation der Karte
+        const vector = new Three.Vector3();
+        vector.setFromMatrixColumn(camera.matrix, 0);
+        vector.crossVectors(camera.up, vector);
+        const spher = new Three.Spherical();
+        spher.setFromVector3(vector);
+        minimapCamera.rotation.set(minimapCamera.rotation.x, minimapCamera.rotation.y, spher.theta + Math.PI);
+
+        // aktualisiere Position des Markers
+        minimapMarker.position.set(spieler.eigenschaften.position.x, minimapCamYPos - 1, spieler.eigenschaften.position.z);
+
+        // Minimap Hintergrund (Outline)
+        renderer.setScissorTest( true );
+        renderer.setScissor(window.innerWidth - minimapWidth - 30 - 3, 30 - 3, minimapWidth + 6, minimapHeight + 6);
+        renderer.setClearColor( new Three.Color("rgb(50, 50, 50)"), 1 ); // Outline-Farbe
+        renderer.clearColor();
+
+        // Render-Einstellungen der Minimapansicht
+        renderer.clearDepth();
+        renderer.setScissorTest(true);
+        renderer.setScissor(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
+        renderer.setViewport(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
+        renderer.setClearColor(0x000000, 1);
+
+        renderer.render(scene, minimapCamera);
+
+        renderer.setScissorTest(false);
+    }else{
+        renderer.render(scene, camera);
+    }
 
     //wohin damit?
     spieler.eigenschaften.position.x = camera.position.x.toFixed(2);
     spieler.eigenschaften.position.y = camera.position.y.toFixed(2);
     spieler.eigenschaften.position.z = camera.position.z.toFixed(2);
-
-    renderer.render(scene, camera);
 
 };
 
