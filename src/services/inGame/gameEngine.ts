@@ -116,12 +116,10 @@ const initLoader = () => {
             fetch(`/api/level/` + mobiliarId, {
                 method: 'GET',
             }).then((response) => {
-                return response.text();
+                return response.json();
             }).then((URLPfad) => {
-                URLPfad = URLPfad.replace('"', '');
-                console.log(URLPfad)
-                console.log('/' + URLPfad)
-                loader.ladeDatei('http://localhost:8080/' + URLPfad).then((res: any) => {
+
+                loader.ladeDatei(URLPfad.gltfPfad).then((res: any) => {
 
                     // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
                     res.scene.position.x = positionsSkalierungsfaktor * posX
