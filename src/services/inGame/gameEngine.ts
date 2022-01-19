@@ -178,11 +178,12 @@ const initCamera = () => {
 
     // Minimap Kamera
     if(minimap){
+        // initialisiere Kamera der Minimap
         minimapCamera = new Three.PerspectiveCamera();
         minimapCamera.position.set(spieler.position.x, minimapZoom, spieler.position.z);
         minimapCamera.lookAt(new Three.Vector3(0, 0, 0));
 
-        // roter Punkt auf Karte
+        // initialisiere roten Punkt auf der Minimap
         const geometry = new Three.SphereGeometry(0.01, 15, 15);
         const material = new Three.MeshBasicMaterial( { color: new Three.Color("rgb(255, 0, 0)") } );
         minimapMarker = new Three.Mesh( geometry, material );
@@ -351,12 +352,18 @@ const doAnimate = () => {
         // aktualisiere Position des Markers
         minimapMarker.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
 
+        // Minimap Hintergrund (Outline)
+        renderer.setScissorTest( true );
+        renderer.setScissor(window.innerWidth - minimapWidth - 30 - 3, 30 - 3, minimapWidth + 6, minimapHeight + 6);
+        renderer.setClearColor( new Three.Color("rgb(50, 50, 50)"), 1 ); // Outline-Farbe
+        renderer.clearColor();
+
         // Render-Einstellungen der Minimapansicht
         renderer.clearDepth();
         renderer.setScissorTest(true);
         renderer.setScissor(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
         renderer.setViewport(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
-        renderer.setClearColor(0x222222, 1);
+        renderer.setClearColor(0x000000, 1);
 
         renderer.render(scene, minimapCamera);
 
