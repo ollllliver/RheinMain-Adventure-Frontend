@@ -29,8 +29,16 @@ const loader = new GraphicLoader();
 const collidableList: Array<any> = [];
 const interactableList: Array<any> = [];
 const developer = false;
+const minimap = true;
+const minimapWidth = 250;
+const minimapHeight = 250;
+const minimapCamYPos = 30;
+let minimapCamera: any;
+let minimapMarker: any;
 let developerCamera: any;
 let controls: any;
+let requestID: number;
+
 
 let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
@@ -70,13 +78,14 @@ const initScene = () => {
  * Initialisiert Loader Klasse, lädt Raum
  */
 const initLoader = () => {
+    const positionsSkalierungsfaktor = 4;
 
     // TODO: Level-ID dynamisch bestimmen
 
     // const { lobbystate } = useLobbyStore()
     // const levelId : string = lobbystate.levelID
 
-    fetch(`http://${window.location.hostname}:3000/api/level/1/0`, {
+    fetch(`/api/level/1/0`, {
         method: 'GET',
     }).then((response) => {
         if (!response.ok) {
@@ -88,14 +97,13 @@ const initLoader = () => {
     }).then((RaumMobiliarListe) => {
         console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.")
         RaumMobiliarListe.forEach(function (raumMobiliar) {
-            console.log(raumMobiliar);
             const posX = raumMobiliar.positionX;
             const posY = raumMobiliar.positionY;
 
             // Startposition ermitteln und hier festlegen. Ginge auch per fetch auf
             // /api/level/startposition/{levelID}/{raumindex}, so ist es aber stabiler und schneller
             if (raumMobiliar.mobiliar.mobiliartyp == "EINGANG") {
-                startPosition = new Position(posX, spieler.height * 3, posY);
+                startPosition = new Position(positionsSkalierungsfaktor * posX, spieler.height * 3, positionsSkalierungsfaktor * posY);
             }
 
             // Idee von Olli:
@@ -103,22 +111,36 @@ const initLoader = () => {
             // Davor müsste man zu begin ein Set des Mobiliars erstellen
 
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
-            console.log("GLTF-Datei für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
-            loader.ladeDatei(`http://${window.location.hostname}:3000/api/level/` + mobiliarId).then((res: any) => {
+            console.log("GLTF-URL für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
 
-                // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
-                res.scene.position.x = 4 * posX
-                res.scene.position.z = 4 * posY
-                collidableList.push(res.scene)
+            fetch(`/api/level/` + mobiliarId, {
+                method: 'GET',
+            }).then((response) => {
+                return response.json();
+            }).then((URLPfad) => {
 
-                // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
-                if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
-                    res.scene.children[0].name = raumMobiliar.mobiliar.name;
-                    interactableList.push(res.scene);
-                }
+                loader.ladeDatei(URLPfad.gltfPfad).then((res: any) => {
 
-                scene.add(res.scene)
-            });
+                    // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
+                    res.scene.position.x = positionsSkalierungsfaktor * posX
+                    res.scene.position.z = positionsSkalierungsfaktor * posY
+                    collidableList.push(res.scene)
+
+                    // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
+                    if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
+                        res.scene.children[0].name = raumMobiliar.mobiliar.name;
+                        if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
+                            //Tür und Schlüssel bestehen aus mehreren Objekten,
+                            //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
+                            interactableList.push(res.scene.children[0]);
+                        } else {
+                            interactableList.push(res.scene);
+                        }
+                    }
+                    scene.add(res.scene)
+                });
+            })
+
         });
         console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
 
@@ -132,8 +154,8 @@ const initLoader = () => {
 
                     scene.add(objektInScene)
 
-                    objektInScene.position.x = 1 * startPosition.x;
-                    objektInScene.position.z = 1 * startPosition.z;
+                    objektInScene.position.x = positionsSkalierungsfaktor * startPosition.x;
+                    objektInScene.position.z = positionsSkalierungsfaktor * startPosition.z;
 
                     mitspieler3dObjektListe.set(spieler.name, objektInScene);
                 });
@@ -170,6 +192,23 @@ const initCamera = () => {
 
     }
 
+    // Minimap Kamera
+    if(minimap){
+        // initialisiere Kamera der Minimap
+        minimapCamera = new Three.OrthographicCamera();
+        minimapCamera.layers.enable(1);
+        minimapCamera.zoom = 0.1;
+        minimapCamera.position.set(spieler.eigenschaften.position.x, minimapCamYPos, spieler.eigenschaften.position.z);
+        minimapCamera.lookAt(new Three.Vector3(0, 0, 0));
+        minimapCamera.updateProjectionMatrix();
+
+        // initialisiere roten Punkt auf der Minimap
+        const geometry = new Three.SphereGeometry(0.5, 15, 15);
+        const material = new Three.MeshBasicMaterial( { color: new Three.Color("rgb(255, 0, 0)") } );
+        minimapMarker = new Three.Mesh( geometry, material );
+        minimapMarker.layers.set(1);
+        scene.add(minimapMarker);
+    }
 
     // Kamera Collision objekt init
 
@@ -211,16 +250,43 @@ const initInteractions = () => {
     interaktionText = document.getElementById("interaktionText");
 }
 
+/**
+ * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
+ */
 const connect = () => {
-    window.addEventListener('click', mouseControls.lock); //locked die Maus
+    window.addEventListener('click', mouseControls.lock); //locked die Maus     
+    keyControls.connect();
+    mouseControls.connect();
+    console.log("gameEninge.connect: verbunden")
+
+    const pauseFenster = document.getElementById('pause');
+    if (pauseFenster != null) {
+        pauseFenster.style.display = "none";
+    }
 }
 
-const disconnect = () => {
+/**
+ *  und öffnet das Spielunterbrechungsfenster
+ */
+const disconnect = () => { //nur aufrufen wenn man die Seite verlässt
+    disconnectController();
+    interactions.disconnect();
+    //unsubscribeChat();
+    window.removeEventListener('click', mouseControls.lock);
+    console.log("gameEninge.disconnect: getrennt")
+}
+/**
+ * Trennt die Verbindung zu den Eingabe-Controllern (Maus und Tastatursteuerung)
+ */
+const disconnectController = () => { //Getrennt von disconnect, da man die interactions sonst verliert
+
     mouseControls.dispose();
     keyControls.disconnect();
-    interactions.disconnect();
-    window.removeEventListener('click', mouseControls.lock);
-    console.log("Müsste disconnected sein")
+
+    const pauseFenster = document.getElementById('pause');
+    if (pauseFenster != null) {
+        pauseFenster.style.display = "";
+    }
 }
 
 const initPlane = () => {
@@ -306,15 +372,68 @@ const doAnimate = () => {
         renderer.render(scene, camera);
     }
 
+    if(minimap){
+        // Hauptansicht:
+
+        // Render-Einstellungen der Hauptansicht
+        renderer.setClearColor(0x000000, 0);
+        renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+        renderer.render(scene, camera);
+
+
+
+        // Minimapansicht:
+
+        // aktualisiere Position der Karte
+        minimapCamera.position.set(spieler.eigenschaften.position.x, minimapCamYPos, spieler.eigenschaften.position.z);
+
+        // aktualisiere Rotation der Karte
+        const vector = new Three.Vector3();
+        vector.setFromMatrixColumn(camera.matrix, 0);
+        vector.crossVectors(camera.up, vector);
+        const spher = new Three.Spherical();
+        spher.setFromVector3(vector);
+        minimapCamera.rotation.set(minimapCamera.rotation.x, minimapCamera.rotation.y, spher.theta + Math.PI);
+
+        // aktualisiere Position des Markers
+        minimapMarker.position.set(spieler.eigenschaften.position.x, minimapCamYPos - 1, spieler.eigenschaften.position.z);
+
+        // Minimap Hintergrund (Outline)
+        renderer.setScissorTest( true );
+        renderer.setScissor(window.innerWidth - minimapWidth - 30 - 3, 30 - 3, minimapWidth + 6, minimapHeight + 6);
+        renderer.setClearColor( new Three.Color("rgb(50, 50, 50)"), 1 ); // Outline-Farbe
+        renderer.clearColor();
+
+        // Render-Einstellungen der Minimapansicht
+        renderer.clearDepth();
+        renderer.setScissorTest(true);
+        renderer.setScissor(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
+        renderer.setViewport(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
+        renderer.setClearColor(0x000000, 1);
+
+        renderer.render(scene, minimapCamera);
+
+        renderer.setScissorTest(false);
+    }else{
+        renderer.render(scene, camera);
+    }
 
     //wohin damit?
-    spieler.position.x = camera.position.x.toFixed(2);
-    spieler.position.y = camera.position.y.toFixed(2);
-    spieler.position.z = camera.position.z.toFixed(2);
-
-    renderer.render(scene, camera);
+    spieler.eigenschaften.position.x = camera.position.x.toFixed(2);
+    spieler.eigenschaften.position.y = camera.position.y.toFixed(2);
+    spieler.eigenschaften.position.z = camera.position.z.toFixed(2);
 
 };
+
+const stopAnimate = () => {
+    cancelAnimationFrame(requestID);
+    console.log("gameEngine.stopAnimate(): Animation erfolgreich gestoppt.");
+}
+
+const startAnimate = () => {
+    requestID = requestAnimationFrame(doAnimate);
+    doAnimate();
+}
 
 function zeigeInteraktionText(interaktion: any) {
     if (interaktionText != null /*&& interaktionText.style.display == "none"*/) {
@@ -330,6 +449,11 @@ function verbergeInteraktionText() {
     }
 }
 
+/**
+ * Setzt das Mitspieler 3d Objekt eines Mitspielers auf die richtige Position.
+ *
+ * @param spieler neu zu Positionierender Mitspieler.
+ */
 function setzeMitspielerAufPosition(spieler: Spieler) {
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
 
@@ -348,8 +472,9 @@ export function useGameEngine() {
         initRenderer,
         initControls,
         initInteractions,
-        doAnimate,
-        connect, disconnect,
+        startAnimate,
+        stopAnimate,
+        connect, disconnect, disconnectController,
         setContainer,
         scene
     }

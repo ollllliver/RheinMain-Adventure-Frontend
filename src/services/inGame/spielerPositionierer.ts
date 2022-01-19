@@ -2,7 +2,12 @@ import {Spieler } from '@/models/Spieler';
 import { Client } from '@stomp/stompjs';
 import { useLobbyStore } from '@/services/lobby/lobbyService';
 
-const wsurl = `ws://${window.location.hostname}:8080/gamebroker`;
+let wsurl;
+if (window.location.hostname == 'localhost') {
+    wsurl = `ws://${window.location.hostname}:8080/gamebroker`;
+}else{
+    wsurl = `wss://${window.location.hostname}/gamebroker`;
+}
 export const gamebrokerStompclient = new Client({ brokerURL: wsurl });
 const { lobbystate } = useLobbyStore();
 import userStore from '@/stores/user'
@@ -10,6 +15,11 @@ import { useGameEngine } from './gameEngine';
 
 const {setzeMitspielerAufPosition} = useGameEngine();
 
+/**
+ * Schribt sich bei STOMP auf das Topic /topic/spiel/{lobbyID} ein
+ * 
+ * @param stompclient 
+ */
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
     const DEST = "/topic/spiel/" + lobbystate.lobbyID;
     stompclient.onConnect = async () => {

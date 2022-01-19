@@ -6,7 +6,6 @@ export class Spieler {
     speed: number;
     jumpHeight: number;
     velocity: number;
-    position: Position;
     jumps: boolean;
     ducks: boolean;
     eigenschaften: {position: Position};
@@ -17,7 +16,6 @@ export class Spieler {
         this.speed = .1;
         this.jumpHeight = .2;
         this.velocity = 0;
-        this.position = { x:0, y:0, z:0 };
         this.jumps = false;
         this.ducks = false;
         this.eigenschaften = new SpielerEigenschaften;

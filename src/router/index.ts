@@ -4,6 +4,8 @@ import LobbyView from '@/views/LobbyView.vue'
 import Register from "@/views/Register.vue";
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
 import Editor from "@/views/Editor.vue";
+import AboutView from "@/views/AboutView.vue";
+import userStore from '@/stores/user'
 
 // Routen der Anwendung
 
@@ -28,14 +30,32 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/uebersicht',
         name: 'Lobbyuebersicht',
-        component: LobbyuebersichtView
+        component: LobbyuebersichtView,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                console.log(from);
+                console.log(to);
+                next('/')
+            }else{
+                next();
+            }
+        }
     },
 
     {
         path: '/lobby/:lobby_id',
         name: 'LobbyView',
         component: LobbyView,
-        props: true
+        props: true,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                console.log(from);
+                console.log(to);
+                next('/')
+            }else{
+                next();
+            }
+        }
     },
     {
         path: '/environment',
@@ -45,7 +65,22 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/editor',
         name: 'Editor',
-        component: Editor
+        component: Editor,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                console.log(from);
+                console.log(to);
+                next('/')
+            }else{
+                next();
+            }
+        }
+    },
+
+    {
+        path: '/about',
+        name: 'About',
+        component: AboutView
     }
 ]
 
