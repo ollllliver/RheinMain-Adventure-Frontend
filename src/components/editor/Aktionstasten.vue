@@ -12,8 +12,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { CommandStack } from "../../commands/CommandManager";
+import {defineComponent} from "vue";
+import {CommandStack} from "../../commands/CommandManager";
 import editorStore from "@/stores/editor";
 
 export default defineComponent({

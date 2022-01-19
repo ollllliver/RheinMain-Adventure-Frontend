@@ -116,7 +116,7 @@ const initLoader = () => {
                 // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
                 if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
                     res.scene.children[0].name = raumMobiliar.mobiliar.name;
-                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL'){
+                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
                         //Tür und Schlüssel bestehen aus mehreren Objekten,
                         //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
                         interactableList.push(res.scene.children[0]); 
@@ -338,9 +338,9 @@ const doAnimate = () => {
 
 
     //wohin damit?
-    spieler.position.x = camera.position.x.toFixed(2);
-    spieler.position.y = camera.position.y.toFixed(2);
-    spieler.position.z = camera.position.z.toFixed(2);
+    spieler.eigenschaften.position.x = camera.position.x.toFixed(2);
+    spieler.eigenschaften.position.y = camera.position.y.toFixed(2);
+    spieler.eigenschaften.position.z = camera.position.z.toFixed(2);
 
     renderer.render(scene, camera);
 
