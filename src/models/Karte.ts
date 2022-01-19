@@ -20,10 +20,10 @@ export class Karte {
 
 
       // Liste wird erstellt -> testweise 14 Reihen und 22 Spalten (müssen wir dann klären wie groß eine Karte ist)
-      
+
       for (let i = 0; i < 14; i++) {
         for (let j = 0; j < 22; j++) {
-          if(liste === null) {
+          if(liste[i][j] === null) {
             this.levelInhalt[i][j] = {y: i, x: j, e: 0}
           }
           else {
@@ -32,7 +32,7 @@ export class Karte {
         }
       }
   }
-
+  
 
   // liefert aktuelle Liste als zweidimensionales Array zurück
   public get liste():any[][] {
@@ -63,6 +63,14 @@ export class Karte {
     return true;
   }
 
+  public setLevelName(levelname : string) {
+    this.levelName = levelname
+  }
+
+  public setLevelBeschreibung(beschreibung : string) {
+    this.levelBeschreibung = beschreibung
+  }
+
   public wandleKarteZuInt() {
     for (let i = 0; i < 14; i++) {
       for (let j = 0; j < 22; j++) {
@@ -70,5 +78,15 @@ export class Karte {
       }
     }
   }
+
+  public wandleKarteZuObjekt() {
+    for (let i = 0; i < 14; i++) {
+      for (let j = 0; j < 22; j++) {
+         this.levelInhalt[i][j] = {y: i, x: j, e: this.levelInhalt[i][j]}
+      }
+    }
+  }
+
+  
 
 }

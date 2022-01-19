@@ -35,10 +35,11 @@ export default defineComponent({
     var liste: any[][];
     karte = editorStore.getters.getGrid;
     liste = karte.liste;
-    
+    let neu = true
     onMounted(() => {
       
-      console.log("mounted editor",liste)
+        CommandStack.getInstance().reset()
+      
       //if(editorStore.getters.getLevelName !== "") {
         // aktuelle Liste von db
         // durch liste iterieren und grid fuellen wenn bearbeitet
@@ -53,30 +54,37 @@ export default defineComponent({
             switch (liste[y][x].e) {
               case 1:
                 element.style.backgroundColor = "#ffd39bBF"
+                neu = false
                 break;
               case 2:
                 editorStore.start(true)
                 element.style.backgroundColor = "#25bb1fA6"
+                neu = false
                 break;
               case 3:
                 editorStore.ziel(true)
                 element.style.backgroundColor = "#131ec4A6"
+                neu = false
                 break;
               case 4:
                 editorStore.setzeSchluessel(1)
                 element.style.background = "no-repeat center url('../img/schluessel.png') rgba(255,211,155, 0.75)"
+                neu = false
                 break;
               case 5:
                 editorStore.setzeNpc(1)
                 element.style.background = "no-repeat center url('../img/npc.png') rgba(255,211,155, 0.75)"
+                neu = false
                 break;
               case 6:
                 editorStore.setzeTuer(1)
                 element.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)"
+                neu = false
                 break;
               case 7: 
                 editorStore.setzeTuer(1)
                 element.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)"
+                neu = false
                 break;
             }
           }

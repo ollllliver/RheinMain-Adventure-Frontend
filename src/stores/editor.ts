@@ -187,6 +187,7 @@ const actions = {
     state.schluessel = 0,
     state.tuer = 0,
     state.npc = 0
+    state.stackindex = 0
   },
   async setzeLevel(level: Karte) {
      karte = level

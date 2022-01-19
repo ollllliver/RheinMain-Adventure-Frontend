@@ -46,10 +46,9 @@ export default defineComponent({
             editorStore.info('Jede Karte benötigt mindestens 1 Raum. Bitte platziere erst einen Raum bevor du die Karte zur Prüfung einreichst.')
           }
           */
-          if (editorStore.getters.getSchluessel > editorStore.getters.getTuer) {
+          if (editorStore.getters.getSchluessel >= editorStore.getters.getTuer) {
             editorStore.info("Karte wird eingereicht. Schluessel=" + editorStore.getters.getSchluessel + " Tueren=" + editorStore.getters.getTuer);
             editorStore.getters.getGrid.wandleKarteZuInt()
-            
             const pojo = editorStore.getters.getGrid
             console.log("sende", editorStore.getters.getGrid)
             fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+editorStore.getters.getGrid._levelID+"/0", {
@@ -65,7 +64,9 @@ export default defineComponent({
                 }),
             }).then(function (res) {
               console.log("LEVEL GESPEICHERT");
-              console.log(res);
+              editorStore.getters.getGrid.wandleKarteZuObjekt()
+              console.log(editorStore.getters.getGrid.liste);
+              editorStore.default()
               router.push("/editoruebersicht")
             });
           } else {

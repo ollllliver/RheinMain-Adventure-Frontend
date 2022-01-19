@@ -3,7 +3,7 @@
   <div class="container" style="max-width: 600px">
     <div class="d-flex mt-5">
       <input
-        v-model="karte"
+        v-model="levelname"
         type="text"
         placeholder="Levelname"
         class="form-control"
@@ -84,7 +84,7 @@ export default defineComponent({
     
     return {
 
-      karte: '',
+      levelname: '',
       bearbeiteterName: null,
       bearbeiteteBeschreibung: null,
       kbeschreibung: '',
@@ -120,26 +120,24 @@ export default defineComponent({
         this.bearbeiteteBeschreibung=null;
       }
       /* Leere Felder angezeigt bekommen */
-      this.karte='';
+      this.levelname='';
       this.kbeschreibung='';
     },
     /* Name und Beschreibung löschen */
     loescheKarte(levelId){
       console.log(levelId)
       
-      // fetch("/api/level/loeschen/"+levelId, {
-      //   method: "DELETE",
-      // })
-      // .then(async res => {
-      //   const geloeschteKarte = await res.json()
-      //   this.karten.pop(geloeschteKarte.levelId)
-      //   const delIndex = this.karten.indexOf(geloeschteKarte)
-      //   this.karten.splice((delIndex), 1);
-      //   console.log(this.karten)
-      // })
-      // .catch((err => {
-      //   console.log(err)
-      // }));
+      fetch("/api/level/"+levelId, {
+        method: "DELETE",
+      })
+      .then(res => {
+        console.log(res)
+        
+        console.log(this.karten)
+      })
+      .catch((err => {
+        console.log(err)
+      }));
     },
     /* Name und Beschreibung ändern */
     bearbeiteName(index){
@@ -152,14 +150,24 @@ export default defineComponent({
     
     
     ladeKarte(levelId){
+      
       fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+levelId+"/0", {
         method: "GET",
       })
       .then(async res => {
         const erwartet = await res.json()
         console.log("bekommen", erwartet)
-        editorStore.setzeLevel(new Karte(erwartet.levelID,
-          erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung, erwartet.levelInhalt))
+        if (erwartet.levelName === "") {
+          erwartet.levelName = this.levelname
+        }
+        if (erwartet.levelBeschreibung === "") {
+          erwartet.levelBeschreibung = this.kbeschreibung
+        }
+
+        const aktuellesLevel = new Karte(erwartet.levelID,
+          erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung, erwartet.levelInhalt)
+        editorStore.setzeLevel(aktuellesLevel)
+        console.log("gesetzt:" ,editorStore.getters.getGrid)
           router.push("/editor")
       })
       .catch((err => {
