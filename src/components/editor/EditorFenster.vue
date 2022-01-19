@@ -38,7 +38,8 @@ export default defineComponent({
     
     onMounted(() => {
       
-      if(editorStore.getters.getLevelName !== "") {
+      console.log("mounted editor",liste)
+      //if(editorStore.getters.getLevelName !== "") {
         // aktuelle Liste von db
         // durch liste iterieren und grid fuellen wenn bearbeitet
         
@@ -48,6 +49,7 @@ export default defineComponent({
           for(let x = 0; x < 22; x++) {
             let spalte = reihe[y].getElementsByClassName("element")
             let element = spalte[x] as HTMLDivElement
+
             switch (liste[y][x].e) {
               case 1:
                 element.style.backgroundColor = "#ffd39bBF"
@@ -79,7 +81,7 @@ export default defineComponent({
             }
           }
         }
-      }    
+      //}    
       console.log(liste);
     });
 
@@ -188,7 +190,11 @@ export default defineComponent({
           }
         }
         if (!editorStore.getters.getEntfernen) {
+          
           let storeElement = liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e;
+          console.log(event.target.__vnode.key.y)
+          console.log(event.target.__vnode.key.x)
+
           if (storeElement === 0) {
             CommandStack.getInstance().execAndPush(
               new ElementHinzufuegenCommand(

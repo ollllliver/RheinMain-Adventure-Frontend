@@ -14,7 +14,7 @@
         placeholder="Kurzbeschreibung"
         class="form-control"
       />
-      <button @click="submitName" class="btn btn-warning rounded-0">neues Level hinzufuegen</button>
+      <button @click="ladeKarte(-1)" class="btn btn-warning rounded-0" >neues Level hinzufuegen</button>
     </div>
 
     <!-- Tabelle -->
@@ -55,6 +55,8 @@
 import userStore from "@/stores/user"
 import editorStore from "@/stores/editor"
 import { defineComponent, onMounted } from "vue";
+import { Karte } from "@/models/Karte";
+import router from "@/router";
 export default defineComponent({
   name: "Karten",
   data() {
@@ -147,13 +149,18 @@ export default defineComponent({
       this.bearbeiteteBeschreibung=index;
 
     },
+    
+    
     ladeKarte(levelId){
-      fetch("/api/level/bearbeiten/"+levelId, {
+      fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+levelId+"/0", {
         method: "GET",
       })
       .then(async res => {
-        const erwarteteKarte = await res.json()
-        editorStore.setzeLevel = erwarteteKarte
+        const erwartet = await res.json()
+        console.log("bekommen", erwartet)
+        editorStore.setzeLevel(new Karte(erwartet.levelID,
+          erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung, erwartet.levelInhalt))
+          router.push("/editor")
       })
       .catch((err => {
         console.log(err)

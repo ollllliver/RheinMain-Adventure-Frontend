@@ -20,8 +20,8 @@ import { Karte } from '@/models/Karte';
 
 const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
 const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tuer ist horizontal."
-const karte = new Karte();
-const bearbeiteLevel: any[][] = []
+let karte: Karte
+
 const state = reactive({
   wegbeschreibung: 0,
   aktiv: false,
@@ -35,8 +35,6 @@ const state = reactive({
   npc: 0,
   entfernen: false,
   stackindex: 0,
-  levelName: "",
-  bearbeiteLevel: bearbeiteLevel
 })
 
 /**
@@ -82,9 +80,6 @@ const getters = reactive({
   getStackindex: computed(() => {
     return state.stackindex
   }),
-  getLevelName: computed(() => {
-    return state.levelName
-  })
 })
 
 /**
@@ -181,9 +176,6 @@ const actions = {
   async entfernen(gesetzt: boolean) {
     state.entfernen = gesetzt
   },
-  async setzeLevelName(gesetzt: string) {
-    state.levelName = gesetzt
-  },
   async default() {
     state.wegbeschreibung = 0,
     state.aktiv = false,
@@ -194,11 +186,10 @@ const actions = {
     state.ausrichtung = 0,
     state.schluessel = 0,
     state.tuer = 0,
-    state.npc = 0,
-    state.levelName = ""
+    state.npc = 0
   },
-  async setzeLevel(level: any[][]) {
-     state.bearbeiteLevel = level
+  async setzeLevel(level: Karte) {
+     karte = level
   }
 }
 
