@@ -32,7 +32,7 @@ const developer = false;
 const minimap = true;
 const minimapWidth = 250;
 const minimapHeight = 250;
-const minimapZoom = 30;
+const minimapCamYPos = 30;
 let minimapCamera: any;
 let minimapMarker: any;
 let developerCamera: any;
@@ -179,15 +179,18 @@ const initCamera = () => {
     // Minimap Kamera
     if(minimap){
         // initialisiere Kamera der Minimap
-        minimapCamera = new Three.PerspectiveCamera();
-        minimapCamera.position.set(spieler.position.x, minimapZoom, spieler.position.z);
+        minimapCamera = new Three.OrthographicCamera();
+        minimapCamera.layers.enable(1);
+        minimapCamera.zoom = 0.1;
+        minimapCamera.position.set(spieler.position.x, minimapCamYPos, spieler.position.z);
         minimapCamera.lookAt(new Three.Vector3(0, 0, 0));
+        minimapCamera.updateProjectionMatrix();
 
         // initialisiere roten Punkt auf der Minimap
-        const geometry = new Three.SphereGeometry(0.01, 15, 15);
+        const geometry = new Three.SphereGeometry(0.5, 15, 15);
         const material = new Three.MeshBasicMaterial( { color: new Three.Color("rgb(255, 0, 0)") } );
         minimapMarker = new Three.Mesh( geometry, material );
-        minimapMarker.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
+        minimapMarker.layers.set(1);
         scene.add(minimapMarker);
     }
 
@@ -339,7 +342,7 @@ const doAnimate = () => {
         // Minimapansicht:
 
         // aktualisiere Position der Karte
-        minimapCamera.position.set(spieler.position.x, minimapZoom, spieler.position.z);
+        minimapCamera.position.set(spieler.position.x, minimapCamYPos, spieler.position.z);
 
         // aktualisiere Rotation der Karte
         const vector = new Three.Vector3();
@@ -350,7 +353,7 @@ const doAnimate = () => {
         minimapCamera.rotation.set(minimapCamera.rotation.x, minimapCamera.rotation.y, spher.theta + Math.PI);
 
         // aktualisiere Position des Markers
-        minimapMarker.position.set(spieler.position.x, minimapZoom - 0.5, spieler.position.z);
+        minimapMarker.position.set(spieler.position.x, minimapCamYPos - 1, spieler.position.z);
 
         // Minimap Hintergrund (Outline)
         renderer.setScissorTest( true );
