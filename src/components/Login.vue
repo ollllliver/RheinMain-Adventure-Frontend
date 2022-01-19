@@ -30,6 +30,7 @@
 import { defineComponent, reactive } from 'vue'
 import { SpielerLokal } from '@/models/SpielerLokal';
 import userStore from '@/stores/user'
+import router from "@/router"
 export default defineComponent({
   setup() {
     const form = reactive({
@@ -37,9 +38,17 @@ export default defineComponent({
       passwort: ''
     })
     const onSubmit = () => {
-      userStore.login(form.benutzername, form.passwort)
-      form.benutzername = ''
-      form.passwort = ''
+      userStore.login(form.benutzername, form.passwort).then(response => {
+        router.push('/')
+        //console.log("Benutzer "+ form.benutzername + " erfolgreich eingeloggt.");
+        
+      }).catch(error => {
+        //console.log(error.response)
+        //console.log("Benutzer "+ form.benutzername + " konnte nicht eingeloggt werden.");
+        form.benutzername = ''
+        form.passwort = ''
+      })
+      
     }
 
     return { form, userStore, onSubmit }
