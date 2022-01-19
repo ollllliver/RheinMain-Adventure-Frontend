@@ -78,7 +78,7 @@ const initLoader = () => {
     // const { lobbystate } = useLobbyStore()
     // const levelId : string = lobbystate.levelID
 
-    fetch(`http://${window.location.hostname}:3000/api/level/1/0`, {
+    fetch(`/api/level/1/0`, {
         method: 'GET',
     }).then((response) => {
         if (!response.ok) {
@@ -106,7 +106,7 @@ const initLoader = () => {
 
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
             console.log("GLTF-Datei für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
-            loader.ladeDatei(`http://${window.location.hostname}:3000/api/level/` + mobiliarId).then((res: any) => {
+            loader.ladeDatei(`/api/level/` + mobiliarId).then((res: any) => {
 
                 // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
                 res.scene.position.x = 4 * posX
@@ -116,7 +116,7 @@ const initLoader = () => {
                 // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
                 if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
                     res.scene.children[0].name = raumMobiliar.mobiliar.name;
-                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL'){
+                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
                         //Tür und Schlüssel bestehen aus mehreren Objekten,
                         //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
                         interactableList.push(res.scene.children[0]); 

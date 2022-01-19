@@ -12,8 +12,8 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { CommandStack } from "../../commands/CommandManager";
+import {defineComponent} from "vue";
+import {CommandStack} from "../../commands/CommandManager";
 import editorStore from "@/stores/editor";
 
 export default defineComponent({
@@ -48,7 +48,7 @@ export default defineComponent({
             editorStore.info("Karte wird eingereicht. Schluessel=" + editorStore.getters.getSchluessel + " Tueren=" + editorStore.getters.getTuer);
             console.log(editorStore.getters.getGrid);
             let n = Math.floor(Math.random() * 120);
-            fetch("http://localhost:8080/api/level", {
+            fetch("/api/level", {
               method: "PUT",
               headers: {
                 Accept: "application/json",
