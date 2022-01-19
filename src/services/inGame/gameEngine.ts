@@ -338,9 +338,9 @@ const doAnimate = () => {
 
 
     //wohin damit?
-    spieler.position.x = camera.position.x.toFixed(2);
-    spieler.position.y = camera.position.y.toFixed(2);
-    spieler.position.z = camera.position.z.toFixed(2);
+    spieler.eigenschaften.position.x = camera.position.x.toFixed(2);
+    spieler.eigenschaften.position.y = camera.position.y.toFixed(2);
+    spieler.eigenschaften.position.z = camera.position.z.toFixed(2);
 
     renderer.render(scene, camera);
 

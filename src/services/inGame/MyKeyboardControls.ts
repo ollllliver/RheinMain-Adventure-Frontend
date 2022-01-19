@@ -244,7 +244,7 @@ export class MyKeyboardControls {
 
             //Wenn der Spieler keine Geschwindikeit mehr => er nicht mehr am Laufen ist
             if (velocity.x != 0 || velocity.z != 0 || velocity.y !=0){
-                spieler.updatePosition(spieler.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
+                spieler.updatePosition(spieler.eigenschaften.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
 
         };
