@@ -21,6 +21,11 @@ export class SpielerLokal extends Spieler{
         console.log(`SpielerLokal: name=${this.name}, `)
     }
 
+    /**
+     * Sendet eine neue Position für seinen eigenen Spieler an das Backend.
+     * 
+     * @param position seine eigene neue Position.
+     */
     async updatePosition (position: Position) {
         const DEST_POS = "/topic/spiel/" + this.lobbyID + '/pos/' + this.name;
         this.stompclient.publish({destination: DEST_POS, body: JSON.stringify(position), skipContentLengthHeader: true,});
