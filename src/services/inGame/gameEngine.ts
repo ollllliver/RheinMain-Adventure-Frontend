@@ -72,6 +72,7 @@ const initScene = () => {
  * Initialisiert Loader Klasse, lädt Raum
  */
 const initLoader = () => {
+    const positionsSkalierungsfaktor = 4;
 
     // TODO: Level-ID dynamisch bestimmen
 
@@ -90,14 +91,13 @@ const initLoader = () => {
     }).then((RaumMobiliarListe) => {
         console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.")
         RaumMobiliarListe.forEach(function (raumMobiliar) {
-            console.log(raumMobiliar);
             const posX = raumMobiliar.positionX;
             const posY = raumMobiliar.positionY;
 
             // Startposition ermitteln und hier festlegen. Ginge auch per fetch auf
             // /api/level/startposition/{levelID}/{raumindex}, so ist es aber stabiler und schneller
             if (raumMobiliar.mobiliar.mobiliartyp == "EINGANG") {
-                startPosition = new Position(posX, spieler.height * 3, posY);
+                startPosition = new Position(positionsSkalierungsfaktor * posX, spieler.height * 3, positionsSkalierungsfaktor * posY);
             }
 
             // Idee von Olli:
@@ -105,27 +105,38 @@ const initLoader = () => {
             // Davor müsste man zu begin ein Set des Mobiliars erstellen
 
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
-            console.log("GLTF-Datei für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
-            loader.ladeDatei(`/api/level/` + mobiliarId).then((res: any) => {
+            console.log("GLTF-URL für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
 
-                // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
-                res.scene.position.x = 4 * posX
-                res.scene.position.z = 4 * posY
-                collidableList.push(res.scene)
+            fetch(`/api/level/` + mobiliarId, {
+                method: 'GET',
+            }).then((response) => {
+                return response.text();
+            }).then((URLPfad) => {
+                URLPfad = URLPfad.replace('"', '');
+                console.log(URLPfad)
+                console.log('/' + URLPfad)
+                loader.ladeDatei('http://localhost:8080/' + URLPfad).then((res: any) => {
 
-                // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
-                if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
-                    res.scene.children[0].name = raumMobiliar.mobiliar.name;
-                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
-                        //Tür und Schlüssel bestehen aus mehreren Objekten,
-                        //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
-                        interactableList.push(res.scene.children[0]); 
-                    } else {
-                        interactableList.push(res.scene);
+                    // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
+                    res.scene.position.x = positionsSkalierungsfaktor * posX
+                    res.scene.position.z = positionsSkalierungsfaktor * posY
+                    collidableList.push(res.scene)
+
+                    // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
+                    if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
+                        res.scene.children[0].name = raumMobiliar.mobiliar.name;
+                        if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
+                            //Tür und Schlüssel bestehen aus mehreren Objekten,
+                            //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
+                            interactableList.push(res.scene.children[0]);
+                        } else {
+                            interactableList.push(res.scene);
+                        }
                     }
-                }
-                scene.add(res.scene)
-            });
+                    scene.add(res.scene)
+                });
+            })
+
         });
         console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
 
@@ -139,8 +150,8 @@ const initLoader = () => {
 
                     scene.add(objektInScene)
 
-                    objektInScene.position.x = 1 * startPosition.x;
-                    objektInScene.position.z = 1 * startPosition.z;
+                    objektInScene.position.x = positionsSkalierungsfaktor * startPosition.x;
+                    objektInScene.position.z = positionsSkalierungsfaktor * startPosition.z;
 
                     mitspieler3dObjektListe.set(spieler.name, objektInScene);
                 });
@@ -221,14 +232,16 @@ const initInteractions = () => {
 /**
  * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
  */
- const connect = () => {
+const connect = () => {
     window.addEventListener('click', mouseControls.lock); //locked die Maus     
-        keyControls.connect();
-        mouseControls.connect();
-        console.log("gameEninge.connect: verbunden")
+    keyControls.connect();
+    mouseControls.connect();
+    console.log("gameEninge.connect: verbunden")
 
-        const pauseFenster = document.getElementById('pause');
-        if (pauseFenster != null){ pauseFenster.style.display = "none";}
+    const pauseFenster = document.getElementById('pause');
+    if (pauseFenster != null) {
+        pauseFenster.style.display = "none";
+    }
 }
 
 /**
@@ -250,7 +263,9 @@ const disconnectController = () => { //Getrennt von disconnect, da man die inter
     keyControls.disconnect();
 
     const pauseFenster = document.getElementById('pause');
-    if (pauseFenster != null){ pauseFenster.style.display = "";}
+    if (pauseFenster != null) {
+        pauseFenster.style.display = "";
+    }
 }
 
 const initPlane = () => {
@@ -372,7 +387,7 @@ function verbergeInteraktionText() {
 
 /**
  * Setzt das Mitspieler 3d Objekt eines Mitspielers auf die richtige Position.
- * 
+ *
  * @param spieler neu zu Positionierender Mitspieler.
  */
 function setzeMitspielerAufPosition(spieler: Spieler) {
