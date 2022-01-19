@@ -8,8 +8,7 @@
     "test": "jest",
     "lint": "vue-cli-service lint",
     "doc": "jsdoc -c jsdoc.json",
-    "test:unit": "vue-cli-service test:unit",
-    "lint": "vue-cli-service lint"
+    "test:unit": "vue-cli-service test:unit"
   },
   "dependencies": {
     "@stomp/stompjs": "^6.1.2",

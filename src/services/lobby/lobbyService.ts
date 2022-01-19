@@ -9,7 +9,12 @@ import {NachrichtenCode} from '@/messaging/NachrichtenCode';
 import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
 
-const wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
+let wsurl;
+if (window.location.hostname == 'localhost') {
+    wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
+}else{
+    wsurl = `wss://${window.location.hostname}/messagebroker`;
+}
 const stompclient = new Client({brokerURL: wsurl});
 
 /**

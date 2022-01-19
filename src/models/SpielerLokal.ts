@@ -1,9 +1,14 @@
 import { useLobbyStore } from '@/services/lobby/lobbyService';
-import { Client, Message } from '@stomp/stompjs';
+import { Client } from '@stomp/stompjs';
 import { Spieler, Position } from '@/models/Spieler';
 import user from '@/stores/user' 
 
-const wsurl = `ws://${window.location.hostname}:8080/gamebroker`;
+let wsurl;
+if (window.location.hostname == 'localhost') {
+    wsurl = `ws://${window.location.hostname}:8080/gamebroker`;
+}else{
+    wsurl = `wss://${window.location.hostname}/gamebroker`;
+}
 export const stompclient = new Client({ brokerURL: wsurl });
 
 export class SpielerLokal extends Spieler{
