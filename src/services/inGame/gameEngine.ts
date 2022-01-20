@@ -9,6 +9,7 @@ import {gamebrokerStompclient, subscribeToSchluesselUpdater, subscribeToSpielerP
 import {Position, Spieler} from "@/models/Spieler";
 import {useLobbyStore} from "../lobby/lobbyService";
 import userStore from '@/stores/user'
+import { ChatTyp, useChatStore } from "@/services/ChatStore";
 import { reactive } from "vue";
 
 
@@ -60,6 +61,8 @@ const gamestate = reactive({
     anzSchluessel:0
 })
 const mitspieler3dObjektListe = new Map();
+
+const {unsubscribeChat, subscribeChat} = useChatStore();
 
 let startPosition: Position;
 
@@ -256,6 +259,33 @@ const initInteractions = () => {
     schluesselText = document.getElementById("schluesselText")
 }
 
+
+/**
+* Initialisiert den InGame-Chat
+*/
+const initChat = () =>{
+    subscribeChat(lobbystate.lobbyID, ChatTyp.INGAME);
+
+    const chat = document.getElementById("Chat");
+    const chatButton = document.getElementById("ChatButton");
+
+    if(chat != null && chatButton != null){
+        const btn = document.createElement("button");
+        btn.id = "CloseButton";
+        btn.innerHTML = "x";
+        btn.onclick = function () {
+            closeChat(chat, chatButton);
+        };
+        chat.appendChild(btn);
+
+        chatButton.onclick = function (){
+            openChat(chat, chatButton);
+        };
+
+        closeChat(chat, chatButton);
+    }
+}
+
 /**
  * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
  */
@@ -276,8 +306,11 @@ const connect = () => {
  */
 const disconnect = () => { //nur aufrufen wenn man die Seite verlässt
     disconnectController();
-    interactions.disconnect();
+
+    //TODO: unsubscirben wenn man das Spiel wirklich verlaesst
     //unsubscribeChat();
+    //interactions.disconnect();
+
     window.removeEventListener('click', mouseControls.lock);
     console.log("gameEninge.disconnect: getrennt")
 }
@@ -479,6 +512,16 @@ function setzteWarnText(){
     schluesselText.style.display = "block";
 }
 
+function openChat(chat:any, chatButton:any){
+    chat.style.display = "block";
+    chatButton.style.display = "none";
+}
+
+function closeChat(chat:any, chatButton:any){
+    chat.style.display = "none";
+    chatButton.style.display = "block";
+}
+
 export function useGameEngine() {
     return {
         setzteSchluesselAnz,
@@ -492,6 +535,7 @@ export function useGameEngine() {
         initRenderer,
         initControls,
         initInteractions,
+        initChat,
         startAnimate,
         stopAnimate,
         connect, disconnect, disconnectController,
