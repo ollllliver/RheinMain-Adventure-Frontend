@@ -5,10 +5,12 @@ import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
 import {Interactions} from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
-import {gamebrokerStompclient, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
+import {gamebrokerStompclient,schluesselStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
 import {Position, Spieler} from "@/models/Spieler";
 import {useLobbyStore} from "../lobby/lobbyService";
 import userStore from '@/stores/user'
+import { ChatTyp, useChatStore } from "@/services/ChatStore";
+import { reactive } from "vue";
 
 
 let container: any;
@@ -44,6 +46,7 @@ let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
 let interactions: Interactions;
 let interaktionText: any;
+let schluesselText:any;
 
 let spieler: SpielerLokal
 
@@ -52,10 +55,15 @@ const velocity = new Three.Vector3();
 const direction = new Three.Vector3();
 
 const stompClient = gamebrokerStompclient;
+const stompClient2 = schluesselStompclient;
 
 const {lobbystate} = useLobbyStore();
-
+const gamestate = reactive({
+    anzSchluessel:0
+})
 const mitspieler3dObjektListe = new Map();
+
+const {unsubscribeChat, subscribeChat} = useChatStore();
 
 let startPosition: Position;
 
@@ -78,6 +86,7 @@ const initScene = () => {
  * Initialisiert Loader Klasse, lädt Raum
  */
 const initLoader = () => {
+    const positionsSkalierungsfaktor = 4;
 
     // TODO: Level-ID dynamisch bestimmen
 
@@ -96,14 +105,13 @@ const initLoader = () => {
     }).then((RaumMobiliarListe) => {
         console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.")
         RaumMobiliarListe.forEach(function (raumMobiliar) {
-            console.log(raumMobiliar);
             const posX = raumMobiliar.positionX;
             const posY = raumMobiliar.positionY;
 
             // Startposition ermitteln und hier festlegen. Ginge auch per fetch auf
             // /api/level/startposition/{levelID}/{raumindex}, so ist es aber stabiler und schneller
             if (raumMobiliar.mobiliar.mobiliartyp == "EINGANG") {
-                startPosition = new Position(posX, spieler.height * 3, posY);
+                startPosition = new Position(positionsSkalierungsfaktor * posX, spieler.height * 3, positionsSkalierungsfaktor * posY);
             }
 
             // Idee von Olli:
@@ -111,27 +119,37 @@ const initLoader = () => {
             // Davor müsste man zu begin ein Set des Mobiliars erstellen
 
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
-            console.log("GLTF-Datei für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
-            loader.ladeDatei(`/api/level/` + mobiliarId).then((res: any) => {
+            console.log("GLTF-URL für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
 
-                // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
-                res.scene.position.x = 4 * posX
-                res.scene.position.z = 4 * posY
-                collidableList.push(res.scene)
+            fetch(`/api/level/` + mobiliarId, {
+                method: 'GET',
+            }).then((response) => {
+                return response.json();
+            }).then((URLPfad) => {
 
-                // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
-                if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
-                    res.scene.children[0].name = raumMobiliar.mobiliar.name;
-                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
-                        //Tür und Schlüssel bestehen aus mehreren Objekten,
-                        //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
-                        interactableList.push(res.scene.children[0]); 
-                    } else {
-                        interactableList.push(res.scene);
+                loader.ladeDatei(URLPfad.gltfPfad).then((res: any) => {
+
+                    // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
+                    res.scene.position.x = positionsSkalierungsfaktor * posX
+                    res.scene.position.z = positionsSkalierungsfaktor * posY
+                    collidableList.push(res.scene)
+
+                    // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
+                    if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
+                        res.scene.children[0].name = raumMobiliar.mobiliar.name;
+                        if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
+                            //Tür und Schlüssel bestehen aus mehreren Objekten,
+                            //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
+                            console.log(res.scene.children[0])
+                            interactableList.push(res.scene.children[0]);
+                        } else {
+                            interactableList.push(res.scene);
+                        }
                     }
-                }
-                scene.add(res.scene)
-            });
+                    scene.add(res.scene)
+                });
+            })
+
         });
         console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
 
@@ -145,8 +163,8 @@ const initLoader = () => {
 
                     scene.add(objektInScene)
 
-                    objektInScene.position.x = 1 * startPosition.x;
-                    objektInScene.position.z = 1 * startPosition.z;
+                    objektInScene.position.x = positionsSkalierungsfaktor * startPosition.x;
+                    objektInScene.position.z = positionsSkalierungsfaktor * startPosition.z;
 
                     mitspieler3dObjektListe.set(spieler.name, objektInScene);
                 });
@@ -164,6 +182,9 @@ const initCamera = () => {
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
     subscribeToSpielerPositionenUpdater(stompClient);
+
+    stompClient2.activate();
+    subscribeToSchluesselUpdater(stompClient2);
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
@@ -237,21 +258,51 @@ const initControls = () => {
  * Initialisiert die Interaktionen
  */
 const initInteractions = () => {
-    interactions = new Interactions(interactableList, cameraCollidable, document);
+    interactions = new Interactions(interactableList, cameraCollidable, document, stompClient);
     interaktionText = document.getElementById("interaktionText");
+    schluesselText = document.getElementById("schluesselText")
+}
+
+
+/**
+* Initialisiert den InGame-Chat
+*/
+const initChat = () =>{
+    subscribeChat(lobbystate.lobbyID, ChatTyp.INGAME);
+
+    const chat = document.getElementById("Chat");
+    const chatButton = document.getElementById("ChatButton");
+
+    if(chat != null && chatButton != null){
+        const btn = document.createElement("button");
+        btn.id = "CloseButton";
+        btn.innerHTML = "x";
+        btn.onclick = function () {
+            closeChat(chat, chatButton);
+        };
+        chat.appendChild(btn);
+
+        chatButton.onclick = function (){
+            openChat(chat, chatButton);
+        };
+
+        closeChat(chat, chatButton);
+    }
 }
 
 /**
  * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
  */
- const connect = () => {
+const connect = () => {
     window.addEventListener('click', mouseControls.lock); //locked die Maus     
-        keyControls.connect();
-        mouseControls.connect();
-        console.log("gameEninge.connect: verbunden")
+    keyControls.connect();
+    mouseControls.connect();
+    console.log("gameEninge.connect: verbunden")
 
-        const pauseFenster = document.getElementById('pause');
-        if (pauseFenster != null){ pauseFenster.style.display = "none";}
+    const pauseFenster = document.getElementById('pause');
+    if (pauseFenster != null) {
+        pauseFenster.style.display = "none";
+    }
 }
 
 /**
@@ -259,8 +310,11 @@ const initInteractions = () => {
  */
 const disconnect = () => { //nur aufrufen wenn man die Seite verlässt
     disconnectController();
-    interactions.disconnect();
+
+    //TODO: unsubscirben wenn man das Spiel wirklich verlaesst
     //unsubscribeChat();
+    //interactions.disconnect();
+
     window.removeEventListener('click', mouseControls.lock);
     console.log("gameEninge.disconnect: getrennt")
 }
@@ -273,7 +327,9 @@ const disconnectController = () => { //Getrennt von disconnect, da man die inter
     keyControls.disconnect();
 
     const pauseFenster = document.getElementById('pause');
-    if (pauseFenster != null){ pauseFenster.style.display = "";}
+    if (pauseFenster != null) {
+        pauseFenster.style.display = "";
+    }
 }
 
 const initPlane = () => {
@@ -438,7 +494,7 @@ function verbergeInteraktionText() {
 
 /**
  * Setzt das Mitspieler 3d Objekt eines Mitspielers auf die richtige Position.
- * 
+ *
  * @param spieler neu zu Positionierender Mitspieler.
  */
 function setzeMitspielerAufPosition(spieler: Spieler) {
@@ -448,8 +504,40 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
+function setzteSchluesselAnz(anzSchluessel: number, id: number){
+    gamestate.anzSchluessel = anzSchluessel;
+    console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
+    schluesselText.textContent = "Keys x" + anzSchluessel;
+    schluesselText.style.display = "block";
+
+    const removeObject = scene.getObjectById(id);
+    console.log("DAS OBJECT MUSS WEG:")
+    console.log(removeObject);
+
+    removeObject.parent.remove(removeObject);
+   
+    
+}
+
+function setzteWarnText(){
+    schluesselText.textContent = "Ihr habt noch keinen Schlüssel!";
+    schluesselText.style.display = "block";
+}
+
+function openChat(chat:any, chatButton:any){
+    chat.style.display = "block";
+    chatButton.style.display = "none";
+}
+
+function closeChat(chat:any, chatButton:any){
+    chat.style.display = "none";
+    chatButton.style.display = "block";
+}
+
 export function useGameEngine() {
     return {
+        setzteSchluesselAnz,
+        setzteWarnText,
         setzeMitspielerAufPosition,
         initScene,
         initLoader,
@@ -459,10 +547,12 @@ export function useGameEngine() {
         initRenderer,
         initControls,
         initInteractions,
+        initChat,
         startAnimate,
         stopAnimate,
         connect, disconnect, disconnectController,
         setContainer,
-        scene
+        scene,
+        gamestate
     }
 }

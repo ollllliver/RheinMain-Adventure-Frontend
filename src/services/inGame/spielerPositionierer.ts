@@ -9,11 +9,12 @@ if (location.protocol == 'http:') {
     wsurl = `wss://${window.location.hostname}/gamebroker`;
 }
 export const gamebrokerStompclient = new Client({ brokerURL: wsurl });
+export const schluesselStompclient = new Client({ brokerURL: wsurl });
 const { lobbystate } = useLobbyStore();
 import userStore from '@/stores/user'
 import { useGameEngine } from './gameEngine';
 
-const {setzeMitspielerAufPosition} = useGameEngine();
+const {setzeMitspielerAufPosition, setzteSchluesselAnz, setzteWarnText} = useGameEngine();
 
 /**
  * Schribt sich bei STOMP auf das Topic /topic/spiel/{lobbyID} ein
@@ -21,6 +22,7 @@ const {setzeMitspielerAufPosition} = useGameEngine();
  * @param stompclient 
  */
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
+    
     const DEST = "/topic/spiel/" + lobbystate.lobbyID;
     stompclient.onConnect = async () => {
         stompclient.subscribe(DEST, (message) => {
@@ -29,6 +31,30 @@ export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
             if (spieler.name!= userStore.state.benutzername){
                 setzeMitspielerAufPosition(spieler)
             }
+        });
+    }
+}
+
+export function subscribeToSchluesselUpdater(stompclient: Client): void{
+    const DEST = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
+    stompclient.onConnect = async () => {
+        stompclient.subscribe(DEST, (message) => {
+            const update: any = JSON.parse(message.body);
+            //Jenachdem wie viele Schluessel eingesammelt wurden:
+            if (update.anzSchluessel != 0){
+                //entweder SchluesselCOunter hochzaehler...
+                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.id)
+                setzteSchluesselAnz(update.anzSchluessel, update.id); 
+
+            }else{
+                //... oder keine Schluessel meldung
+                console.log("KEINE SCHLÜSSEL");
+                setzteWarnText();
+
+            }
+            
+
+
         });
     }
 }

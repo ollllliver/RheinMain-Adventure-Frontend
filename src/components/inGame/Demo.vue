@@ -3,6 +3,11 @@
     <Pause id="pause"/>
     <div id="container">
       <h2 id="interaktionText"></h2>
+      <h2 id="schluesselText"></h2>
+      <div class="GameChat">
+        <button type="button" id="ChatButton">Chat</button>
+        <Chat :sendeNachricht="sendeChatNachricht" class="row border border-secondary rounded px-4 mt-3" id="Chat" />
+      </div>
     </div>
   </div>
 </template>
@@ -11,11 +16,13 @@
 import {defineComponent, onMounted} from "vue";
 import { useGameEngine } from "@/services/inGame/gameEngine";
 import Pause from "./Pause.vue";
+import Chat from "@/components/lobby/Chat.vue";
+import { useChatStore } from "@/services/ChatStore";
 
 
 export default defineComponent({
   name: "RenderDemo",
-  components: {Pause},
+  components: {Pause, Chat},
   setup() {
 
     const {
@@ -27,12 +34,15 @@ export default defineComponent({
       initRenderer,
       initControls,
       initInteractions,
+      initChat,
       startAnimate,
       stopAnimate,
       connect,
       disconnect,
       setContainer
     } = useGameEngine();
+
+    const { sendeChatNachricht, empfangeChatNachricht} = useChatStore();
     
 
     onMounted(() => {
@@ -45,11 +55,12 @@ export default defineComponent({
       initRenderer();
       initControls();
       initInteractions();
+      initChat();
       startAnimate();
 
     });
 
-    return {connect, disconnect, stopAnimate}
+    return {connect, disconnect, stopAnimate, sendeChatNachricht, empfangeChatNachricht}
 
   },
   beforeUnmount() {

@@ -6,8 +6,7 @@ import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
 import userStore from '@/stores/user'
 import {NachrichtenCode} from '@/messaging/NachrichtenCode';
-import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
-import {ChatNachricht} from '@/messaging/ChatNachricht';
+import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
 let wsurl;
 if (location.protocol == 'http:') {
@@ -38,6 +37,8 @@ const lobbystate = reactive({
     gewaehlteKarte: {} as any,
 })
 
+const {unsubscribeChat, subscribeChat} = useChatStore();
+
 /**
  * alleLobbiesState ist ein reactive, das die Liste von Lobbys hält + errormessage
  */
@@ -53,7 +54,6 @@ const alleKartenState = reactive({
 
 // verwendete StompSubscriptions:
 let lobbySubscription: StompSubscription;
-let lobbyChatSubscription: StompSubscription;
 let uebersichtSubscription: StompSubscription;
 
 /**
@@ -196,6 +196,8 @@ async function connectToLobby(lobby_id: string) {
                     console.log(subscribeToLobby.name + "()");
                     subscribeToLobby(lobby_id);
                 }
+                // Chat fuer stomp subscriben:
+                subscribeChat(lobby_id, ChatTyp.LOBBY);
                 // und lobbydaten holen:
                 updateLobby(lobby_id);
                 alleLobbiesState.errormessage = '';
@@ -217,14 +219,9 @@ async function connectToLobby(lobby_id: string) {
  */
 function subscribeToLobby(lobby_id: string) {
     const DEST = "/topic/lobby/" + lobby_id;
-    const DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
     lobbySubscription = stompclient.subscribe(DEST, (message) => {
         const lobbymessage = JSON.parse(message.body) as LobbyMessage;
         empfangeLobbyMessageLobby(lobbymessage, lobby_id);
-    });
-    lobbyChatSubscription = stompclient.subscribe(DEST_CHAT, (message) => {
-        const chatmessage = JSON.parse(message.body) as ChatNachricht;
-        empfangeChatNachricht(chatmessage);
     });
 }
 
@@ -280,49 +277,6 @@ function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
     console.log("message from broker:", lobbymessage);
     // Es gibt keine errormessages, die über diesen Kanal geteilt werden.
     alleLobbiesladen();
-}
-
-// TODO: Chatfunktionen auslagern in seperates ChatStore.ts
-async function sendeChatNachricht(typ: NachrichtenTyp, inhalt: string, sender: string) {
-
-    const DEST_CHAT = "/topic/lobby/" + lobbystate.lobbyID + "/chat";
-    const nachricht: ChatNachricht = { typ: typ, inhalt: inhalt, sender: sender };
-    stompclient.publish({ destination: DEST_CHAT, body: JSON.stringify(nachricht) });
-    console.log("Gesendete Nachricht: ", nachricht);
-}
-
-async function empfangeChatNachricht(nachricht: ChatNachricht) {
-
-    console.log("Empfangene Nachricht: ", nachricht);
-    const messageArea = document.getElementById("messageArea");
-    const messageElement = document.createElement("li");
-
-    if (nachricht.typ == 'JOIN') {
-        messageElement.classList.add('event-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ' ist gejoined!';
-    } else if (nachricht.typ == 'LEAVE') {
-        messageElement.classList.add('event-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ' ist geleaved!';
-    } else {
-        messageElement.classList.add('chat-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ": " + nachricht.inhalt;
-    }
-
-    let nachUntenGescrollt;
-
-    if (messageArea) {
-        if ((messageArea.offsetHeight + messageArea.scrollTop) >= messageArea.scrollHeight - 20) {
-            nachUntenGescrollt = true;
-        } else {
-            nachUntenGescrollt = false;
-        }
-
-        messageArea.appendChild(messageElement);
-    }
-
-    if (nachUntenGescrollt) {
-        messageElement.scrollIntoView({ behavior: 'smooth' });
-    }
 }
 
 /**
@@ -436,7 +390,7 @@ function resetLobbyState() {
  */
 async function leaveLobby(): Promise<boolean> {
     lobbySubscription.unsubscribe()
-    lobbyChatSubscription.unsubscribe()
+    unsubscribeChat();
 
     console.log("Fetch auf: /leave/" + lobbystate.lobbyID)
     router.push("/uebersicht");
@@ -719,9 +673,6 @@ export function useLobbyStore() {
 
         // Funktionen zum ändern der Lobby Einstellungen:
         einstellungsfunktionen: { changeLimit, changePrivacy, changeHost, changeKarte },
-
-        // Chat Funktionen:
-        sendeChatNachricht, empfangeChatNachricht,
 
         alleKartenLaden,
     }
