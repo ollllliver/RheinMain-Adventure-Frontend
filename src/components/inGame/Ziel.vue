@@ -3,17 +3,16 @@
     <div class="fenster__inner">
       <div class="fenster__top">
         <h1 class="title">{{ titel }}</h1>
+        <div :class="closeButton" @click="schließen()">&times;</div>
+        <span class="helper"></span>
       </div>
       <div :class="fenster__frage">
-        <button class="button" @click="falsch">{{ shuffleAntworten() }}</button
-        ><br />
-        <button class="button" @click="richtig">{{ buttonString }}</button
-        ><br />
-        <button class="button" @click="falsch">{{ shuffleAntworten() }}</button
-        ><br />
+        <button class="button" @click="falsch">{{ shuffleAntworten() }}</button>
+        <button class="button" @click="richtig">{{ buttonString }}</button>
+        <button class="button" @click="falsch">{{ shuffleAntworten() }}</button>
       </div>
       <div :class="fenster__beende">
-        <button class="button" @click="beenden">Kehre Zurück zur Lobby</button
+        <button class="button" @click="beenden">Spiel beenden</button
         ><br />
       </div>
     </div>
@@ -22,14 +21,18 @@
 
 <script lang="ts">
 import { defineComponent, ref } from "vue";
+import { useGameEngine } from "@/services/inGame/gameEngine";
 import { useLobbyStore } from "@/services/lobby/lobbyService";
 
 export default defineComponent({
   setup() {
     const { beendeSpiel } = useLobbyStore();
-    const fenster__frage = ref('fenster__frage')
-    const fenster__beende = ref('fenster__beende');
-    fenster__beende.value = 'hidden';
+    const { connect, disconnect, disconnectController } = useGameEngine();
+    
+    const closeButton = ref('closeButton');
+    const fenster__inner = ref('fenster__inner');
+    const fenster__frage = ref('fenster__frage');
+    const fenster__beende = ref('hidden');
 
     let titel: string;
     let byteString: string;
@@ -59,8 +62,13 @@ export default defineComponent({
     }
 
     function aktualisiereFenster() {
-      fenster__frage.value = 'hidden'
-      fenster__beende.value = 'block'
+      closeButton.value = 'hidden';
+      fenster__frage.value = 'hidden';
+      fenster__beende.value = 'fenster__beende';
+    }
+
+    function versteckeFenster() {
+      fenster__inner.value = 'hidden';
     }
 
     function getRandomInt(min: number, max: number): number {
@@ -73,8 +81,14 @@ export default defineComponent({
       beendeSpiel,
       shuffleAntworten,
       aktualisiereFenster,
+      versteckeFenster,
+      connect,
+      disconnect,
+      disconnectController,
+      fenster__inner,
       fenster__frage,
       fenster__beende,
+      closeButton,
       buttonString,
       titel,
     };
@@ -82,11 +96,17 @@ export default defineComponent({
   methods: {
     richtig() {
       this.titel = "Richtig! Ihr habt das Spiel gewonnen";
+      this.disconnect();
       this.aktualisiereFenster();
     },
     falsch() {
       this.titel = "Falsch! Ihr habt das Spiel leider verloren";
+      this.disconnect();
       this.aktualisiereFenster();
+    },
+    schließen() {
+      this.versteckeFenster();
+      this.connect();
     },
     beenden() {
       this.beendeSpiel();
@@ -96,8 +116,44 @@ export default defineComponent({
 </script>
 
 <style>
-.fenster__none {
+.helper{
+  display:inline-block;
+  width: 1%;
+  vertical-align:middle;
+}
+
+.hidden{
   display: none;
+}
+
+.title {
+  flex-grow: 1;
+  padding: var(--gap) var(--gap) 0 var(--gap);
+  font-size: 20px;
+  /* color: #fff; */
+}
+
+.button:hover {
+  background: #e4e4e4;
+}
+
+.closeButton {
+    background-color: #fff;
+    border: 1px solid #999;
+    border-radius: 50px;
+    cursor: pointer;
+    display: inline-block;
+    font-family: arial;
+    font-weight: bold;
+    font-size: 30px;
+    line-height: 30px;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+}
+.closeButton:hover {
+    background-color: #ccc;
+    color: red;
 }
 
 .fenster__inner {
@@ -109,17 +165,9 @@ export default defineComponent({
 }
 
 .fenster__top {
-  display: flex;
   align-items: center;
   background-color: #eeeeee;
   text-align: center;
-}
-
-.title {
-  flex-grow: 1;
-  padding: var(--gap) var(--gap) 0 var(--gap);
-  font-size: 20px;
-  /* color: #fff; */
 }
 
 .fenster__frage {
@@ -144,9 +192,5 @@ export default defineComponent({
   font-size: 18px;
   width: 150px;
   margin: 2px;
-}
-
-.button:hover {
-  background: #e4e4e4;
 }
 </style>

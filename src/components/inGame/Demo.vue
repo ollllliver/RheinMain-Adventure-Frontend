@@ -58,23 +58,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#pause{
-  --gap: 15px;
-
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  padding: var(--gap);
-  background: rgba(0, 0, 0, 0.5);
-  font-family: sans-serif;
-}
-#ziel{
+#pause, #ziel{
   --gap: 15px;
 
   position: fixed;

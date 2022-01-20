@@ -14,10 +14,9 @@ export class Interactions {
     update: (cameraPosition: any) => void
     keyDisconnect: () => void
 
-
     constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document) {
 
-        const { playMouseControls, stopMouseControls } = useGameEngine();
+        const { disconnectController } = useGameEngine();
         const interaktionReichweite = 2
         let hatSchluessel = false
         let popupFenster: any;
@@ -89,15 +88,9 @@ export class Interactions {
                     break;
                 case "Ziel":
                     popupFenster = document.getElementById('ziel');
-                    if (popupFenster.style.display === "block") {
-                        playMouseControls();
-                        popupFenster.style.display = "none"
-                        console.log("popup ist deaktiviert");
-                    } else {
-                        stopMouseControls();
-                        popupFenster.style.display = "block"
-                        console.log("popup ist aktiviert");
-                    }
+                    popupFenster.style.display = "block";
+                    disconnectController("ziel");
+                    console.log("popup ist aktiviert");
                     break;
             }
         }

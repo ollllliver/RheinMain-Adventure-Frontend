@@ -39,25 +39,20 @@ let developerCamera: any;
 let controls: any;
 let requestID: number;
 
-
 let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
 let interactions: Interactions;
 let interaktionText: any;
-
-let spieler: SpielerLokal
-
+let spieler: SpielerLokal;
+let startPosition: Position;
 let prevTime = performance.now();
+
 const velocity = new Three.Vector3();
 const direction = new Three.Vector3();
-
+const mitspieler3dObjektListe = new Map();
 const stompClient = gamebrokerStompclient;
 
 const {lobbystate} = useLobbyStore();
-
-const mitspieler3dObjektListe = new Map();
-
-let startPosition: Position;
 
 function setContainer(element: HTMLElement | null) {
     container = element
@@ -262,48 +257,62 @@ const initInteractions = () => {
 /**
  * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
  */
-export const connect = () => {
+const connect = () => {
     window.addEventListener('click', mouseControls.lock); //locked die Maus     
+    
     keyControls.connect();
     mouseControls.connect();
-    console.log("gameEninge.connect: verbunden")
 
     const pauseFenster = document.getElementById('pause');
     if (pauseFenster != null) {
         pauseFenster.style.display = "none";
     }
-
+    
     const zielFenster = document.getElementById('ziel');
     if (zielFenster != null) {
         zielFenster.style.display = "none";
     }
+
+    console.log("gameEninge.connect: verbunden")
 }
 
-/**
- *  und öffnet das Spielunterbrechungsfenster
- */
-const disconnect = () => { //nur aufrufen wenn man die Seite verlässt
+const disconnect = () => {
+    window.removeEventListener('click', mouseControls.lock);
+
     disconnectController();
     interactions.keyDisconnect();
-    //unsubscribeChat();
-    window.removeEventListener('click', mouseControls.lock);
-    console.log("gameEninge.disconnect: getrennt")
 }
 
 /**
  * Trennt die Verbindung zu den Eingabe-Controllern (Maus und Tastatursteuerung)
+ * Getrennt von disconnect ausgeführt, da man die interactions sonst verliert
  */
-const disconnectController = () => { //Getrennt von disconnect, da man die interactions sonst verliert
-
+const disconnectController = (element?: string) => {
     mouseControls.dispose();
     keyControls.disconnect();
 
     const pauseFenster = document.getElementById('pause');
-    if (pauseFenster != null) {
-        pauseFenster.style.display = "";
+    const zielFenster = document.getElementById('ziel');
+
+    if (element != null) {
+        switch (element) {
+            case "ziel":
+                if (zielFenster != null) {
+                    zielFenster.style.display = "";
+                }
+                break;
+        }
+    } else {
+        if (pauseFenster != null && zielFenster != null) {
+            if (zielFenster.style.display !== "") {
+                pauseFenster.style.display = "";
+            }
+        }
     }
 
+    console.log("gameEninge.disconnect: getrennt")
 }
+
 
 const initPlane = () => {
     const plane = new Three.PlaneGeometry(100, 100);
@@ -451,29 +460,6 @@ const startAnimate = () => {
     doAnimate();
 }
 
-const playMouseControls = () => {
-    keyControls.connect();
-    mouseControls.connect();
-
-    const zielFenster = document.getElementById('ziel');
-    if (zielFenster != null) {
-        zielFenster.style.display = "none";
-    }
-}
-
-const stopMouseControls = () => {
-    window.removeEventListener('click', mouseControls.lock);
-    interactions.keyDisconnect();
-
-    mouseControls.dispose();
-    keyControls.disconnect();
-
-    const zielFenster = document.getElementById('ziel');
-    if (zielFenster != null) {
-        zielFenster.style.display = "";
-    }
-}
-
 function zeigeInteraktionText(interaktion: any) {
     if (interaktionText != null /*&& interaktionText.style.display == "none"*/) {
         interaktionText.textContent = "[E] Interagiere mit " + interaktion.object.name
@@ -514,7 +500,6 @@ export function useGameEngine() {
         startAnimate,
         stopAnimate,
         connect, disconnect, disconnectController,
-        playMouseControls, stopMouseControls,
         setContainer,
         scene
     }
