@@ -10,7 +10,7 @@ import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
 
 let wsurl;
-if (window.location.hostname == 'localhost') {
+if (location.protocol == 'http:') {
     wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
 }else{
     wsurl = `wss://${window.location.hostname}/messagebroker`;

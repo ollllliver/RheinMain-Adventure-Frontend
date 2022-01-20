@@ -3,7 +3,7 @@ import { Client } from '@stomp/stompjs';
 import { useLobbyStore } from '@/services/lobby/lobbyService';
 
 let wsurl;
-if (window.location.hostname == 'localhost') {
+if (location.protocol == 'http:') {
     wsurl = `ws://${window.location.hostname}:8080/gamebroker`;
 }else{
     wsurl = `wss://${window.location.hostname}/gamebroker`;
