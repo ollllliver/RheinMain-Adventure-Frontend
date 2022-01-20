@@ -1,4 +1,5 @@
-import {Raycaster, Vector3} from 'three';
+import { Raycaster, Vector3 } from 'three';
+import { useGameEngine } from './gameEngine';
 
 /**
  * Verarbeitet Interaktionsmoeglichkeiten
@@ -11,13 +12,15 @@ export class Interactions {
     erkannteInteraktion: any
     rayCaster: any
     update: (cameraPosition: any) => void
-    disconnect: () => void
+    keyDisconnect: () => void
 
 
     constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document) {
 
+        const { playMouseControls, stopMouseControls } = useGameEngine();
         const interaktionReichweite = 2
         let hatSchluessel = false
+        let popupFenster: any;
 
         this.domElement = domElement
         this.cameraCollidable = cameraCollidable
@@ -40,11 +43,11 @@ export class Interactions {
             }
         };
 
-        const connect = () => {
+        const keyConnect = () => {
             this.domElement.addEventListener('keydown', onKeyDown)
         };
 
-        this.disconnect = () => {
+        this.keyDisconnect = () => {
             this.domElement.removeEventListener('keydown', onKeyDown)
         };
 
@@ -84,22 +87,30 @@ export class Interactions {
                         //TODO: "Du benötigst einen Schlüssel" - Meldung
                     }
                     break;
+                case "Ziel":
+                    popupFenster = document.getElementById('ziel');
+                    if (popupFenster.style.display === "block") {
+                        playMouseControls();
+                        popupFenster.style.display = "none"
+                        console.log("popup ist deaktiviert");
+                    } else {
+                        stopMouseControls();
+                        popupFenster.style.display = "block"
+                        console.log("popup ist aktiviert");
+                    }
+                    break;
             }
         }
 
         this.update = (camera: any) => {
-
             const blickRichtung = new Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-
             const originPoint = this.cameraCollidable.position.clone()
-
             const vorneVektor = blickRichtung.clone()
 
             this.rayCaster = new Raycaster(originPoint, vorneVektor, 0, interaktionReichweite)
-
             this.erkannteInteraktion = interaktionErkennung(vorneVektor, originPoint)
         }
 
-        connect()
+        keyConnect()
     }
 }

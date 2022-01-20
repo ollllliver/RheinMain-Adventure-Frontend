@@ -238,7 +238,6 @@ window.addEventListener('resize', () => {
 const initControls = () => {
     mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
     keyControls = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
-
     connect();
 }
 
@@ -248,12 +247,22 @@ const initControls = () => {
 const initInteractions = () => {
     interactions = new Interactions(interactableList, cameraCollidable, document);
     interaktionText = document.getElementById("interaktionText");
+    
+    const geometry = new Three.BoxGeometry( 1, 1, 1 );
+    const material = new Three.MeshBasicMaterial( {color: 0x00ff00} );
+    const cube = new Three.Mesh( geometry, material );
+
+    cube.name = "Ziel";
+    cube.position.x = -10;
+    interactableList.push(cube);
+
+    scene.add( cube );
 }
 
 /**
  * Verbindet die Eingabe-Controller und und schließt das Spielunterbrechungsfenster
  */
-const connect = () => {
+export const connect = () => {
     window.addEventListener('click', mouseControls.lock); //locked die Maus     
     keyControls.connect();
     mouseControls.connect();
@@ -263,6 +272,11 @@ const connect = () => {
     if (pauseFenster != null) {
         pauseFenster.style.display = "none";
     }
+
+    const zielFenster = document.getElementById('ziel');
+    if (zielFenster != null) {
+        zielFenster.style.display = "none";
+    }
 }
 
 /**
@@ -270,11 +284,12 @@ const connect = () => {
  */
 const disconnect = () => { //nur aufrufen wenn man die Seite verlässt
     disconnectController();
-    interactions.disconnect();
+    interactions.keyDisconnect();
     //unsubscribeChat();
     window.removeEventListener('click', mouseControls.lock);
     console.log("gameEninge.disconnect: getrennt")
 }
+
 /**
  * Trennt die Verbindung zu den Eingabe-Controllern (Maus und Tastatursteuerung)
  */
@@ -287,6 +302,7 @@ const disconnectController = () => { //Getrennt von disconnect, da man die inter
     if (pauseFenster != null) {
         pauseFenster.style.display = "";
     }
+
 }
 
 const initPlane = () => {
@@ -435,6 +451,29 @@ const startAnimate = () => {
     doAnimate();
 }
 
+const playMouseControls = () => {
+    keyControls.connect();
+    mouseControls.connect();
+
+    const zielFenster = document.getElementById('ziel');
+    if (zielFenster != null) {
+        zielFenster.style.display = "none";
+    }
+}
+
+const stopMouseControls = () => {
+    window.removeEventListener('click', mouseControls.lock);
+    interactions.keyDisconnect();
+
+    mouseControls.dispose();
+    keyControls.disconnect();
+
+    const zielFenster = document.getElementById('ziel');
+    if (zielFenster != null) {
+        zielFenster.style.display = "";
+    }
+}
+
 function zeigeInteraktionText(interaktion: any) {
     if (interaktionText != null /*&& interaktionText.style.display == "none"*/) {
         interaktionText.textContent = "[E] Interagiere mit " + interaktion.object.name
@@ -475,6 +514,7 @@ export function useGameEngine() {
         startAnimate,
         stopAnimate,
         connect, disconnect, disconnectController,
+        playMouseControls, stopMouseControls,
         setContainer,
         scene
     }
