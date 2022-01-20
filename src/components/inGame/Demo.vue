@@ -3,6 +3,7 @@
     <Pause id="pause"/>
     <div id="container">
       <h2 id="interaktionText"></h2>
+      <h2 id="schluesselText"></h2>
     </div>
   </div>
 </template>

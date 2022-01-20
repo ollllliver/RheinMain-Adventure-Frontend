@@ -5,10 +5,11 @@ import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
 import {Interactions} from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
-import {gamebrokerStompclient, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
+import {gamebrokerStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
 import {Position, Spieler} from "@/models/Spieler";
 import {useLobbyStore} from "../lobby/lobbyService";
 import userStore from '@/stores/user'
+import { reactive } from "vue";
 
 
 let container: any;
@@ -44,6 +45,7 @@ let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
 let interactions: Interactions;
 let interaktionText: any;
+let schluesselText:any;
 
 let spieler: SpielerLokal
 
@@ -54,7 +56,9 @@ const direction = new Three.Vector3();
 const stompClient = gamebrokerStompclient;
 
 const {lobbystate} = useLobbyStore();
-
+const gamestate = reactive({
+    anzSchluessel:0
+})
 const mitspieler3dObjektListe = new Map();
 
 let startPosition: Position;
@@ -173,6 +177,7 @@ const initCamera = () => {
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
     subscribeToSpielerPositionenUpdater(stompClient);
+    subscribeToSchluesselUpdater(stompClient)
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
@@ -246,8 +251,9 @@ const initControls = () => {
  * Initialisiert die Interaktionen
  */
 const initInteractions = () => {
-    interactions = new Interactions(interactableList, cameraCollidable, document);
+    interactions = new Interactions(interactableList, cameraCollidable, document, stompClient);
     interaktionText = document.getElementById("interaktionText");
+    schluesselText = document.getElementById("schluesselText")
 }
 
 /**
@@ -461,8 +467,22 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
+function setzteSchluesselAnz(anzSchluessel: number){
+    gamestate.anzSchluessel = anzSchluessel;
+    console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
+    schluesselText.textContent = "Keys x" + anzSchluessel;
+    schluesselText.style.display = "block";
+}
+
+function setzteWarnText(){
+    schluesselText.textContent = "Ihr habt noch keinen Schlüssel!";
+    schluesselText.style.display = "block";
+}
+
 export function useGameEngine() {
     return {
+        setzteSchluesselAnz,
+        setzteWarnText,
         setzeMitspielerAufPosition,
         initScene,
         initLoader,
@@ -476,6 +496,7 @@ export function useGameEngine() {
         stopAnimate,
         connect, disconnect, disconnectController,
         setContainer,
-        scene
+        scene,
+        gamestate
     }
 }

@@ -13,7 +13,7 @@ const { lobbystate } = useLobbyStore();
 import userStore from '@/stores/user'
 import { useGameEngine } from './gameEngine';
 
-const {setzeMitspielerAufPosition} = useGameEngine();
+const {setzeMitspielerAufPosition, setzteSchluesselAnz, setzteWarnText} = useGameEngine();
 
 /**
  * Schribt sich bei STOMP auf das Topic /topic/spiel/{lobbyID} ein
@@ -29,6 +29,30 @@ export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
             if (spieler.name!= userStore.state.benutzername){
                 setzeMitspielerAufPosition(spieler)
             }
+        });
+    }
+}
+
+export function subscribeToSchluesselUpdater(stompclient: Client): void{
+    const DEST = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
+    stompclient.onConnect = async () => {
+        stompclient.subscribe(DEST, (message) => {
+            const anzSchluess: any = message.body;
+            //Jenachdem wie viele Schluessel eingesammelt wurden:
+            if (anzSchluess != 0){
+                //entweder SchluesselCOunter hochzaehler...
+                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
+                setzteSchluesselAnz(anzSchluess); 
+
+            }else{
+                //... oder keine Schluessel meldung
+                console.log("KEINE SCHLÜSSEL");
+                setzteWarnText();
+
+            }
+            
+
+
         });
     }
 }
