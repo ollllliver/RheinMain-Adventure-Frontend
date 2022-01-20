@@ -66,7 +66,10 @@ export class Interactions {
 
             const collisionResult = this.rayCaster.intersectObjects(interaktionsListe)
 
+            
+
             if (collisionResult.length > 0) {
+                
                 return collisionResult[0]
             }
 
@@ -78,12 +81,13 @@ export class Interactions {
             switch (interaktion.object.name) {
                 //Jenachdem womit man interagiert wird eine StompNachricht an eine andere DEST gepublisht
                 case "Schlüssel":
-
-                    console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/schluessel');
+                    //interaktion.object.parent.remove(interaktion.object);
+                    //console.log(interaktion.object)
+                    console.log("publish: " + interaktion.object.id + "auf /topic/spiel/" + this.lobbyID + '/schluessel');
                     this.DEST = "/topic/spiel/" + this.lobbyID + '/key';
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/key
-                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
-                    interaktion.object.parent.remove(interaktion.object);
+                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.id, skipContentLengthHeader: true,});
+                    
                     break;
                 case "Tür":
                     if(gamestate.anzSchluessel !=  0){
@@ -100,7 +104,7 @@ export class Interactions {
                     console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/tuer');
                     this.DEST = "/topic/spiel/" + this.lobbyID + '/tuer';
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/tuer
-                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.name, skipContentLengthHeader: true,});
+                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.uuid, skipContentLengthHeader: true,});
                     break;
 
 

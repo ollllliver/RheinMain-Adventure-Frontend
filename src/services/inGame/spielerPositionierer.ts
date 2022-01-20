@@ -9,6 +9,7 @@ if (window.location.hostname == 'localhost') {
     wsurl = `wss://${window.location.hostname}/gamebroker`;
 }
 export const gamebrokerStompclient = new Client({ brokerURL: wsurl });
+export const schluesselStompclient = new Client({ brokerURL: wsurl });
 const { lobbystate } = useLobbyStore();
 import userStore from '@/stores/user'
 import { useGameEngine } from './gameEngine';
@@ -21,6 +22,7 @@ const {setzeMitspielerAufPosition, setzteSchluesselAnz, setzteWarnText} = useGam
  * @param stompclient 
  */
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
+    
     const DEST = "/topic/spiel/" + lobbystate.lobbyID;
     stompclient.onConnect = async () => {
         stompclient.subscribe(DEST, (message) => {
@@ -37,12 +39,12 @@ export function subscribeToSchluesselUpdater(stompclient: Client): void{
     const DEST = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
     stompclient.onConnect = async () => {
         stompclient.subscribe(DEST, (message) => {
-            const anzSchluess: any = message.body;
+            const update: any = JSON.parse(message.body);
             //Jenachdem wie viele Schluessel eingesammelt wurden:
-            if (anzSchluess != 0){
+            if (update.anzSchluessel != 0){
                 //entweder SchluesselCOunter hochzaehler...
-                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + anzSchluess)
-                setzteSchluesselAnz(anzSchluess); 
+                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.id)
+                setzteSchluesselAnz(update.anzSchluessel, update.id); 
 
             }else{
                 //... oder keine Schluessel meldung

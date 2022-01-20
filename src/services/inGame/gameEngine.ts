@@ -5,7 +5,7 @@ import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
 import {Interactions} from '@/services/inGame/Interactions';
 //import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
 import {SpielerLokal} from '@/models/SpielerLokal';
-import {gamebrokerStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
+import {gamebrokerStompclient,schluesselStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
 import {Position, Spieler} from "@/models/Spieler";
 import {useLobbyStore} from "../lobby/lobbyService";
 import userStore from '@/stores/user'
@@ -55,6 +55,7 @@ const velocity = new Three.Vector3();
 const direction = new Three.Vector3();
 
 const stompClient = gamebrokerStompclient;
+const stompClient2 = schluesselStompclient;
 
 const {lobbystate} = useLobbyStore();
 const gamestate = reactive({
@@ -139,6 +140,7 @@ const initLoader = () => {
                         if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
                             //Tür und Schlüssel bestehen aus mehreren Objekten,
                             //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
+                            console.log(res.scene.children[0])
                             interactableList.push(res.scene.children[0]);
                         } else {
                             interactableList.push(res.scene);
@@ -180,7 +182,9 @@ const initCamera = () => {
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
     subscribeToSpielerPositionenUpdater(stompClient);
-    subscribeToSchluesselUpdater(stompClient)
+
+    stompClient2.activate();
+    subscribeToSchluesselUpdater(stompClient2);
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
@@ -500,11 +504,19 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
-function setzteSchluesselAnz(anzSchluessel: number){
+function setzteSchluesselAnz(anzSchluessel: number, id: number){
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
     schluesselText.textContent = "Keys x" + anzSchluessel;
     schluesselText.style.display = "block";
+
+    const removeObject = scene.getObjectById(id);
+    console.log("DAS OBJECT MUSS WEG:")
+    console.log(removeObject);
+
+    removeObject.parent.remove(removeObject);
+   
+    
 }
 
 function setzteWarnText(){
