@@ -123,9 +123,10 @@ export class MyKeyboardControls {
 
         const collisionDetection = (blickVektor:any, originPoint: any) => {
 
-            // TODO: Raycasting nur wenn Taste gedrueckt bzw mit Maus umgeschaut wird und in Intervallen checken, nicht jedes Frame (PERFORMANCE)
-            // TODO: Springen und crouchen auch testen
+            // TODO: (EXTRA) Raycasting nur wenn Taste gedrueckt bzw mit Maus umgeschaut wird und in Intervallen checken, nicht jedes Frame (PERFORMANCE)
+            // TODO: Springen und crouchen ueberhaupt noch einbauen ?
 
+            // Raycaster nur updaten anstatt immer neu zu bauen (performance)
             this.rayCaster.set(originPoint, blickVektor);
 
             // // Blickhelper fuer Blickrichtung der Collisiondetection, braucht scene uebergabe in constructor....
@@ -147,7 +148,7 @@ export class MyKeyboardControls {
             direction.y = Number(this.moveDown) - Number(this.moveUp);
             direction.normalize(); // this ensures consistent movements in all directions
 
-            const speed = 50.0; //geschwindigkeit der camera
+            const speed = 50.0; //Geschwindigkeit der Kamera
 
             // cameraCollidable immer mit Kamera updaten
             this.cameraCollidable.position.set(camera.position.x,camera.position.y, camera.position.z)
@@ -158,14 +159,13 @@ export class MyKeyboardControls {
             // Positionsvariable benoetigt zum berechnen der (Blickrichtung der Kamera fuer) CollisionDetection
             const originPoint = this.cameraCollidable.position.clone(); // position in SPielfeld
             // cameraCollidable.                        arbeitet auf Mesh
-            
             // cameraCollidable.geometry.               arbeitet auf Buffergeometry
             // cameraCollidable.geometry.attributes.    arbeitet auf Bufferattribute 
 
 
 
             // Blickrichtung cameraCollidable an KameraBlickrichtung anpassen
-            // nimmt punkt auf den Kamera schaut (von 0,0,0) und addiert aktuelle Position der Kamera drauf 
+            // Nimmt Punkt auf den Kamera schaut (von 0,0,0) und addiert aktuelle Position der Kamera drauf 
             const blickRichtung = new Vector3(0,0,-1).applyQuaternion(camera.quaternion)
             
             const blickRichtungCubePos = blickRichtung.clone().add(camera.position) 
@@ -177,24 +177,13 @@ export class MyKeyboardControls {
             const hinten = Math.PI;
             const rechts = (3*Math.PI)/2;
 
-            const drehVektor = new Vector3(0,1,0); // um Y-Achse drehen (y-achse geht nach oben)
+            // um Y-Achse drehen (y-achse geht nach oben)
+            const drehVektor = new Vector3(0,1,0); 
 
-            const vorneVektor = blickRichtung.clone()
+            const vorneVektor = blickRichtung.clone().setComponent(1,0);
             const linksVektor = vorneVektor.clone().applyAxisAngle(drehVektor, links)
             const hintenVektor = vorneVektor.clone().applyAxisAngle(drehVektor, hinten)
             const rechtsVektor = vorneVektor.clone().applyAxisAngle(drehVektor, rechts)
-
-
-            // 45 grad winkel EXTRA SICHER, muss aber nicht da
-            // const vorneLinks = Math.PI / 4;
-            // const vorneRechts = (7*Math.PI)/4;
-            // const hintenLinks = (3*Math.PI)/4
-            // const hintenRechts = (5*Math.PI)/4
-            // const vorneLinksV = blickRichtung.clone().applyAxisAngle(drehVektor, vorneLinks)
-            // const vorneRechtsV = blickRichtung.clone().applyAxisAngle(drehVektor, vorneRechts)
-            // const hintenLinksV = blickRichtung.clone().applyAxisAngle(drehVektor, hintenLinks)
-            // const hintenRechtsV = blickRichtung.clone().applyAxisAngle(drehVektor, hintenRechts)
-
 
             this.rayCaster = new Raycaster(originPoint,vorneVektor,0,1);
             const vorneCollision = collisionDetection(vorneVektor,originPoint);
@@ -202,10 +191,7 @@ export class MyKeyboardControls {
             const linksCollision = collisionDetection(linksVektor,originPoint);
             const rechtsCollision = collisionDetection(rechtsVektor,originPoint);
             
-
-            //console.log(vorneCollision,hintenCollision,linksCollision,rechtsCollision)
-
-            // x rot, y gelb, z blau
+            // Axishelper Farben: x rot, y gelb, z blau
     
             if ((this.moveForward && !vorneCollision) || (this.moveBackward && !hintenCollision))
                 velocity.z -= direction.z * speed * delta;    
@@ -215,11 +201,11 @@ export class MyKeyboardControls {
                 velocity.y -= direction.y * speed * delta;
 
 
-            // Nicht in Wand haengenbleiben, ist man halt ein Gummi Mensch
+            // Nicht in Wand haengenbleiben, man bounced leicht ab (speed einfach auf 1 gesetzt)
             if ((this.moveForward && vorneCollision) || (this.moveBackward && hintenCollision))
-                velocity.z += direction.z * speed * delta; 
+                velocity.z += direction.z * 1 * delta; 
             if ((this.moveLeft&& linksCollision ) || (this.moveRight&& rechtsCollision ))
-                velocity.x += direction.x * speed * delta;
+                velocity.x += direction.x * 1 * delta;
 
 
         };
