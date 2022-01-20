@@ -57,6 +57,7 @@ const actions = {
       state.benutzername = benutzername;
       // Add a request interceptor (sends bearer token with every axios request)
       axios.defaults.headers.common['Authorization'] = "Bearer " + response.data;
+      sessionStorage.setItem("jwttoken", response.data)
       return Promise.resolve(response)
     } else {
       console.log("LOGIN FEHLGESCHLAGEN");
@@ -89,6 +90,7 @@ const actions = {
     await Request.logout(state.benutzername)
     state.benutzername = ''
     state.istEingeloggt = false
+    sessionStorage.setItem("jwttoken","")
     // Remove Axios interceptor 
     delete axios.defaults.headers.common['Authorization'];
     //router.push('/')

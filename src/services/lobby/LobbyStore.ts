@@ -8,6 +8,7 @@ import userStore from '@/stores/user'
 import {NachrichtenCode} from '@/messaging/NachrichtenCode';
 import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
+import axios from 'axios';
 
 const wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
 const stompclient = new Client({brokerURL: wsurl});
@@ -100,17 +101,15 @@ function subscribeToUebersicht() {
  */
 async function tryJoin(lobby_id: string) {
     console.log("Fetch auf: /api/lobby/join/" + lobby_id);
-    return fetch('/api/lobby/join/' + lobby_id, {
-        method: 'POST'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-    }).then((response) => {
-        if (!response.ok) {
+
+
+    return axios.post('/api/lobby/join/' + lobby_id)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((jsondata) => {
         // verarbeite jsondata
         const lobbymessage = jsondata as LobbyMessage;
@@ -122,6 +121,29 @@ async function tryJoin(lobby_id: string) {
     }).catch((e) => {
         console.log(e);
     });
+
+    // return fetch('/api/lobby/join/' + lobby_id, {
+    //     method: 'POST'
+    //     // ,headers: {
+    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
+    //     // }
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((jsondata) => {
+    //     // verarbeite jsondata
+    //     const lobbymessage = jsondata as LobbyMessage;
+    //     if (lobbymessage.istFehler) {
+    //         return lobbymessage.typ;
+    //     } else {
+    //         return lobbymessage.typ;
+    //     }
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 /*
@@ -309,17 +331,15 @@ async function empfangeChatNachricht(nachricht: ChatNachricht) {
  */
 async function updateLobby(lobby_id: string) {
     console.log("Fetch auf: /api/lobby/" + lobby_id);
-    fetch('/api/lobby/' + lobby_id, {
-        method: 'GET'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-    }).then((response) => {
-        if (!response.ok) {
+
+
+    axios.get('/api/lobby/' + lobby_id)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((jsondata) => {
         console.log(jsondata)
         // verarbeite jsondata
@@ -334,21 +354,45 @@ async function updateLobby(lobby_id: string) {
     }).catch((e) => {
         console.log(e);
     });
+
+
+    // fetch('/api/lobby/' + lobby_id, {
+    //     method: 'GET'
+    //     // ,headers: {
+    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
+    //     // }
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((jsondata) => {
+    //     console.log(jsondata)
+    //     // verarbeite jsondata
+    //     lobbystate.teilnehmerliste = jsondata.teilnehmerliste;
+    //     lobbystate.istGestartet = jsondata.istGestartet;
+    //     lobbystate.istVoll = jsondata.istVoll;
+    //     lobbystate.lobbyID = jsondata.lobbyID;
+    //     lobbystate.spielerlimit = jsondata.spielerlimit;
+    //     lobbystate.host = jsondata.host;
+    //     lobbystate.istPrivat = jsondata.istPrivat;
+
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 async function joinRandomLobby() {
     console.log("Fetch auf: /api/lobby/joinRandom");
-    return fetch('/api/lobby/joinRandom', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    }).then((response) => {
-        if (!response.ok) {
+
+    return axios.post('/api/lobby/joinRandom')
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
         if (lobbyMsg.istFehler) {
@@ -362,31 +406,74 @@ async function joinRandomLobby() {
             console.log(e);
         });
 
+
+    // return fetch('/api/lobby/joinRandom', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     }
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((jsondata) => {
+    //     const lobbyMsg = jsondata as LobbyMessage;
+    //     if (lobbyMsg.istFehler) {
+    //         alleLobbiesState.errormessage = "Keine passende Lobby gefunden. Erstell doch einfach selber eine.";
+    //     }
+    //     else {
+    //         router.push("/lobby/" + lobbyMsg.payload);
+    //     }
+    // })
+    //     .catch((e) => {
+    //         console.log(e);
+    //     });
+
 }
 
 async function starteLobby() {
 
     console.log("Fetch auf: /api/lobby/{lobbyId}/start")
-    return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    }).then((response) => {
-        if (!response.ok) {
+
+    return axios.post('/api/lobby/'+lobbystate.lobbyID+'/start')
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then(async (jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
         console.log(lobbyMsg);
         return lobbyMsg.payload;
 
-    })
-        .catch((e) => {
+    }).catch((e) => {
             console.log(e);
         });
+
+
+    // return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
+    //     method: 'POST',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     }
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then(async (jsondata) => {
+    //     const lobbyMsg = jsondata as LobbyMessage;
+    //     console.log(lobbyMsg);
+    //     return lobbyMsg.payload;
+
+    // })
+    //     .catch((e) => {
+    //         console.log(e);
+    //     });
 }
 
 /**
@@ -416,21 +503,38 @@ async function leaveLobby(): Promise<boolean> {
 
     console.log("Fetch auf: /leave/" + lobbystate.lobbyID)
     router.push("/uebersicht");
-    return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    }).then((response) => {
-        if (!response.ok) {
+
+
+
+    return axios.delete('/api/lobby/leave/' + lobbystate.lobbyID)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
         resetLobbyState();
-        return response.json();
+        return response.data;
     }).catch((e) => {
         console.log(e);
     });
+    
+
+
+    // return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
+    //     method: 'DELETE',
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     resetLobbyState();
+    //     return response.json();
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 /**
@@ -440,24 +544,36 @@ async function leaveLobby(): Promise<boolean> {
  */
 async function neueLobby() {
     console.log("Fetch auf: /api/lobby/neu")
-    return fetch('/api/lobby/neu', {
-        method: 'POST'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-    }).then((response) => {
-        if (!response.ok) {
-            console.log("error");
+
+    return axios.post('/api/lobby/neu')
+    .then((response) => {
+        if (response.status != 200 ) {
+            console.log("Fetch Error /api/lobby/alle");
             return;
         }
-        return response.json();
-    }).then((jsondata) => {
-        console.log(jsondata)
-        router.push("/lobby/" + jsondata.lobbyID);
-        return jsondata.lobbyID
-    }).catch((e) => {
-        console.log(e);
-    });
+        return response.data;
+    })
+
+
+
+    // return fetch('/api/lobby/neu', {
+    //     method: 'POST'
+    //     // ,headers: {
+    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
+    //     // }
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((jsondata) => {
+    //     console.log(jsondata)
+    //     router.push("/lobby/" + jsondata.lobbyID);
+    //     return jsondata.lobbyID
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 /**
@@ -467,19 +583,17 @@ async function neueLobby() {
  */
 async function alleLobbiesladen() {
     const lobbyliste = new Array<Lobby>();
+    
+
     console.log("Fetch auf: /api/lobby/alle")
-    return fetch('/api/lobby/alle', {
-        method: 'GET'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-    }).then((response) => {
-        if (!response.ok) {
-            console.log("error");
+    return axios.get('/api/lobby/alle')
+    .then((response) => {
+        if (response.status != 200 ) {
+            console.log("Fetch Error /api/lobby/alle");
             return;
         }
-        return response.json();
-    }).then((jsondata: Array<Lobby>) => {
+        return response.data;
+    }).then((jsondata : Array<Lobby>)=> {
         console.log(jsondata);
         // verarbeite jsondata
         jsondata.forEach(element => {
@@ -491,6 +605,33 @@ async function alleLobbiesladen() {
     }).catch((e) => {
         console.log(e);
     });
+
+
+
+
+    // return fetch('/api/lobby/alle', {
+    //     method: 'GET'
+    //     // ,headers: {
+    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
+    //     // }
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((jsondata: Array<Lobby>) => {
+    //     console.log(jsondata);
+    //     // verarbeite jsondata
+    //     jsondata.forEach(element => {
+    //         lobbyliste.push(element);
+    //     });
+    //     alleLobbiesState.lobbies = lobbyliste;
+
+    //     return lobbyliste
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 /**
@@ -500,26 +641,41 @@ async function alleLobbiesladen() {
  */
 function changeLimit(neuesLimit) {
     console.log('change limit:', neuesLimit);
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', {
-        method: 'PATCH',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(neuesLimit)
-    }).then((response) => {
-        if (!response.ok) {
+
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', neuesLimit)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response;
     }).then((json) => {
         console.log(json);
     }).catch((e) => {
         console.log(e);
     });
+
+
+    // fetch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', {
+    //     method: 'PATCH',
+    //     // ,headers: {
+    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
+    //     // }
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(neuesLimit)
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((json) => {
+    //     console.log(json);
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 /**
@@ -529,26 +685,43 @@ function changeLimit(neuesLimit) {
  */
 function changePrivacy(istPrivat) {
     console.log('change privacy:', istPrivat);
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/privacy', {
-        method: 'PATCH',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(istPrivat)
-    }).then((response) => {
-        if (!response.ok) {
+
+
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/privacy', istPrivat)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response;
     }).then((json) => {
         console.log(json);
     }).catch((e) => {
         console.log(e);
     });
+
+
+
+    // fetch('/api/lobby/' + lobbystate.lobbyID + '/privacy', {
+    //     method: 'PATCH',
+    //     // ,headers: {
+    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
+    //     // }
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(istPrivat)
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((json) => {
+    //     console.log(json);
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 /**
@@ -558,26 +731,41 @@ function changePrivacy(istPrivat) {
  */
 function changeHost(neuerHost) {
     console.log('change host:', neuerHost);
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/host', {
-        method: 'PATCH',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(neuerHost)
-    }).then((response) => {
-        if (!response.ok) {
+
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/host', neuerHost)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response;
     }).then((json) => {
         console.log(json);
     }).catch((e) => {
         console.log(e);
     });
+
+
+    // fetch('/api/lobby/' + lobbystate.lobbyID + '/host', {
+    //     method: 'PATCH',
+    //     // ,headers: {
+    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
+    //     // }
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(neuerHost)
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((json) => {
+    //     console.log(json);
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 /**
@@ -587,21 +775,15 @@ function changeHost(neuerHost) {
  */
 function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
     console.log('entferne Mitspieler:', zuEntzfernenderSpieler);
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', {
-        method: 'DELETE',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(zuEntzfernenderSpieler)
-    }).then((response) => {
-        if (!response.ok) {
+
+    
+    axios.delete('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', { data: zuEntzfernenderSpieler })
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((lobbyMessage: LobbyMessage) => {
         console.log(lobbyMessage);
         if (lobbyMessage.istFehler) {
@@ -611,6 +793,32 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
     }).catch((e) => {
         console.log(e);
     });
+
+
+    // fetch('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', {
+    //     method: 'DELETE',
+    //     // ,headers: {
+    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
+    //     // }
+    //     headers: {
+    //         'Content-Type': 'application/json',
+    //     },
+    //     body: JSON.stringify(zuEntzfernenderSpieler)
+    // }).then((response) => {
+    //     if (!response.ok) {
+    //         console.log("error");
+    //         return;
+    //     }
+    //     return response.json();
+    // }).then((lobbyMessage: LobbyMessage) => {
+    //     console.log(lobbyMessage);
+    //     if (lobbyMessage.istFehler) {
+    //         lobbystate.errormessage = "Du darfst das nicht!";
+    //         // Todo: vielleicht nen timer, der die nachricht nach 5 Sekunden entfernt?
+    //     }
+    // }).catch((e) => {
+    //     console.log(e);
+    // });
 }
 
 /**

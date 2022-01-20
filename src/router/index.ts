@@ -2,7 +2,6 @@ import {createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw} fr
 import Home from '../views/Home.vue'
 import LobbyView from '@/views/LobbyView.vue'
 import Register from "@/views/Register.vue";
-import Dashboard from "@/views/Dashboard.vue";
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
 import Editor from "@/views/Editor.vue";
 import userStore from '@/stores/user'
@@ -21,21 +20,6 @@ const routes: Array<RouteRecordRaw> = [
         name: 'SignUp',
         component: Register
     },
-    {
-        path: '/dashboard',
-        name: 'Dashboard',
-        component: Dashboard,
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                console.log(from);
-                console.log(to);
-                next('/')
-            }else{
-                next();
-            }
-        }
-    },
-
     {
         path: '/instructions',
         name: 'Instructions',

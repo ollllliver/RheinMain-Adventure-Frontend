@@ -34,7 +34,6 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref} from 'vue';
 import userStore from '@/stores/user'
-import { useLoginStore } from "@/stores/LoginStore";
 import Login from '@/components/Login.vue'
 import { useRouter } from "vue-router";
 export default defineComponent({
@@ -44,30 +43,7 @@ export default defineComponent({
 
     onMounted(userStore.getUser)
     return { userStore }
-    // const {loginstate, errormessage, doLogin, doLogout} = useLoginStore();
-    //     onMounted(()=>{
-    //         console.log("deine Mudda")
-    //         doLogout();
-    //     })
-    //     const router = useRouter();
-    //     const username = ref("friedfert");
-    //     const password = ref("dingdong");
-    //     async function login(){
-    //         console.log("username:", username.value);
-    //         console.log("password:", password.value);
-    //         const post = await doLogin(username.value, password.value);
-    //         if (post){
-    //             router.push("/");
-    //         }
-
-    //     }
-
-    //     return {
-    //         login,
-    //         username,
-    //         password,
-    //         errormessage: ref(errormessage),
-    //     }
+    
   }
 });
 </script>
