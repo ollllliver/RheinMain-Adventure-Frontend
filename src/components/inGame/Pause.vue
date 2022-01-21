@@ -19,6 +19,7 @@
 import { defineComponent, PropType } from "vue";
 import { useGameEngine } from "@/services/inGame/gameEngine";
 import { useLobbyStore } from "@/services/lobby/lobbyService"
+import { useChatStore } from "@/services/ChatStore"
 import router from "@/router";
 
 
@@ -29,7 +30,8 @@ export default defineComponent({
     setup(){
         const fenster = document.getElementById("fenster");
         const { disconnect, connect } = useGameEngine();
-        return {fenster, connect, disconnect}
+        const { unsubscribeChat } = useChatStore();
+        return {fenster, connect, disconnect, unsubscribeChat}
     },
     methods: {
         /**
@@ -46,6 +48,7 @@ export default defineComponent({
          */
         verlassen() {
             console.log("Pause.abbrechen: Spiel wurde verlassen");
+            this.unsubscribeChat();
             this.disconnect();
             router.push(`/lobby/${useLobbyStore().lobbystate.lobbyID}`);
         },

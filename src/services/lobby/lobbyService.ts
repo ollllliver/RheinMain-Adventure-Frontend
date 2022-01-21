@@ -262,6 +262,7 @@ function starteTimer(delay = 1000) {
       }, delay);
     } else {
       router.push("/environment");
+      unsubscribeChat();
     }
   }
 
