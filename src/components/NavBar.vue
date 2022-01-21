@@ -25,7 +25,7 @@
             <button class="dropbtn w-100" @click="router.push('/login')">Login</button>
           </div>
         </div> -->
-        <router-link v-else class="dropbtn" to="/">Login</router-link>
+        <router-link v-else class="dropbtn" to="/home">Login</router-link>
     </div>
 
 

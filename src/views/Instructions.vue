@@ -2,7 +2,7 @@
   
   <Tutorial/>
 
-  <button class="btn btn-success" @click="$router.push('/')">
+  <button class="btn btn-success" @click="$router.push('/home')">
   Home
   </button>
   

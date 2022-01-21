@@ -12,7 +12,7 @@ import Landingpage from '@views/Landingpage.vue';
 
 const routes: Array<RouteRecordRaw> = [
     {
-        path: '/',
+        path: '/home',
         name: 'Home',
         component: Home
     },
@@ -29,7 +29,7 @@ const routes: Array<RouteRecordRaw> = [
     },
 
     {
-        path: '/landingpage',
+        path: '/',
         name: 'Landingpage',
         component: () => import('../views/Landingpage.vue')
     },
