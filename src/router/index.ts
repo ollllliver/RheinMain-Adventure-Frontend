@@ -6,6 +6,7 @@ import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
 import Editor from "@/views/Editor.vue";
 import AboutView from "@/views/AboutView.vue";
 import userStore from '@/stores/user'
+import Landingpage from '@views/Landingpage.vue';
 
 // Routen der Anwendung
 
@@ -26,6 +27,13 @@ const routes: Array<RouteRecordRaw> = [
         name: 'Instructions',
         component: () => import('../views/Instructions.vue')
     },
+
+    {
+        path: '/landingpage',
+        name: 'Landingpage',
+        component: () => import('../views/Landingpage.vue')
+    },
+    
 
     {
         path: '/uebersicht',

@@ -1,10 +1,11 @@
 <template>
-    <div>
-      <button class="btn btn-primary" @click="$router.push('/')">
-        Home
-      </button>
-      <Tutorial/>
-    </div>
+  
+  <Tutorial/>
+
+  <button class="btn btn-success" @click="$router.push('/')">
+  Home
+  </button>
+  
 </template>
 
 <script lang="ts">
