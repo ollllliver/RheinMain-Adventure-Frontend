@@ -46,6 +46,11 @@ class CommandStack {
         this.index++;
         console.log(cmd.describe() + " auf Stack gelegt.");
     }
+    
+    reset = () => {
+        this.stack = []
+        this.index = 0
+    }
 
     /**
      * Rückgängig machen des zuletzt hinzugefügten Befehls
