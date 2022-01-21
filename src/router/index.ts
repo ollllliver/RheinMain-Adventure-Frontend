@@ -15,9 +15,9 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/Register.vue')
   },
   {
-    path: '/create',
-    name: 'Create',
-    component: () => import('../views/Create.vue')
+    path: '/landingpage',
+    name: 'Landingpage',
+    component: () => import('../views/Landingpage.vue')
   },
   {
     path: '/join',
