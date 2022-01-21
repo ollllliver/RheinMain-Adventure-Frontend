@@ -1,30 +1,46 @@
 <!-- Login-Formular Komponente -->
 
 <template>
-  <form @submit.prevent="onSubmit">
-    <div class="form-group my-2">
-      <label>Benutzername</label>
-      <input
-        v-model="form.benutzername"
-        class="form-control"
-        placeholder="Benutzername"
-        required
-      />
+
+<section class="container">
+  <div class="row content d-flex justify-content-center">
+    <div class="col-md-12">
+      <div class="box shadow bg-white p-4">
+        <h3 class="mb-4 text-center fs-1">Einloggen</h3>
+        <form @submit.prevent="onSubmit" class="mb-3">
+          <div class="form-floating mb-3">
+          <input v-model="form.benutzername"
+          class="form-control rounded-0"
+          id="floatingInput"
+          placeholder="Benutzername"
+          required>  
+          <label for="floatingInput">Benutzername</label>
+          </div>
+      <div class="form-floating mb-3">
+          <input v-model="form.passwort"
+          class="form-control rounded-0"
+          id="floatingPasswort"
+          placeholder="Passwort"
+          required>  
+          <label for="floatingPasswort">Passwort</label>
+          </div>
+
+          <div class="d-grid gap-2 mb-6">{{ userStore.state.error }}
+            <div class="col md-6">
+              <button class="btn btn-success btn-lg btn-block rounded-0" type="submit" style="float: right;">Einloggen</button>
+            </div>
+           <p align="left" class="text">Noch keinen Account? 
+             <button id="anmelden" class="btn btn-outline-warning" @click="$router.push('SignUp')">Jetzt anmelden</button>
+           </p>
+          </div>
+        </form>
+      </div>
     </div>
-    <div class="form-group my-2">
-      <label>Passwort</label>
-      <input
-        v-model="form.passwort"
-        class="form-control"
-        type="passwort"
-        placeholder="Passwort"
-        required
-      />
-    </div>
-    <div class="text-danger my-2">{{ userStore.state.error }}</div>
-    <button class="btn btn-success btn-block my-2" type="submit">Login</button>
-    <button class="btn btn-secondary" @click="$router.push('SignUp')">Sign Up</button>
-  </form>
+  </div>
+</section>
+ 
+
+
 </template>
 <script lang="ts">
 import { defineComponent, reactive } from 'vue'
@@ -50,5 +66,9 @@ export default defineComponent({
 <style scoped>
 button {
   margin-left: 10px;
+}
+
+#anmelden{
+  border: 2px white;
 }
 </style>
