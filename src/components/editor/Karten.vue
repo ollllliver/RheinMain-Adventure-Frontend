@@ -75,7 +75,7 @@ export default defineComponent({
         for (let i =0; i< listeVomBackend.length; i++) {
           this.karten.push(listeVomBackend[i])
         }
-        console.log(this.karten)
+        console.log("Karten vom Backend in Liste eingefuegt")
       })
       .catch((err => {
         console.log(err)
@@ -164,9 +164,8 @@ export default defineComponent({
           erwartet.levelBeschreibung = this.kbeschreibung
         }
 
-        const aktuellesLevel = new Karte(erwartet.levelID,
-          erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung, erwartet.levelInhalt)
-        editorStore.setzeLevel(aktuellesLevel)
+        //let aktLevel = new Karte(erwartet.levelID,erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung, erwartet.levelInhalt)
+        editorStore.setzeLevel(erwartet)
         console.log("gesetzt:" ,editorStore.getters.getGrid)
           router.push("/editor")
       })

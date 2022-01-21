@@ -10,27 +10,24 @@ export class Karte {
   private levelInhalt: any[][];
   
 
-  constructor(levelID: number, benutzername: string, levelname: string, beschreibung: string, liste: number[][]) {
+  constructor(levelID: number, benutzername: string, levelname: string, beschreibung: string) {
     
       this.levelID = levelID
       this.benutzerName = benutzername
       this.levelName = levelname
       this.levelBeschreibung = beschreibung
-      this.levelInhalt = liste
-
+      this.levelInhalt = []
 
       // Liste wird erstellt -> testweise 14 Reihen und 22 Spalten (müssen wir dann klären wie groß eine Karte ist)
-
       for (let i = 0; i < 14; i++) {
+        this.levelInhalt[i] = []
         for (let j = 0; j < 22; j++) {
-          if(liste[i][j] === null) {
-            this.levelInhalt[i][j] = {y: i, x: j, e: 0}
-          }
-          else {
-            this.levelInhalt[i][j] = {y: i, x: j, e: liste[i][j]}
-          }
+           this.levelInhalt[i][j] = {y: i, x: j, e: 0}
         }
       }
+      console.log("genullt")
+      
+
   }
   
 
@@ -56,37 +53,48 @@ export class Karte {
   // setzt übergebenes Element an übergebener Position in der Liste
   public setElement(positionY: number, positionX: number, element: number, ausrichtung?: number):boolean {
     if (ausrichtung !== undefined) {
-      this.levelInhalt[positionY][positionX] = {y: positionY, x: positionX, e: element}
+      this.levelInhalt[positionY][positionX] = {y: positionY, x: positionX, e: element, a: ausrichtung}
     } else {
-      this.levelInhalt[positionY][positionX] = {y: positionY,x: positionX, e: element,a: ausrichtung}
+      this.levelInhalt[positionY][positionX] = {y: positionY,x: positionX, e: element}
     }
     return true;
+  }
+
+  public setLevelId(levelID: number) {
+    this.levelID = levelID
   }
 
   public setLevelName(levelname : string) {
     this.levelName = levelname
   }
 
+  public setBenutzername(benutzername : string) {
+    this.benutzerName = benutzername
+  }
+
   public setLevelBeschreibung(beschreibung : string) {
     this.levelBeschreibung = beschreibung
   }
 
-  public wandleKarteZuInt() {
-    for (let i = 0; i < 14; i++) {
-      for (let j = 0; j < 22; j++) {
-         this.levelInhalt[i][j] = this.levelInhalt[i][j].e
+  public setLevelInhalt(inhalt: number[][]) {
+    for (let y = 0; y < 14; y++) {
+      for (let x = 0; x < 22; x++) {
+        this.levelInhalt[y][x] = {y: y, x: x, e:inhalt[y][x]}
       }
     }
+    console.log("aktualisiert")
   }
 
-  public wandleKarteZuObjekt() {
+  public wandleKarteZuInt() : number[][]{
+    const rueck: number[][] = []
     for (let i = 0; i < 14; i++) {
+      rueck[i] = []
       for (let j = 0; j < 22; j++) {
-         this.levelInhalt[i][j] = {y: i, x: j, e: this.levelInhalt[i][j]}
+         rueck[i][j] = this.levelInhalt[i][j].e
       }
     }
-  }
+    return rueck
 
-  
+  }
 
 }

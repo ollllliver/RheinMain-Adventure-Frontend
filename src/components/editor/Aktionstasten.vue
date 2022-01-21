@@ -48,9 +48,13 @@ export default defineComponent({
           */
           if (editorStore.getters.getSchluessel >= editorStore.getters.getTuer) {
             editorStore.info("Karte wird eingereicht. Schluessel=" + editorStore.getters.getSchluessel + " Tueren=" + editorStore.getters.getTuer);
-            editorStore.getters.getGrid.wandleKarteZuInt()
+            const inhalt = editorStore.getters.getGrid.wandleKarteZuInt()
+            console.log(inhalt)
             const pojo = editorStore.getters.getGrid
-            console.log("sende", editorStore.getters.getGrid)
+            console.log("sende",JSON.stringify({levelID: pojo._levelID, benutzername: pojo._benutzername, 
+                  levelName: pojo._levelName, levelBeschreibung: pojo._levelBeschreibung,
+                  levelInhalt: inhalt}))
+            //console.log("sende", editorStore.getters.getGrid)
             fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+editorStore.getters.getGrid._levelID+"/0", {
               method: "PUT",
               headers: {
@@ -60,12 +64,10 @@ export default defineComponent({
               body: JSON.stringify(
                 { levelID: pojo._levelID, benutzername: pojo._benutzername, 
                   levelName: pojo._levelName, levelBeschreibung: pojo._levelBeschreibung,
-                  levelInhalt: pojo.liste
+                  levelInhalt: inhalt
                 }),
             }).then(function (res) {
               console.log("LEVEL GESPEICHERT");
-              editorStore.getters.getGrid.wandleKarteZuObjekt()
-              console.log(editorStore.getters.getGrid.liste);
               editorStore.default()
               router.push("/editoruebersicht")
             });

@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { computed, isProxy, reactive } from 'vue'
 import { Karte } from '@/models/Karte';
 
 /**
@@ -20,7 +20,11 @@ import { Karte } from '@/models/Karte';
 
 const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
 const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tuer ist horizontal."
-let karte: Karte
+
+
+
+
+const karte: Karte = new Karte(99999,"","","")
 
 const state = reactive({
   wegbeschreibung: 0,
@@ -35,6 +39,7 @@ const state = reactive({
   npc: 0,
   entfernen: false,
   stackindex: 0,
+  
 })
 
 /**
@@ -189,8 +194,14 @@ const actions = {
     state.npc = 0
     state.stackindex = 0
   },
-  async setzeLevel(level: Karte) {
-     karte = level
+  async setzeLevel(erwartet: any) {
+    const aktKarte = new Karte(erwartet.levelID,erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung)
+    karte.setLevelId(aktKarte._levelID)
+    karte.setBenutzername(aktKarte._benutzername)
+    karte.setLevelName(aktKarte._levelName)
+    karte.setLevelBeschreibung(aktKarte._levelBeschreibung)
+    karte.setBenutzername(aktKarte._benutzername)
+    karte.setLevelInhalt(erwartet.levelInhalt)
   }
 }
 
