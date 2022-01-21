@@ -41,19 +41,19 @@ let developerCamera: any;
 let controls: any;
 let requestID: number;
 
-
 let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
 let interactions: Interactions;
 let interaktionText: any;
 let schluesselText:any;
 
-let spieler: SpielerLokal
-
+let spieler: SpielerLokal;
+let startPosition: Position;
 let prevTime = performance.now();
+
 const velocity = new Three.Vector3();
 const direction = new Three.Vector3();
-
+const mitspieler3dObjektListe = new Map();
 const stompClient = gamebrokerStompclient;
 const stompClient2 = schluesselStompclient;
 
@@ -61,11 +61,8 @@ const {lobbystate} = useLobbyStore();
 const gamestate = reactive({
     anzSchluessel:0
 })
-const mitspieler3dObjektListe = new Map();
 
 const {unsubscribeChat, subscribeChat} = useChatStore();
-
-let startPosition: Position;
 
 function setContainer(element: HTMLElement | null) {
     container = element
@@ -250,7 +247,6 @@ window.addEventListener('resize', () => {
 const initControls = () => {
     mouseControls = new MyMouseControls(camera, document); //init Maussteuerung
     keyControls = new MyKeyboardControls(collidableList, cameraCollidable, document, spieler); //init Keyboardsteuerung
-
     connect();
 }
 
@@ -288,6 +284,17 @@ const initChat = () =>{
 
         closeChat(chat, chatButton);
     }
+    
+    // TestCube zum Spiel beenden
+    const geometry = new Three.BoxGeometry( 1, 1, 1 );
+    const material = new Three.MeshBasicMaterial( {color: 0x00ff00} );
+    const cube = new Three.Mesh( geometry, material );
+
+    cube.name = "Ziel";
+    cube.position.x = -10;
+    interactableList.push(cube);
+
+    scene.add( cube );
 }
 
 /**
@@ -295,14 +302,21 @@ const initChat = () =>{
  */
 const connect = () => {
     window.addEventListener('click', mouseControls.lock); //locked die Maus     
+    
     keyControls.connect();
     mouseControls.connect();
-    console.log("gameEninge.connect: verbunden")
 
     const pauseFenster = document.getElementById('pause');
     if (pauseFenster != null) {
         pauseFenster.style.display = "none";
     }
+    
+    const zielFenster = document.getElementById('ziel');
+    if (zielFenster != null) {
+        zielFenster.style.display = "none";
+    }
+
+    console.log("gameEninge.connect: verbunden")
 }
 
 /**
@@ -316,21 +330,41 @@ const disconnect = () => { //nur aufrufen wenn man die Seite verlässt
     //interactions.disconnect();
 
     window.removeEventListener('click', mouseControls.lock);
-    console.log("gameEninge.disconnect: getrennt")
+
+    disconnectController();
+    interactions.keyDisconnect();
 }
+
 /**
  * Trennt die Verbindung zu den Eingabe-Controllern (Maus und Tastatursteuerung)
+ * Getrennt von disconnect ausgeführt, da man die interactions sonst verliert
  */
-const disconnectController = () => { //Getrennt von disconnect, da man die interactions sonst verliert
-
+const disconnectController = (element?: string) => {
     mouseControls.dispose();
     keyControls.disconnect();
 
     const pauseFenster = document.getElementById('pause');
-    if (pauseFenster != null) {
-        pauseFenster.style.display = "";
+    const zielFenster = document.getElementById('ziel');
+
+    if (element != null) {
+        switch (element) {
+            case "ziel":
+                if (zielFenster != null) {
+                    zielFenster.style.display = "";
+                }
+                break;
+        }
+    } else {
+        if (pauseFenster != null && zielFenster != null) {
+            if (zielFenster.style.display !== "") {
+                pauseFenster.style.display = "";
+            }
+        }
     }
+
+    console.log("gameEninge.disconnect: getrennt")
 }
+
 
 const initPlane = () => {
     const plane = new Three.PlaneGeometry(100, 100);

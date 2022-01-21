@@ -1,6 +1,7 @@
 <template>
   <div>
-    <Pause id="pause"/>
+    <Ziel id="ziel" />
+    <Pause id="pause" />
     <div id="container">
       <h2 id="interaktionText"></h2>
       <h2 id="schluesselText"></h2>
@@ -13,18 +14,18 @@
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted} from "vue";
+import { defineComponent, onMounted, ref } from "vue";
 import { useGameEngine } from "@/services/inGame/gameEngine";
 import Pause from "./Pause.vue";
 import Chat from "@/components/lobby/Chat.vue";
 import { useChatStore } from "@/services/ChatStore";
+import Ziel from "./Ziel.vue";
 
 
 export default defineComponent({
   name: "RenderDemo",
-  components: {Pause, Chat},
+  components: {Pause, Chat, Ziel},
   setup() {
-
     const {
       initScene,
       initLoader,
@@ -39,7 +40,7 @@ export default defineComponent({
       stopAnimate,
       connect,
       disconnect,
-      setContainer
+      setContainer,
     } = useGameEngine();
 
     const { sendeChatNachricht, empfangeChatNachricht} = useChatStore();
@@ -57,25 +58,20 @@ export default defineComponent({
       initInteractions();
       initChat();
       startAnimate();
-
     });
 
     return {connect, disconnect, stopAnimate, sendeChatNachricht, empfangeChatNachricht}
-
   },
   beforeUnmount() {
     this.stopAnimate();
     this.disconnect();
-    console.log("unmounted")
+    console.log("unmounted");
   },
 });
-
-
 </script>
 
 <style scoped>
-
- #pause {
+#pause, #ziel{
   --gap: 15px;
 
   position: fixed;
@@ -90,6 +86,5 @@ export default defineComponent({
   padding: var(--gap);
   background: rgba(0, 0, 0, 0.5);
   font-family: sans-serif;
- }
-
+}
 </style>

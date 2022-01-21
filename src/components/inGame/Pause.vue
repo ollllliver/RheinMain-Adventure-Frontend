@@ -1,17 +1,15 @@
 <template>
   <div id="fenster">    
     <div class="fenster__inner">
-            <div class="fenster__top">
-                <h1 class="title">Spiel unterbrochen</h1>
-            </div>
-            <div class="fenster__bottom">
-                <button class="button" @click="weiter">Weiter</button><br>
-                <button class="button" @click="verlassen">Verlassen</button><br>
-                <!-- <button class="button" @click="einstellungen">Einstellungen</button> -->
-            </div>
+      <div class="fenster__top">
+        <h1 class="title">Spiel unterbrochen</h1>
+      </div>
+      <div class="fenster__bottom">
+        <button class="button" @click="weiter">Weiter</button><br>
+        <button class="button" @click="verlassen">Verlassen</button><br>
+        <!-- <button class="button" @click="einstellungen">Einstellungen</button> -->
+      </div>
     </div>
-
-    
   </div>
 </template>
 

@@ -60,17 +60,16 @@ class MyMouseControls extends EventDispatcher {
 		const onPointerlockChange = () => {
 
 			if (this.domElement.ownerDocument.pointerLockElement === this.domElement) {
-
+				
 				this.dispatchEvent(_lockEvent);
-
 				this.isLocked = true;
 				// console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
 
 			} else {
 
 				this.dispatchEvent(_unlockEvent);
-
 				this.isLocked = false;
+
 				useGameEngine().disconnectController();
 				// console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
 
