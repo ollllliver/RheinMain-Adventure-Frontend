@@ -90,10 +90,10 @@ const initLoader = () => {
 
     // TODO: Level-ID dynamisch bestimmen
 
-    // const { lobbystate } = useLobbyStore()
+    const { lobbystate } = useLobbyStore()
     // const levelId : string = lobbystate.levelID
 
-    fetch(`/api/level/1/0`, {
+    fetch(`/api/level/${lobbystate.gewaehlteKarte.levelId}/0`, {
         method: 'GET',
     }).then((response) => {
         if (!response.ok) {

@@ -33,8 +33,6 @@ const routes: Array<RouteRecordRaw> = [
         component: LobbyuebersichtView,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
-                console.log(from);
-                console.log(to);
                 next('/')
             }else{
                 next();

@@ -77,7 +77,7 @@ async function connectToStomp(callb, param) {
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
         callb(param)
-        console.log(callb.name + "()");
+        console.log("Subscribe to", callb.name + "()");
     };
     stompclient.activate();
 }
@@ -90,7 +90,7 @@ function connectToUebersicht() {
         connectToStomp(subscribeToUebersicht, null);
     }
     else {
-        console.log(subscribeToUebersicht.name + "()");
+        console.log("Subscribe to", subscribeToUebersicht.name + "()");
         subscribeToUebersicht();
     }
 }
@@ -116,7 +116,6 @@ function subscribeToUebersicht() {
  * Bei Misserfolg, steht in der Lobbymessage das istFehler Flag auf true.
  */
 async function tryJoin(lobby_id: string) {
-    console.log("Fetch auf: /api/lobby/join/" + lobby_id);
     return fetch('/api/lobby/join/' + lobby_id, {
         method: 'POST'
         // ,headers: {
@@ -191,9 +190,8 @@ async function connectToLobby(lobby_id: string) {
                     connectToStomp(subscribeToLobby, lobby_id);
                 }
                 else {
-                    console.log('unsubscribe von uebersicht');
                     uebersichtSubscription.unsubscribe();
-                    console.log(subscribeToLobby.name + "()");
+                    console.log("Subscribe to", subscribeToLobby.name + "()");
                     subscribeToLobby(lobby_id);
                 }
                 // Chat fuer stomp subscriben:
@@ -232,7 +230,7 @@ function subscribeToLobby(lobby_id: string) {
  * @param lobby_id zugehörige Lobby ID
  */
 function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string) {
-    console.log("message from broker:", lobbymessage);
+    console.log("message from broker topic lobby:", lobbymessage);
     if (lobbymessage.istFehler) {
         lobbystate.errormessage = lobbymessage.typ;
     }
@@ -274,18 +272,17 @@ function starteTimer(delay = 1000) {
  * @param lobbymessage empfangene Lobbymessage
  */
 function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
-    console.log("message from broker:", lobbymessage);
+    console.log("message from broker topic uebersicht:", lobbymessage);
     // Es gibt keine errormessages, die über diesen Kanal geteilt werden.
     alleLobbiesladen();
 }
 
 /**
- * lädt die Lobby Daten der mitgegebenen Lobby neu in das lobbyState reactive.
+ * lädt die Lobby Date der mitgegebenen Lobby neu in das lobbyState reactive.
  * 
  * @param lobby_id ist die ID der neu zu ladenden Lobby
  */
 async function updateLobby(lobby_id: string) {
-    console.log("Fetch auf: /api/lobby/" + lobby_id);
     fetch('/api/lobby/' + lobby_id, {
         method: 'GET'
         // ,headers: {
@@ -298,7 +295,6 @@ async function updateLobby(lobby_id: string) {
         }
         return response.json();
     }).then((jsondata) => {
-        console.log(jsondata)
         // verarbeite jsondata
         lobbystate.teilnehmerliste = jsondata.teilnehmerliste;
         lobbystate.istGestartet = jsondata.istGestartet;
@@ -308,14 +304,12 @@ async function updateLobby(lobby_id: string) {
         lobbystate.host = jsondata.host;
         lobbystate.istPrivat = jsondata.istPrivat;
         lobbystate.gewaehlteKarte = jsondata.gewaehlteKarte;
-
     }).catch((e) => {
         console.log(e);
     });
 }
 
 async function joinRandomLobby() {
-    console.log("Fetch auf: /api/lobby/joinRandom");
     return fetch('/api/lobby/joinRandom', {
         method: 'POST',
         headers: {
@@ -344,7 +338,6 @@ async function joinRandomLobby() {
 
 async function starteLobby() {
 
-    console.log("Fetch auf: /api/lobby/{lobbyId}/start")
     return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
         method: 'POST',
         headers: {
@@ -358,7 +351,6 @@ async function starteLobby() {
         return response.json();
     }).then(async (jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
-        console.log(lobbyMsg);
         return lobbyMsg.payload;
 
     })
@@ -392,7 +384,6 @@ async function leaveLobby(): Promise<boolean> {
     lobbySubscription.unsubscribe()
     unsubscribeChat();
 
-    console.log("Fetch auf: /leave/" + lobbystate.lobbyID)
     router.push("/uebersicht");
     return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
         method: 'DELETE',
@@ -417,7 +408,6 @@ async function leaveLobby(): Promise<boolean> {
  * @returns bei erfolgreichem Fetch die LobbyID der im Backend neu erstellten Lobby
  */
 async function neueLobby() {
-    console.log("Fetch auf: /api/lobby/neu")
     return fetch('/api/lobby/neu', {
         method: 'POST'
         // ,headers: {
@@ -430,7 +420,6 @@ async function neueLobby() {
         }
         return response.json();
     }).then((jsondata) => {
-        console.log(jsondata)
         const lobbymessage = jsondata as LobbyMessage;
         if (lobbymessage.istFehler) {
             alleLobbiesState.errormessage = "Du bist bereits in einer Lobby die ID lautet :" + lobbymessage.payload
@@ -451,7 +440,6 @@ async function neueLobby() {
  */
 async function alleLobbiesladen() {
     const lobbyliste = new Array<Lobby>();
-    console.log("Fetch auf: /api/lobby/alle")
     return fetch('/api/lobby/alle', {
         method: 'GET'
         // ,headers: {
@@ -464,7 +452,6 @@ async function alleLobbiesladen() {
         }
         return response.json();
     }).then((jsondata: Array<Lobby>) => {
-        console.log(jsondata);
         // verarbeite jsondata
         jsondata.forEach(element => {
             lobbyliste.push(element);
@@ -483,7 +470,6 @@ async function alleLobbiesladen() {
  * @param neuesLimit 
  */
 function changeLimit(neuesLimit) {
-    console.log('change limit:', neuesLimit);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', {
         method: 'PATCH',
         // ,headers: {
@@ -499,8 +485,6 @@ function changeLimit(neuesLimit) {
             return;
         }
         return response.json();
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
@@ -512,7 +496,6 @@ function changeLimit(neuesLimit) {
  * @param istPrivat 
  */
 function changePrivacy(istPrivat) {
-    console.log('change privacy:', istPrivat);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/privacy', {
         method: 'PATCH',
         // ,headers: {
@@ -528,8 +511,6 @@ function changePrivacy(istPrivat) {
             return;
         }
         return response.json();
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
@@ -541,7 +522,6 @@ function changePrivacy(istPrivat) {
  * @param neuerHost 
  */
 function changeHost(neuerHost) {
-    console.log('change host:', neuerHost);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/host', {
         method: 'PATCH',
         // ,headers: {
@@ -557,8 +537,6 @@ function changeHost(neuerHost) {
             return;
         }
         return response.json();
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
@@ -570,7 +548,6 @@ function changeHost(neuerHost) {
  * @param zuEntzfernenderSpieler 
  */
 function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
-    console.log('entferne Mitspieler:', zuEntzfernenderSpieler);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', {
         method: 'DELETE',
         // ,headers: {
@@ -587,7 +564,6 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
         }
         return response.json();
     }).then((lobbyMessage: LobbyMessage) => {
-        console.log(lobbyMessage);
         if (lobbyMessage.istFehler) {
             lobbystate.errormessage = "Du darfst das nicht!";
             // Todo: vielleicht nen timer, der die nachricht nach 5 Sekunden entfernt?
@@ -603,7 +579,6 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
  * @param neueKarte 
  */
  function changeKarte(neueKarte) {
-    console.log('change limit:', neueKarte);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/level', {
         method: 'PATCH',
         // ,headers: {
@@ -619,8 +594,6 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
             return;
         }
         return response.json();
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
@@ -639,9 +612,7 @@ async function alleKartenLaden() {
         }
         return response.json();
     }).then((level: Array<Lobby>) => {
-        console.log(level);
         // verarbeite jsondata
-        console.log("alle level:", level);
         alleKartenState.karten = level;
     }).catch((e) => {
         console.log(e);
