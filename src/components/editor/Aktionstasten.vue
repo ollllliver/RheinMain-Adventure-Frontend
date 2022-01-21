@@ -2,9 +2,8 @@
   <!-- Aktionstasten: Buttons zum Auslösen verschiedener Aktionen (speichern/löschen/redo/undo/...) -->
   <div>
     <button class="btn btn-outline-secondary" @click="zurPruefung()" name="pruef">zur Prüfung einreichen</button>
-    <button class="btn btn-outline-secondary" @click="test()">später beenden</button>
-    <button class="btn btn-outline-secondary">abbrechen</button>
-    <button class="btn btn-outline-secondary" v-on:click="allesEntfernen">alles entfernen</button>
+    <button class="btn btn-outline-secondary" @click="spaeterBeenden()">später beenden</button>
+    <button class="btn btn-outline-secondary" @click="allesEntfernen()">alles entfernen</button>
     <button class="btn btn-outline-secondary" @click="entfernen()">löschen: An/Aus</button>
     <button class="btn btn-outline-secondary" @click="undo()">letzten Schritt rückgängig</button>
     <button class="btn btn-outline-secondary" @click="redo()">letzten Schritt wiederherstellen</button>
@@ -15,7 +14,8 @@
 import {defineComponent} from "vue";
 import {CommandStack} from "../../commands/CommandManager";
 import editorStore from "@/stores/editor";
-
+import userStore from "@/stores/user";
+import router from  "@/router/index"
 export default defineComponent({
   name: "Aktionstasten",
   methods: {
@@ -32,7 +32,8 @@ export default defineComponent({
   setup() {
     
     
-    // Karte nach Prüfung ob Start/Ziel und Raum platziert wurde loggen (vorerst)
+    // Karte nach Prüfung ob Start/Ziel und Raum/Schluessel/Tuer richtig platziert wurde 
+    // an Backend senden und speichern body = {name: levelName, karte: [][]any} 
     const zurPruefung = () => {
       if (editorStore.getters.getZiel === true) {
         if (editorStore.getters.getStart === true) {
@@ -44,23 +45,26 @@ export default defineComponent({
             editorStore.info('Jede Karte benötigt mindestens 1 Raum. Bitte platziere erst einen Raum bevor du die Karte zur Prüfung einreichst.')
           }
           */
-          if (editorStore.getters.getSchluessel === editorStore.getters.getTuer) {
+          if (editorStore.getters.getSchluessel >= editorStore.getters.getTuer) {
             editorStore.info("Karte wird eingereicht. Schluessel=" + editorStore.getters.getSchluessel + " Tueren=" + editorStore.getters.getTuer);
-            console.log(editorStore.getters.getGrid);
-            let n = Math.floor(Math.random() * 120);
-            fetch("/api/level", {
+            const inhalt = editorStore.getters.getGrid.wandleKarteZuInt()
+            const pojo = editorStore.getters.getGrid
+            
+            fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+editorStore.getters.getGrid._levelID+"/0", {
               method: "PUT",
               headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                karte: editorStore.getters.getGrid.liste,
-                name: n.toString(),
-              }),
+              },      
+              body: JSON.stringify(
+                { levelID: pojo._levelID, benutzername: pojo._benutzername, 
+                  levelName: pojo._levelName, levelBeschreibung: pojo._levelBeschreibung,
+                  levelInhalt: inhalt, istFreigegeben: true
+                }),
             }).then(function (res) {
               console.log("LEVEL GESPEICHERT");
-              console.log(res);
+              editorStore.default()
+              router.push("/editoruebersicht")
             });
           } else {
             editorStore.info("Fuer jede Tuer muss ein Schluessel existieren. Aktuelle Anzahl Tueren=" + editorStore.getters.getTuer + " Schluessel=" + editorStore.getters.getSchluessel);
@@ -73,7 +77,7 @@ export default defineComponent({
       }
     };
 
-    const allesEntfernen = (event: any) => {
+    const allesEntfernen = () => {
 
       const stack = CommandStack.getInstance().getStack().length
       for(let i = 0; i < stack; i++) {
@@ -81,19 +85,6 @@ export default defineComponent({
         CommandStack.getInstance().getStack().pop()
       }
       editorStore.default()
-      //console.log(editorStore.getters.getGrid)
-      /*console.log(CommandStack.getInstance().getStack()[1])
-      for (let i = 0; i < editorStore.getters.getStackindex; i++) {
-        
-        for (let j = 0; j < 22; j++) {
-          let storeElement = liste[i][j].e;
-          if (storeElement !== 0) {
-            console.log("Stack Element: { " + i + " " + j + " } " + storeElement);
-            
-            
-          }
-        }
-      }*/
     }
 
     const entfernen = () => {
@@ -113,14 +104,33 @@ export default defineComponent({
       }
     };
 
-    const test  = () => {
-      console.log(editorStore.getters.getGrid)
+    const spaeterBeenden  = () => {
+      const inhalt = editorStore.getters.getGrid.wandleKarteZuInt()
+      const pojo = editorStore.getters.getGrid
+
+      fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+editorStore.getters.getGrid._levelID+"/0", {
+        method: "PUT",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },      
+        body: JSON.stringify(
+          { levelID: pojo._levelID, benutzername: pojo._benutzername, 
+            levelName: pojo._levelName, levelBeschreibung: pojo._levelBeschreibung,
+            levelInhalt: inhalt, istFreigegeben: false
+          }),
+      }).then(function (res) {
+        console.log("LEVEL GESPEICHERT");
+        editorStore.default()
+        router.push("/editoruebersicht")
+      });
     }
+
 
     return {
       zurPruefung,
       allesEntfernen,
-      test,
+      spaeterBeenden,
       entfernen
     };
   },
