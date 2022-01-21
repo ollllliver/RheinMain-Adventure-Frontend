@@ -18,16 +18,13 @@ export class Karte {
       this.levelBeschreibung = beschreibung
       this.levelInhalt = []
 
-      // Liste wird erstellt -> testweise 14 Reihen und 22 Spalten (müssen wir dann klären wie groß eine Karte ist)
+      // Liste initial erstellen -> testweise 14 Reihen und 22 Spalten (müssen wir dann klären wie groß eine Karte ist)
       for (let i = 0; i < 14; i++) {
         this.levelInhalt[i] = []
         for (let j = 0; j < 22; j++) {
            this.levelInhalt[i][j] = {y: i, x: j, e: 0}
         }
       }
-      console.log("genullt")
-      
-
   }
   
 
@@ -60,29 +57,30 @@ export class Karte {
     return true;
   }
 
-  public setLevelId(levelID: number) {
+  public setLevelId(levelID: number): void {
     this.levelID = levelID
   }
 
-  public setLevelName(levelname : string) {
+  public setLevelName(levelname : string): void {
     this.levelName = levelname
+    return
   }
 
-  public setBenutzername(benutzername : string) {
+  public setBenutzername(benutzername : string): void {
     this.benutzerName = benutzername
+    return
   }
 
-  public setLevelBeschreibung(beschreibung : string) {
+  public setLevelBeschreibung(beschreibung : string): void {
     this.levelBeschreibung = beschreibung
   }
 
-  public setLevelInhalt(inhalt: number[][]) {
+  public setLevelInhalt(inhalt: number[][]): void {
     for (let y = 0; y < 14; y++) {
       for (let x = 0; x < 22; x++) {
         this.levelInhalt[y][x] = {y: y, x: x, e:inhalt[y][x]}
       }
     }
-    console.log("aktualisiert")
   }
 
   public wandleKarteZuInt() : number[][]{
@@ -94,7 +92,5 @@ export class Karte {
       }
     }
     return rueck
-
   }
-
 }

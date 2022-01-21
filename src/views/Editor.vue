@@ -87,7 +87,7 @@ export default defineComponent({
     width: 30%;
     margin-left: 10px;
     margin-right: -60px;
-    margin-top: -140px;
+    margin-top: -200px;
     margin-bottom: 90px;
     border: 1px solid black;
   }

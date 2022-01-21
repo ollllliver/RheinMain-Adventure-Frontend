@@ -32,16 +32,20 @@
         <tr v-for="karte in karten" :key="karte">
           <td>{{karte.name}}</td>
           <td style="width: 110px">
-            <span >{{karte.status}}</span>
+            <span >{{karte.istFreigegeben ? "freigegeben" : "in Arbeit"}}</span>
           </td>
           <td>{{karte.beschreibung}}</td>
           <td>
-            <div class="text-center" @click="ladeKarte(karte.levelId)">
+            <div class="text-center" @click="ladeKarte(karte.levelId)" v-if="!karte.istFreigegeben">
               <span class="fa fa-pen" />
             </div>
+            <div class="text-center" v-if="karte.istFreigegeben">
+              <span class="fa fa-ban" />
+            </div>
+
           </td>
           <td>
-            <div class="text-center" @click="loescheKarte(karte.levelId)">
+            <div class="text-center" @click="loescheKarte(karte)">
               <span class="fa fa-trash"> </span>
             </div>
           </td>
@@ -55,7 +59,6 @@
 import userStore from "@/stores/user"
 import editorStore from "@/stores/editor"
 import { defineComponent, onMounted } from "vue";
-import { Karte } from "@/models/Karte";
 import router from "@/router";
 export default defineComponent({
   name: "Karten",
@@ -75,7 +78,6 @@ export default defineComponent({
         for (let i =0; i< listeVomBackend.length; i++) {
           this.karten.push(listeVomBackend[i])
         }
-        console.log("Karten vom Backend in Liste eingefuegt")
       })
       .catch((err => {
         console.log(err)
@@ -88,23 +90,7 @@ export default defineComponent({
       bearbeiteterName: null,
       bearbeiteteBeschreibung: null,
       kbeschreibung: '',
-      /* Spielstatus */
-      status:"in Arbeit",
       karten,
-      
-      // karten: [
-      //   {
-      //     name:'Schwerer Weg',
-      //     status:'in Arbeit',
-      //     beschreibung:'sehr schwer'
-      //   },
-      //   {
-      //     name:'Easypeasy',
-      //     status:'freigegeben',
-      //     beschreibung:'einfaches Spiel'
-
-      //   }
-      // ],
     }
   },
   methods:{
@@ -124,16 +110,14 @@ export default defineComponent({
       this.kbeschreibung='';
     },
     /* Name und Beschreibung löschen */
-    loescheKarte(levelId){
-      console.log(levelId)
+    loescheKarte(karte){
       
-      fetch("/api/level/"+levelId, {
+      fetch("/api/level/"+karte.levelId, {
         method: "DELETE",
       })
-      .then(res => {
-        console.log(res)
+      .then(() => {
+        this.karten.splice(this.karten.indexOf(karte),1)
         
-        console.log(this.karten)
       })
       .catch((err => {
         console.log(err)
@@ -145,41 +129,35 @@ export default defineComponent({
       this.kbeschreibung=this.karten[index].beschreibung;
       this.bearbeiteterName=index;
       this.bearbeiteteBeschreibung=index;
-
     },
     
     
     ladeKarte(levelId){
-      
       fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+levelId+"/0", {
         method: "GET",
       })
       .then(async res => {
         const erwartet = await res.json()
-        console.log("bekommen", erwartet)
         if (erwartet.levelName === "") {
           erwartet.levelName = this.levelname
         }
         if (erwartet.levelBeschreibung === "") {
           erwartet.levelBeschreibung = this.kbeschreibung
         }
-
-        //let aktLevel = new Karte(erwartet.levelID,erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung, erwartet.levelInhalt)
         editorStore.setzeLevel(erwartet)
-        console.log("gesetzt:" ,editorStore.getters.getGrid)
-          router.push("/editor")
+        router.push("/editor")
       })
       .catch((err => {
         console.log(err)
       }));
     },
+
     /* Status ändern */
     aendereStatus(index){
       let neuesI=this.statuse.indexOf(this.karten[index].status);
       if(++neuesI>1)neuesI=0;
       this.karten[index].status=this.statuse[neuesI];
-
-    }
+    },
   },
 
   

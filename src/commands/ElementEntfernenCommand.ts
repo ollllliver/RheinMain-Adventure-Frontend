@@ -34,7 +34,6 @@ export class ElementEntfernenCommand implements ICommand {
         this._karte.setElement(this._element.posY, this._element.posX, 0);
         this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
         editorStore.info("Wegpunkt entfernt")
-        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         break;
       }
       case 2: {
@@ -42,7 +41,6 @@ export class ElementEntfernenCommand implements ICommand {
         this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
         editorStore.start(false);
         editorStore.info("Start entfernt")
-        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         break;
       }
       case 3: {
@@ -50,14 +48,12 @@ export class ElementEntfernenCommand implements ICommand {
         this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
         editorStore.ziel(false);
         editorStore.info("Ziel entfernt")
-        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         break;
       }
       case 4: {
         this._karte.setElement(this._element.posY, this._element.posX, 1);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
         editorStore.info("platziertes Element entfernt entfernt")
-        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         editorStore.setzeSchluessel(-1)
         break;
       }
@@ -65,7 +61,6 @@ export class ElementEntfernenCommand implements ICommand {
         this._karte.setElement(this._element.posY, this._element.posX, 1);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
         editorStore.info("platziertes Element entfernt entfernt")
-        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         editorStore.setzeNpc(-1)
         break;
       }
@@ -74,7 +69,6 @@ export class ElementEntfernenCommand implements ICommand {
         this._karte.setElement(this._element.posY, this._element.posX, 1);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
         editorStore.info("platziertes Element entfernt entfernt")
-        console.log("Element mit Wert '" + pointedElement + "' angeklick");
         editorStore.setzeTuer(-1)
         break;
       }
@@ -83,7 +77,6 @@ export class ElementEntfernenCommand implements ICommand {
 
   undo = () => {
     this._state -= 1;
-    console.log("Entfernen UNDO ----- " + this._element.e);
     switch (this._element.e) {
       case 1: {
         this._karte.setElement(this._element.posY, this._element.posX, 1);

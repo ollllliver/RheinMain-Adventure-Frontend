@@ -13,16 +13,12 @@ import { Karte } from '@/models/Karte';
  * schluessel = anzahl der Schluessel
  * tuer = Anzahl der Tueren
  * npc = Anzahl der NPC's
- * levelname = name der aktuellen Karte
- * minSpieler = Anzahl min Spieler
- * maxSpieler = Anzahl max Spieler
+ * entfernen = bool ob elemente entfernt werden
+ * stackindex = CommandStack index
  */
 
-const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
+const waehlen = "Bitte wählen (Weg, Start oder Ziel)"
 const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tuer ist horizontal."
-
-
-
 
 const karte: Karte = new Karte(99999,"","","")
 
@@ -39,7 +35,6 @@ const state = reactive({
   npc: 0,
   entfernen: false,
   stackindex: 0,
-  
 })
 
 /**

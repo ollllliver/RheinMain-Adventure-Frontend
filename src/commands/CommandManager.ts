@@ -44,7 +44,6 @@ class CommandStack {
         }
         this.stack.push(cmd)
         this.index++;
-        console.log(cmd.describe() + " auf Stack gelegt.");
     }
     
     reset = () => {
@@ -61,7 +60,6 @@ class CommandStack {
             const cmd: ICommand = this.stack[this.index];
             cmd.undo();
             editorStore.info(cmd.describe() + " rückgängig gemacht.")
-            console.log(cmd.describe() + " rückgängig gemacht.");
         } else {
             editorStore.info("Hier gibts nichts rückgängig zu machen  ¯\\_(ツ)_/¯")
         }
@@ -76,7 +74,6 @@ class CommandStack {
             cmd.describe();
             cmd.execute();
             editorStore.info(cmd.describe() + " wiederhergestellt.")
-            console.log(cmd.describe() + " wiederhergestellt.");
             this.index++;
         } else {
             editorStore.info("Hier gibts nichts zu wiederholen  ¯\\_(ツ)_/¯")

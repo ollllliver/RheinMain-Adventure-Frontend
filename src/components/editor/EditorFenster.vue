@@ -24,7 +24,6 @@ import { CommandStack } from "../../commands/CommandManager";
 import { ElementHinzufuegenCommand } from "../../commands/ElementHinzufuegenCommand";
 import { ElementEntfernenCommand } from "../../commands/ElementEntfernenCommand";
 import editorStore from "@/stores/editor";
-import { Karte } from "@/models/Karte";
 
 export default defineComponent({
   name: "Editorfenster",
@@ -39,7 +38,6 @@ export default defineComponent({
 
     const target_copy1 = Object.assign({}, karte);
     liste = Object.assign({}, target_copy1.levelInhalt);
-    console.log("im editorfenster gesetzt",liste)
     
     let neu = true
     onMounted(() => {
@@ -106,7 +104,6 @@ export default defineComponent({
      */
     const onDrop = (event: any) => {
       const itemID = parseInt(event.dataTransfer.getData("itemID"));
-      console.log(itemID, "itemID Editorfenster");
       // wenn an der Stelle ein Weg ist
       if (liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 1) {
         CommandStack.getInstance().execAndPush(
@@ -205,8 +202,6 @@ export default defineComponent({
         if (!editorStore.getters.getEntfernen) {
           
           let storeElement = liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e;
-          console.log(event.target.__vnode.key.y)
-          console.log(event.target.__vnode.key.x)
 
           if (storeElement === 0) {
             CommandStack.getInstance().execAndPush(
@@ -223,7 +218,6 @@ export default defineComponent({
         }
       } else {
         editorStore.info("Bitte wähle erst ein Baustein aus!");
-        console.log("baustein auswaehlen")
       }
     };
     return {
