@@ -64,6 +64,7 @@ const gamestate = reactive({
 
 const interagierbar3dObjektListe = new Map();
 
+
 const {unsubscribeChat, subscribeChat} = useChatStore();
 
 function setContainer(element: HTMLElement | null) {
@@ -542,6 +543,13 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
+/**
+ * 
+ * @param anzSchluessel anzahl der Schluessel in der Lobby
+ * 
+ * @param koordinaten koorinaten des Schlüssels der verschindet
+ */
+
 function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
@@ -556,6 +564,41 @@ function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
    
     
 }
+
+/**
+ * Methode zum öffnen der Tür, da wir die Tür nicht von der Braunen Wand trennen
+ * könnten, lassen wir sie jetzt doch nur verschinden.
+ * 
+ * 
+ * Das könnte man dann auch in der setzteSchluesselAnz Methode machen aber falls 
+ * wir uns doch umentscheiden habe ich die Methode erstmal so gelassen
+ * 
+ * 
+ * @param anzSchluessel anzahl der Schlüssel
+ * @param koordinaten koorinaten der Tür
+ * 
+ * 
+*/
+
+function oeffneTuer(anzSchluessel: number, koordinaten: string){
+    gamestate.anzSchluessel = anzSchluessel;
+    console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
+    schluesselText.textContent = "Keys x" + anzSchluessel;
+    schluesselText.style.display = "block";
+
+    const tuer = interagierbar3dObjektListe.get(koordinaten);
+    console.log("DAS OBJECT MUSS AUF GEHEN:")
+    console.log(tuer);
+
+
+    tuer.rotation.y = Math.PI / 2;
+    //collidableList.pop(tuer)
+    //tuer.parent.remove(tuer)
+}
+
+/**
+ * Methode zum setzten des "Kein Schlueseel Textes"
+ */
 
 function setzteWarnText(){
     schluesselText.textContent = "Ihr habt noch keinen Schlüssel!";
@@ -574,6 +617,7 @@ function closeChat(chat:any, chatButton:any){
 
 export function useGameEngine() {
     return {
+        oeffneTuer,
         setzteSchluesselAnz,
         setzteWarnText,
         setzeMitspielerAufPosition,
