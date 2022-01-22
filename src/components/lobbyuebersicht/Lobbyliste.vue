@@ -47,7 +47,6 @@ export default defineComponent({
     function redirectToLobby(id){
       router.push("/lobby/"+ id);
     }
-    console.log(alleLobbiesState)
     return {
       alleLobbiesState,connectToLobby, refresh, redirectToLobby,
     };

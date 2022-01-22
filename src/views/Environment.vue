@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="canvas">
     <Demo />
   </div>
 </template>

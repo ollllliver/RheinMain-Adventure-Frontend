@@ -12,6 +12,9 @@ const state = reactive({
 const getters = reactive({
   istEingeloggt: computed(() => {
     return state.istEingeloggt;
+  }),
+  getBenutzername: computed(() => {
+    return state.benutzername
   })
 })
 

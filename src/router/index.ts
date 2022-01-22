@@ -5,12 +5,14 @@ import Register from "@/views/Register.vue";
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
 import Editor from "@/views/Editor.vue";
 import AboutView from "@/views/AboutView.vue";
+import userStore from '@/stores/user'
+import Landingpage from '@views/Landingpage.vue';
 
 // Routen der Anwendung
 
 const routes: Array<RouteRecordRaw> = [
     {
-        path: '/',
+        path: '/home',
         name: 'Home',
         component: Home
     },
@@ -27,16 +29,39 @@ const routes: Array<RouteRecordRaw> = [
     },
 
     {
+        path: '/',
+        name: 'Landingpage',
+        component: () => import('../views/Landingpage.vue')
+    },
+    
+
+    {
         path: '/uebersicht',
         name: 'Lobbyuebersicht',
-        component: LobbyuebersichtView
+        component: LobbyuebersichtView,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                next('/')
+            }else{
+                next();
+            }
+        }
     },
 
     {
         path: '/lobby/:lobby_id',
         name: 'LobbyView',
         component: LobbyView,
-        props: true
+        props: true,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                console.log(from);
+                console.log(to);
+                next('/')
+            }else{
+                next();
+            }
+        }
     },
     {
         path: '/environment',
@@ -46,7 +71,21 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/editor',
         name: 'Editor',
-        component: Editor
+        component: Editor,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                console.log(from);
+                console.log(to);
+                next('/')
+            }else{
+                next();
+            }
+        }
+    },
+    {
+        path: '/editoruebersicht',
+        name: 'Editoruebersicht',
+        component: () => import('../views/Editoruebersicht.vue')
     },
 
     {

@@ -6,11 +6,16 @@ import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
 import userStore from '@/stores/user'
 import {NachrichtenCode} from '@/messaging/NachrichtenCode';
-import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
-import {ChatNachricht} from '@/messaging/ChatNachricht';
+import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
-const wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
+let wsurl;
+if (location.protocol == 'http:') {
+    wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
+}else{
+    wsurl = `wss://${window.location.hostname}/messagebroker`;
+}
 const stompclient = new Client({brokerURL: wsurl});
+const countdownDuration = 5;
 
 /**
  * lobbystate ist ein reactive, das zu einer Lobby essentielle Infos hält + errormessage
@@ -28,10 +33,13 @@ const lobbystate = reactive({
     // dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird.
     darfBeitreten: false,
     istPrivat: false,
-    countdown: 5,
+    countdown: countdownDuration,
     //TODO: any zu Karte oder Level ändern, sobald es im selben Branch ist.
     gewaehlteKarte: {} as any,
+    subscriptionStatus: false
 })
+
+const {unsubscribeChat, subscribeChat} = useChatStore();
 
 /**
  * alleLobbiesState ist ein reactive, das die Liste von Lobbys hält + errormessage
@@ -48,7 +56,6 @@ const alleKartenState = reactive({
 
 // verwendete StompSubscriptions:
 let lobbySubscription: StompSubscription;
-let lobbyChatSubscription: StompSubscription;
 let uebersichtSubscription: StompSubscription;
 
 /**
@@ -72,7 +79,7 @@ async function connectToStomp(callb, param) {
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
         callb(param)
-        console.log(callb.name + "()");
+        console.log("Subscribe to", callb.name + "()");
     };
     stompclient.activate();
 }
@@ -81,11 +88,12 @@ async function connectToStomp(callb, param) {
  * connectToUebersicht subscribt sich mit zu Not selbst connectetem Stompclient mit der Function subscribeToUebersicht()
  */
 function connectToUebersicht() {
+    lobbystate.subscriptionStatus = false;
     if (!stompclient.connected) {
         connectToStomp(subscribeToUebersicht, null);
     }
     else {
-        console.log(subscribeToUebersicht.name + "()");
+        console.log("Subscribe to", subscribeToUebersicht.name + "()");
         subscribeToUebersicht();
     }
 }
@@ -111,7 +119,6 @@ function subscribeToUebersicht() {
  * Bei Misserfolg, steht in der Lobbymessage das istFehler Flag auf true.
  */
 async function tryJoin(lobby_id: string) {
-    console.log("Fetch auf: /api/lobby/join/" + lobby_id);
     return fetch('/api/lobby/join/' + lobby_id, {
         method: 'POST'
         // ,headers: {
@@ -186,11 +193,12 @@ async function connectToLobby(lobby_id: string) {
                     connectToStomp(subscribeToLobby, lobby_id);
                 }
                 else {
-                    console.log('unsubscribe von uebersicht');
                     uebersichtSubscription.unsubscribe();
-                    console.log(subscribeToLobby.name + "()");
+                    console.log("Subscribe to", subscribeToLobby.name + "()");
                     subscribeToLobby(lobby_id);
                 }
+                // Chat fuer stomp subscriben:
+                subscribeChat(lobby_id, ChatTyp.LOBBY);
                 // und lobbydaten holen:
                 updateLobby(lobby_id);
                 alleLobbiesState.errormessage = '';
@@ -212,14 +220,9 @@ async function connectToLobby(lobby_id: string) {
  */
 function subscribeToLobby(lobby_id: string) {
     const DEST = "/topic/lobby/" + lobby_id;
-    const DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
     lobbySubscription = stompclient.subscribe(DEST, (message) => {
         const lobbymessage = JSON.parse(message.body) as LobbyMessage;
         empfangeLobbyMessageLobby(lobbymessage, lobby_id);
-    });
-    lobbyChatSubscription = stompclient.subscribe(DEST_CHAT, (message) => {
-        const chatmessage = JSON.parse(message.body) as ChatNachricht;
-        empfangeChatNachricht(chatmessage);
     });
 }
 
@@ -230,7 +233,7 @@ function subscribeToLobby(lobby_id: string) {
  * @param lobby_id zugehörige Lobby ID
  */
 function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string) {
-    console.log("message from broker:", lobbymessage);
+    console.log("message from broker topic lobby:", lobbymessage);
     if (lobbymessage.istFehler) {
         lobbystate.errormessage = lobbymessage.typ;
     }
@@ -241,6 +244,9 @@ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string)
         } else if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET){
             lobbystate.istGestartet = true;
             starteTimer();
+        } else if (lobbymessage.typ == NachrichtenCode.BEENDE_SPIEL) {
+            lobbystate.istGestartet = false;
+            router.push("/lobby/" + lobbystate.lobbyID);
         } else {
             updateLobby(lobby_id);
             lobbystate.errormessage = '';
@@ -262,6 +268,8 @@ function starteTimer(delay = 1000) {
       }, delay);
     } else {
       router.push("/environment");
+      unsubscribeChat();
+      lobbystate.countdown = countdownDuration;
     }
   }
 
@@ -272,61 +280,17 @@ function starteTimer(delay = 1000) {
  * @param lobbymessage empfangene Lobbymessage
  */
 function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
-    console.log("message from broker:", lobbymessage);
+    console.log("message from broker topic uebersicht:", lobbymessage);
     // Es gibt keine errormessages, die über diesen Kanal geteilt werden.
     alleLobbiesladen();
 }
 
-// TODO: Chatfunktionen auslagern in seperates ChatStore.ts
-async function sendeChatNachricht(typ: NachrichtenTyp, inhalt: string, sender: string) {
-
-    const DEST_CHAT = "/topic/lobby/" + lobbystate.lobbyID + "/chat";
-    const nachricht: ChatNachricht = { typ: typ, inhalt: inhalt, sender: sender };
-    stompclient.publish({ destination: DEST_CHAT, body: JSON.stringify(nachricht) });
-    console.log("Gesendete Nachricht: ", nachricht);
-}
-
-async function empfangeChatNachricht(nachricht: ChatNachricht) {
-
-    console.log("Empfangene Nachricht: ", nachricht);
-    const messageArea = document.getElementById("messageArea");
-    const messageElement = document.createElement("li");
-
-    if (nachricht.typ == 'JOIN') {
-        messageElement.classList.add('event-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ' ist gejoined!';
-    } else if (nachricht.typ == 'LEAVE') {
-        messageElement.classList.add('event-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ' ist geleaved!';
-    } else {
-        messageElement.classList.add('chat-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ": " + nachricht.inhalt;
-    }
-
-    let nachUntenGescrollt;
-
-    if (messageArea) {
-        if ((messageArea.offsetHeight + messageArea.scrollTop) >= messageArea.scrollHeight - 20) {
-            nachUntenGescrollt = true;
-        } else {
-            nachUntenGescrollt = false;
-        }
-
-        messageArea.appendChild(messageElement);
-    }
-
-    if (nachUntenGescrollt) {
-        messageElement.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
 /**
- * lädt die Lobby Daten der mitgegebenen Lobby neu in das lobbyState reactive.
+ * lädt die Lobby Date der mitgegebenen Lobby neu in das lobbyState reactive.
  * 
  * @param lobby_id ist die ID der neu zu ladenden Lobby
  */
 async function updateLobby(lobby_id: string) {
-    console.log("Fetch auf: /api/lobby/" + lobby_id);
     fetch('/api/lobby/' + lobby_id, {
         method: 'GET'
         // ,headers: {
@@ -339,7 +303,6 @@ async function updateLobby(lobby_id: string) {
         }
         return response.json();
     }).then((jsondata) => {
-        console.log(jsondata)
         // verarbeite jsondata
         lobbystate.teilnehmerliste = jsondata.teilnehmerliste;
         lobbystate.istGestartet = jsondata.istGestartet;
@@ -349,14 +312,12 @@ async function updateLobby(lobby_id: string) {
         lobbystate.host = jsondata.host;
         lobbystate.istPrivat = jsondata.istPrivat;
         lobbystate.gewaehlteKarte = jsondata.gewaehlteKarte;
-
     }).catch((e) => {
         console.log(e);
     });
 }
 
 async function joinRandomLobby() {
-    console.log("Fetch auf: /api/lobby/joinRandom");
     return fetch('/api/lobby/joinRandom', {
         method: 'POST',
         headers: {
@@ -383,9 +344,9 @@ async function joinRandomLobby() {
 
 }
 
+// starteSpiel?
 async function starteLobby() {
 
-    console.log("Fetch auf: /api/lobby/{lobbyId}/start")
     return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
         method: 'POST',
         headers: {
@@ -399,13 +360,18 @@ async function starteLobby() {
         return response.json();
     }).then(async (jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
-        console.log(lobbyMsg);
         return lobbyMsg.payload;
 
     })
         .catch((e) => {
             console.log(e);
         });
+}
+
+function beendeSpiel() {
+    const destination = "/topic/lobby/" + lobbystate.lobbyID;
+    console.log(destination);
+    stompclient.publish({destination: destination, body: JSON.stringify({typ: NachrichtenCode.BEENDE_SPIEL, istFehler: false, payload: "Kehre zurück zur Lobby"} as LobbyMessage)})
 }
 
 /**
@@ -431,9 +397,8 @@ function resetLobbyState() {
  */
 async function leaveLobby(): Promise<boolean> {
     lobbySubscription.unsubscribe()
-    lobbyChatSubscription.unsubscribe()
+    unsubscribeChat();
 
-    console.log("Fetch auf: /leave/" + lobbystate.lobbyID)
     router.push("/uebersicht");
     return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
         method: 'DELETE',
@@ -458,7 +423,6 @@ async function leaveLobby(): Promise<boolean> {
  * @returns bei erfolgreichem Fetch die LobbyID der im Backend neu erstellten Lobby
  */
 async function neueLobby() {
-    console.log("Fetch auf: /api/lobby/neu")
     return fetch('/api/lobby/neu', {
         method: 'POST'
         // ,headers: {
@@ -471,7 +435,6 @@ async function neueLobby() {
         }
         return response.json();
     }).then((jsondata) => {
-        console.log(jsondata)
         const lobbymessage = jsondata as LobbyMessage;
         if (lobbymessage.istFehler) {
             alleLobbiesState.errormessage = "Du bist bereits in einer Lobby die ID lautet :" + lobbymessage.payload
@@ -492,7 +455,6 @@ async function neueLobby() {
  */
 async function alleLobbiesladen() {
     const lobbyliste = new Array<Lobby>();
-    console.log("Fetch auf: /api/lobby/alle")
     return fetch('/api/lobby/alle', {
         method: 'GET'
         // ,headers: {
@@ -505,7 +467,6 @@ async function alleLobbiesladen() {
         }
         return response.json();
     }).then((jsondata: Array<Lobby>) => {
-        console.log(jsondata);
         // verarbeite jsondata
         jsondata.forEach(element => {
             lobbyliste.push(element);
@@ -524,7 +485,6 @@ async function alleLobbiesladen() {
  * @param neuesLimit 
  */
 function changeLimit(neuesLimit) {
-    console.log('change limit:', neuesLimit);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', {
         method: 'PATCH',
         // ,headers: {
@@ -540,8 +500,6 @@ function changeLimit(neuesLimit) {
             return;
         }
         return response.json();
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
@@ -553,7 +511,6 @@ function changeLimit(neuesLimit) {
  * @param istPrivat 
  */
 function changePrivacy(istPrivat) {
-    console.log('change privacy:', istPrivat);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/privacy', {
         method: 'PATCH',
         // ,headers: {
@@ -569,8 +526,6 @@ function changePrivacy(istPrivat) {
             return;
         }
         return response.json();
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
@@ -582,7 +537,6 @@ function changePrivacy(istPrivat) {
  * @param neuerHost 
  */
 function changeHost(neuerHost) {
-    console.log('change host:', neuerHost);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/host', {
         method: 'PATCH',
         // ,headers: {
@@ -598,8 +552,6 @@ function changeHost(neuerHost) {
             return;
         }
         return response.json();
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
@@ -611,7 +563,6 @@ function changeHost(neuerHost) {
  * @param zuEntzfernenderSpieler 
  */
 function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
-    console.log('entferne Mitspieler:', zuEntzfernenderSpieler);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', {
         method: 'DELETE',
         // ,headers: {
@@ -628,7 +579,6 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
         }
         return response.json();
     }).then((lobbyMessage: LobbyMessage) => {
-        console.log(lobbyMessage);
         if (lobbyMessage.istFehler) {
             lobbystate.errormessage = "Du darfst das nicht!";
             // Todo: vielleicht nen timer, der die nachricht nach 5 Sekunden entfernt?
@@ -644,7 +594,6 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
  * @param neueKarte 
  */
  function changeKarte(neueKarte) {
-    console.log('change limit:', neueKarte);
     fetch('/api/lobby/' + lobbystate.lobbyID + '/level', {
         method: 'PATCH',
         // ,headers: {
@@ -660,8 +609,6 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
             return;
         }
         return response.json();
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
@@ -680,9 +627,7 @@ async function alleKartenLaden() {
         }
         return response.json();
     }).then((level: Array<Lobby>) => {
-        console.log(level);
         // verarbeite jsondata
-        console.log("alle level:", level);
         alleKartenState.karten = level;
     }).catch((e) => {
         console.log(e);
@@ -710,13 +655,10 @@ export function useLobbyStore() {
         alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht,
 
         // Lobby Funktionen zum Ändern
-        neueLobby, joinRandomLobby, leaveLobby, starteLobby, spielerEntfernen,
+        neueLobby, joinRandomLobby, leaveLobby, starteLobby, beendeSpiel, spielerEntfernen,
 
         // Funktionen zum ändern der Lobby Einstellungen:
         einstellungsfunktionen: { changeLimit, changePrivacy, changeHost, changeKarte },
-
-        // Chat Funktionen:
-        sendeChatNachricht, empfangeChatNachricht,
 
         alleKartenLaden,
     }

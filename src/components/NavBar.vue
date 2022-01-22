@@ -1,23 +1,20 @@
 <template>
   <div class="p-2 border-bottom border-success d-flex align-items-center justify-content-between" style="background-color: #BDD3B9;">
-    <a class="mr-auto" href="#">
+    <router-link class="mr-auto" to="/home" >
         <img src="/assets/RMA_Logo.png" height="40" alt="">
-    </a>
+    </router-link>
     <div>
-        <b class="dropdown" style="color: red;"> TODO: </b>
-        <!-- TODO: Benutzernamen reinschreiben -->
-        <div class="btn-success dropdown">
-          <button class="dropbtn" v-text="benutzername"></button>
+        <div v-if="userStore.state.istEingeloggt" class="btn-success dropdown">
+          <button class="dropbtn" v-text="userStore.state.benutzername"></button>
           <div class="dropdown-content">
             <!-- <button class="grey-btn w-100" @click="router.push('/')">Home</button>
             <button class="grey-btn w-100" @click="router.push('/uebersicht')">Spiele</button>
             <button class="grey-btn w-100" @click="router.push('/editoruebersicht')">Editor</button>
             <button class="grey-btn w-100" @click="router.push('/instructions')">Anleitung</button>
             <button class="grey-btn w-100" @click="router.push('/about')">About</button> -->
-            <button class="red-btn w-100" @click="router.push('/logout')">Logout</button>
+            <button class="red-btn w-100" @click="userStore.logout()">Logout</button>
           </div>
         </div>
-        <b class="dropdown" style="color: red;"> ODER </b>
         <!-- TODO: Entweder Oder einblenden! -->
         <!-- <div class="btn-success dropdown">
           <button class="dropbtn">Menü</button>
@@ -28,7 +25,7 @@
             <button class="dropbtn w-100" @click="router.push('/login')">Login</button>
           </div>
         </div> -->
-        <button class="dropbtn" @click="router.push('/login')">Login</button>
+        <router-link v-else class="dropbtn" to="/home">Login</router-link>
     </div>
 
 
@@ -39,6 +36,7 @@
 import { defineComponent } from "vue";
 import {navbar} from "@/stores/navbarStore"
 import router from '@/router';
+import userStore from '@/stores/user'
 
 export default defineComponent({
   name: "NavBar",
@@ -46,7 +44,7 @@ export default defineComponent({
     return {
         navbar,
         router,
-        benutzername: 'BENUTZERNAME',
+        userStore,
     };
   },
 });
@@ -56,6 +54,7 @@ export default defineComponent({
 .dropbtn {
   background-color: #6d9466;
   color: white;
+  text-decoration: none;
   padding: 10px;
   font-size: 16px;
   border: 2px solid #c0dcbd;
@@ -88,7 +87,11 @@ export default defineComponent({
 .red-btn:hover {background-color: #840000;}
 .grey-btn:hover {background-color: #aacca4;}
 .dropdown:hover .dropdown-content {display: block;}
-.dropbtn:hover{background-color: #4f7a46;}
+.dropbtn:hover{
+  background-color: #4f7a46;
+  color: white;
+  text-decoration: none;
+  }
 
 .red-btn {
   background-color: #aa0404;

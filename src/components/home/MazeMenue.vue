@@ -28,7 +28,7 @@
         <polyline class="wand path" points="0,0 1200,0 1200,200 900,200 900,400 1300,400 1300,100"/>
 
         <!-- HOME -->
-        <a href="/" class="POI">
+        <a href="/home" class="POI">
             <text href="#" x="120" y="75" >Home</text>
         </a>
         <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,50 450,50 450,150 350,150 350,150 350,50 320,50"/>
@@ -67,8 +67,10 @@
         <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1250,450 1250,650 1350,650 1350,700"/>
         
         <!-- Open Door -->
-        <image :class="oDoor" @click="oDoorClick" x="1310" y="710" width="80" height="80" href="@/assets/img/maze-items/opened-door.svg" alt=""/>
-        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1250,450 1250,650 1350,650 1350,700"/>
+        <a xlink:href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="__blank">
+          <image :class="oDoor" @click="oDoorClick" x="1310" y="710" width="80" height="80" href="@/assets/img/maze-items/opened-door.svg" alt=""/>
+          <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1250,450 1250,650 1350,650 1350,700"/>
+        </a>
         
         <!-- Tupel -->
         <image class="POI" @click="tupelClick" x="860" y="620" width="180" height="180" href="@/assets/img/maze-items/tupel.svg" alt=""/>
