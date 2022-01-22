@@ -29,7 +29,7 @@ export class ElementHinzufuegenCommand implements ICommand {
     this._state = state;
     this._karte = karte;
     this._event = event;
-    this._element = { posY: this._event.target.__vnode.key.y, posX: this._event.target.__vnode.key.x, e: element };
+    this._element = { posY: event.target.__vnode.key.y, posX: event.target.__vnode.key.x, e: element };
     if (ausrichtung !== undefined) {
       this._ausrichtung = ausrichtung
     } else {
@@ -41,6 +41,7 @@ export class ElementHinzufuegenCommand implements ICommand {
    * Befehl ausführen
    */
   execute = () => {
+    
     // Braucht man für CommandManager ?
     this._state += 1;
     if (this._karte.liste[this._element.posY][this._element.posX].e !== this._element.e) {

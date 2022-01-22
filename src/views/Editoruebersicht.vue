@@ -6,7 +6,7 @@
     
   <div class="row justify-content-md-center">
     <div class="col-md-auto">
-      <h4> Wähle eine Karte aus zum bearbeiten </h4>
+      <h4> Wähle ein Level aus zum bearbeiten </h4>
     </div>
   </div>
 
@@ -21,12 +21,7 @@
         Zurück zum Menü
       </button>
     </div>
-    <div class="col col-lg-2">
-    <!-- Wechsel zum "Editor"-Fenster -->
-      <button class="btn btn-outline-secondary" @click="$router.push('/editor')">
-        neue Karte
-      </button>
-    </div>
+    
     
   </div>
 </div>

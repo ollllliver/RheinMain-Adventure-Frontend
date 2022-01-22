@@ -82,6 +82,11 @@ const routes: Array<RouteRecordRaw> = [
             }
         }
     },
+    {
+        path: '/editoruebersicht',
+        name: 'Editoruebersicht',
+        component: () => import('../views/Editoruebersicht.vue')
+    },
 
     {
         path: '/about',
