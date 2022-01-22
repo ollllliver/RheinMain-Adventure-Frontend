@@ -418,7 +418,7 @@ function resetLobbyState() {
 async function leaveLobby(): Promise<boolean> {
     lobbySubscription.unsubscribe()
     unsubscribeChat();
-
+    resetLobbyID();
     router.push("/uebersicht");
     return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
         method: 'DELETE',
