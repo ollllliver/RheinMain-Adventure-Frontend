@@ -17,7 +17,7 @@
           <label for="floatingInput">Benutzername</label>
           </div>
       <div class="form-floating mb-3">
-          <input v-model="form.passwort"
+          <input input type="password" v-model="form.passwort"
           class="form-control rounded-0"
           id="floatingPasswort"
           placeholder="Passwort"
