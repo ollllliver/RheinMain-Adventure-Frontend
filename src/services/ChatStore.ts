@@ -1,9 +1,11 @@
-import { Client, StompSubscription } from '@stomp/stompjs';
+import { Client, StompHeaders, StompSubscription } from '@stomp/stompjs';
 import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
 
 const wsurl = `ws://localhost:8080/messagebroker`;
 const stompclient = new Client({brokerURL: wsurl});
+var headerName = "${_csrf.headerName}";
+var token = "${_csrf.token}";
 
 // verwendete StompSubscription
 let chatSubscription: StompSubscription;
@@ -67,6 +69,8 @@ function subscribeChat(lobby_id: string, typ: ChatTyp){
  * @param lobby_id ist die Lobby ID, für die sich eingeschrieben werden soll.
  */
  function subscribeStompChat(lobby_id: string){
+    var headers = {}
+    headers[headerName] = token;
     chatSubscription = stompclient.subscribe(DEST_CHAT, (message) => {
         const chatmessage = JSON.parse(message.body) as ChatNachricht;
         empfangeChatNachricht(chatmessage);
@@ -77,7 +81,7 @@ function subscribeChat(lobby_id: string, typ: ChatTyp){
  * Trennt die Verbindung der Chat-Subscription
  */
 function unsubscribeChat(){
-    chatSubscription.unsubscribe();
+    chatSubscription.unsubscribe(); //{ headers: "schwanzball" }
     aktLobbyID = "";
     DEST_CHAT = "";
 }
