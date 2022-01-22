@@ -376,7 +376,7 @@ async function starteLobby() {
 }
 
 async function resetLobbyID() {
-    return await fetch('/api/lobby/reset', {
+    return fetch('/api/lobby/reset', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -384,9 +384,7 @@ async function resetLobbyID() {
     }).then((response) => {
         if (!response.ok) {
             console.log("error");
-            return;
         }
-        return;
     })
 }
 
