@@ -5,16 +5,18 @@
     -->
 
   <div class="drop-zone" @drop="onDrop($event)" @dragenter.prevent @dragover.prevent>
-    <div v-for="row in liste" :key="row" class="reihe" draggable="false">
-      <div
-        v-for="col in row"
-        :key="col"
-        v-bind="col.id"
-        class="element"
-        v-on:click="wegPunkt"
-        draggable="false"
-      ></div>
-    </div>
+    <Filter>
+      <div v-for="row in liste" :key="row?.values" class="reihe" draggable="false">
+        <div
+          v-for="col in row"
+          :key="col"
+          v-bind="col.id"
+          class="element"
+          v-on:click="wegPunkt"
+          draggable="false"
+        ></div>
+      </div>
+    </Filter>
   </div>
 </template>
 
@@ -32,9 +34,7 @@ export default defineComponent({
 
     // Kartenklasse mit liste als Array aus editorStore
     var karte: any;
-    // var liste: any[][];
-    var liste = new Array<HTMLDivElement>();
-    
+    var liste: any[][];    
     karte = editorStore.getters.getGrid;
 
     const target_copy1 = Object.assign({}, karte);
