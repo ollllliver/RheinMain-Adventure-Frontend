@@ -5,18 +5,16 @@
     -->
 
   <div class="drop-zone" @drop="onDrop($event)" @dragenter.prevent @dragover.prevent>
-    <Filter>
-      <div v-for="row in liste" :key="row?.values" class="reihe" draggable="false">
-        <div
-          v-for="col in row"
-          :key="col"
-          v-bind="col.id"
-          class="element"
-          v-on:click="wegPunkt"
-          draggable="false"
-        ></div>
-      </div>
-    </Filter>
+    <div v-for="row in liste" :key="row?.values" class="reihe" draggable="false">
+      <div
+        v-for="col in row"
+        :key="col"
+        v-bind="col.id"
+        class="element"
+        v-on:click="wegPunkt"
+        draggable="false"
+      ></div>
+    </div>
   </div>
 </template>
 
