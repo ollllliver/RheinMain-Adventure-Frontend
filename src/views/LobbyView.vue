@@ -41,6 +41,8 @@ export default defineComponent({
     const { sendeChatNachricht, empfangeChatNachricht} = useChatStore();
 
     window.addEventListener('beforeunload',function(e){
+      e.preventDefault();
+      e.returnValue = '';
       leaveLobby();
     });
 
