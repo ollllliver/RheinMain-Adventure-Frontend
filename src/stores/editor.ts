@@ -1,4 +1,4 @@
-import { computed, reactive } from 'vue'
+import { computed, isProxy, reactive } from 'vue'
 import { Karte } from '@/models/Karte';
 
 /**
@@ -13,14 +13,14 @@ import { Karte } from '@/models/Karte';
  * schluessel = anzahl der Schluessel
  * tuer = Anzahl der Tueren
  * npc = Anzahl der NPC's
- * levelname = name der aktuellen Karte
- * minSpieler = Anzahl min Spieler
- * maxSpieler = Anzahl max Spieler
+ * entfernen = bool ob elemente entfernt werden
+ * stackindex = CommandStack index
  */
 
-const waehlen = "Bitte wählen. (W, S, Z oder R1-R5)"
+const waehlen = "Bitte wählen (Weg, Start oder Ziel)"
 const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tuer ist horizontal."
-const karte = new Karte();
+
+const karte: Karte = new Karte(99999,"","","")
 
 const state = reactive({
   wegbeschreibung: 0,
@@ -35,7 +35,6 @@ const state = reactive({
   npc: 0,
   entfernen: false,
   stackindex: 0,
-  levelName: "",
 })
 
 /**
@@ -81,9 +80,6 @@ const getters = reactive({
   getStackindex: computed(() => {
     return state.stackindex
   }),
-  getLevelName: computed(() => {
-    return state.levelName
-  })
 })
 
 /**
@@ -180,9 +176,6 @@ const actions = {
   async entfernen(gesetzt: boolean) {
     state.entfernen = gesetzt
   },
-  async setzeLevelName(gesetzt: string) {
-    state.levelName = gesetzt
-  },
   async default() {
     state.wegbeschreibung = 0,
     state.aktiv = false,
@@ -193,10 +186,18 @@ const actions = {
     state.ausrichtung = 0,
     state.schluessel = 0,
     state.tuer = 0,
-    state.npc = 0,
-    state.levelName = ""
+    state.npc = 0
+    state.stackindex = 0
+  },
+  async setzeLevel(erwartet: any) {
+    const aktKarte = new Karte(erwartet.levelID,erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung)
+    karte.setLevelId(aktKarte._levelID)
+    karte.setBenutzername(aktKarte._benutzername)
+    karte.setLevelName(aktKarte._levelName)
+    karte.setLevelBeschreibung(aktKarte._levelBeschreibung)
+    karte.setBenutzername(aktKarte._benutzername)
+    karte.setLevelInhalt(erwartet.levelInhalt)
   }
-
 }
 
 export default { state, getters, ...actions }

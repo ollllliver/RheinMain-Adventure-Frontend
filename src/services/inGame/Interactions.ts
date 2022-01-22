@@ -18,14 +18,16 @@ export class Interactions {
     DEST:string
     index:number
     update: (cameraPosition: any) => void
-    disconnect: () => void
-
+    keyDisconnect: () => void
 
     constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document, client: Client) {
 
+        const { disconnectController } = useGameEngine();
         const interaktionReichweite = 2
         const {lobbystate} = useLobbyStore()
         const {gamestate} = useGameEngine()
+        // let hatSchluessel = false
+        let popupFenster: any;
 
         this.domElement = domElement
         this.cameraCollidable = cameraCollidable
@@ -52,11 +54,11 @@ export class Interactions {
             }
         };
 
-        const connect = () => {
+        const keyConnect = () => {
             this.domElement.addEventListener('keydown', onKeyDown)
         };
 
-        this.disconnect = () => {
+        this.keyDisconnect = () => {
             this.domElement.removeEventListener('keydown', onKeyDown)
         };
 
@@ -107,24 +109,24 @@ export class Interactions {
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/tuer
                     this.stompclient.publish({destination: this.DEST, body: interaktion.object.uuid, skipContentLengthHeader: true,});
                     break;
-
-
+                case "Ziel":
+                    popupFenster = document.getElementById('ziel');
+                    popupFenster.style.display = "block";
+                    disconnectController("ziel");
+                    console.log("popup ist aktiviert");
+                    break;
             }
         }
 
         this.update = (camera: any) => {
-
             const blickRichtung = new Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
-
             const originPoint = this.cameraCollidable.position.clone()
-
             const vorneVektor = blickRichtung.clone()
 
             this.rayCaster = new Raycaster(originPoint, vorneVektor, 0, interaktionReichweite)
-
             this.erkannteInteraktion = interaktionErkennung(vorneVektor, originPoint)
         }
 
-        connect()
+        keyConnect()
     }
 }

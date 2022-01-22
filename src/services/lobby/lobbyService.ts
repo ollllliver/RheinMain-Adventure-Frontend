@@ -15,6 +15,7 @@ if (location.protocol == 'http:') {
     wsurl = `wss://${window.location.hostname}/messagebroker`;
 }
 const stompclient = new Client({brokerURL: wsurl});
+const countdownDuration = 5;
 
 /**
  * lobbystate ist ein reactive, das zu einer Lobby essentielle Infos hält + errormessage
@@ -32,9 +33,10 @@ const lobbystate = reactive({
     // dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird.
     darfBeitreten: false,
     istPrivat: false,
-    countdown: 5,
+    countdown: countdownDuration,
     //TODO: any zu Karte oder Level ändern, sobald es im selben Branch ist.
     gewaehlteKarte: {} as any,
+    subscriptionStatus: false
 })
 
 const {unsubscribeChat, subscribeChat} = useChatStore();
@@ -86,6 +88,7 @@ async function connectToStomp(callb, param) {
  * connectToUebersicht subscribt sich mit zu Not selbst connectetem Stompclient mit der Function subscribeToUebersicht()
  */
 function connectToUebersicht() {
+    lobbystate.subscriptionStatus = false;
     if (!stompclient.connected) {
         connectToStomp(subscribeToUebersicht, null);
     }
@@ -241,6 +244,9 @@ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string)
         } else if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET){
             lobbystate.istGestartet = true;
             starteTimer();
+        } else if (lobbymessage.typ == NachrichtenCode.BEENDE_SPIEL) {
+            lobbystate.istGestartet = false;
+            router.push("/lobby/" + lobbystate.lobbyID);
         } else {
             updateLobby(lobby_id);
             lobbystate.errormessage = '';
@@ -263,6 +269,7 @@ function starteTimer(delay = 1000) {
     } else {
       router.push("/environment");
       unsubscribeChat();
+      lobbystate.countdown = countdownDuration;
     }
   }
 
@@ -337,6 +344,7 @@ async function joinRandomLobby() {
 
 }
 
+// starteSpiel?
 async function starteLobby() {
 
     return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
@@ -358,6 +366,12 @@ async function starteLobby() {
         .catch((e) => {
             console.log(e);
         });
+}
+
+function beendeSpiel() {
+    const destination = "/topic/lobby/" + lobbystate.lobbyID;
+    console.log(destination);
+    stompclient.publish({destination: destination, body: JSON.stringify({typ: NachrichtenCode.BEENDE_SPIEL, istFehler: false, payload: "Kehre zurück zur Lobby"} as LobbyMessage)})
 }
 
 /**
@@ -641,7 +655,7 @@ export function useLobbyStore() {
         alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht,
 
         // Lobby Funktionen zum Ändern
-        neueLobby, joinRandomLobby, leaveLobby, starteLobby, spielerEntfernen,
+        neueLobby, joinRandomLobby, leaveLobby, starteLobby, beendeSpiel, spielerEntfernen,
 
         // Funktionen zum ändern der Lobby Einstellungen:
         einstellungsfunktionen: { changeLimit, changePrivacy, changeHost, changeKarte },
