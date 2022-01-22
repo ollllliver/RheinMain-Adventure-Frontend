@@ -7,9 +7,9 @@
         <span class="helper"></span>
       </div>
       <div :class="fenster__frage">
-        <button class="button" @click="falsch">{{ shuffleAntworten() }}</button>
-        <button class="button" @click="richtig">{{ buttonString }}</button>
-        <button class="button" @click="falsch">{{ shuffleAntworten() }}</button>
+        <button class="button" @click="falsch">{{ antworten.get(false) }}</button>
+        <button class="button" @click="richtig">{{ antworten.get(true) }}</button>
+        <button class="button" @click="falsch">{{ antworten.get(false) }}</button>
       </div>
       <div :class="fenster__beende">
         <button class="button" @click="beenden">Spiel beenden</button
@@ -27,12 +27,14 @@ import { useLobbyStore } from "@/services/lobby/lobbyService";
 export default defineComponent({
   setup() {
     const { beendeSpiel } = useLobbyStore();
-    const { connect, disconnect, disconnectController } = useGameEngine();
+    const { connect, disconnect } = useGameEngine();
     
     const closeButton = ref('closeButton');
     const fenster__inner = ref('fenster__inner');
     const fenster__frage = ref('fenster__frage');
     const fenster__beende = ref('hidden');
+
+    const antworten = new Map<boolean, number>();
 
     let titel: string;
     let byteString: string;
@@ -50,15 +52,21 @@ export default defineComponent({
       }
     }
 
+    getReverseString(byteString);
     titel = "Welche Dezimalzahl befindet sich hier hinter -> " + byteString;
+
+    antworten.set(true, counter);
+    antworten.set(false, shuffleAntworten());
+    antworten.set(false, shuffleAntworten());
+
     buttonString = counter.toString();
 
-    function shuffleAntworten(): string {
+    function shuffleAntworten(): number {
       let rndNumb = getRandomInt(0, 15);
       do {
         rndNumb = getRandomInt(0, 15);
       } while (rndNumb === counter);
-      return rndNumb.toString();
+      return rndNumb;
     }
 
     function aktualisiereFenster() {
@@ -69,6 +77,11 @@ export default defineComponent({
 
     function versteckeFenster() {
       fenster__inner.value = 'hidden';
+    }
+
+    function getReverseString(str: string) {
+      let stringArray = str.split("");
+      byteString = stringArray.reverse().join("");
     }
 
     function getRandomInt(min: number, max: number): number {
@@ -84,13 +97,13 @@ export default defineComponent({
       versteckeFenster,
       connect,
       disconnect,
-      disconnectController,
       fenster__inner,
       fenster__frage,
       fenster__beende,
       closeButton,
       buttonString,
       titel,
+      antworten
     };
   },
   methods: {

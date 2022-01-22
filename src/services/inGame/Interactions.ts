@@ -26,7 +26,7 @@ export class Interactions {
         const interaktionReichweite = 2
         const {lobbystate} = useLobbyStore()
         const {gamestate} = useGameEngine()
-        let hatSchluessel = false
+        // let hatSchluessel = false
         let popupFenster: any;
 
         this.domElement = domElement
