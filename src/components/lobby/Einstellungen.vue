@@ -10,6 +10,14 @@
         {{ lobbystate.spielerlimit }}
       </h3>
 
+      <!-- AUSWAHL - Karte -->
+      <div>
+        <label class="h3">Karte:&nbsp;</label>
+        <select class="h4" v-model="gewaehlteKarte" @change="changeKarte">
+          <option :text="karte.name" :value="karte" v-for="karte in kartenArray" :key="karte"></option>
+        </select>
+      </div>
+
       <!-- AUSWAHL - Spielerlimit -->
       <div>
         <label class="h3">Spielerlimit:&nbsp;</label>
@@ -44,21 +52,24 @@
         </select>
       </div>
 
+    <div class="row">
       <!-- START BUTTON -->
-      <button class="row btn btn-primary" v-on:click="starten" :disabled="startbuttonUnsichtbar">
+      <button class="m-4  col btn btn-success" v-on:click="starten" :disabled="startbuttonUnsichtbar">
         SPIEL STARTEN
       </button>
+      <h1 v-if="lobbystate.istGestartet" class="m-4 col">{{ lobbystate.countdown }}</h1>
+    </div>
+
     </div>
     <div v-else>
       <h1 class="row">Einstellungen</h1>
-      <h3 class="row">Teilnehmer: {{ lobbystate.teilnehmerliste.length }} \{{ lobbystate.spielerlimit }}</h3>
-      <h3 class="row">istVoll: {{ lobbystate.istVoll }}</h3>
-      <h3 class="row">spielerlimit: {{ lobbystate.spielerlimit }}</h3>
-      <h3 class="row">istGestartet: {{ lobbystate.istGestartet }}</h3>
-      <h3 class="row">private Lobby: {{ lobbystate.istPrivat }}</h3>
-      <h3 class="row">host: {{ lobbystate.host.name }}</h3>
+      <h3 class="row">Teilnehmer: {{ lobbystate.teilnehmerliste.length }}/{{ lobbystate.spielerlimit }}</h3>
+      <h3 class="row">Karte: {{ lobbystate.gewaehlteKarte.name }}</h3>
+      <h3 v-if="lobbystate.istPrivat" class="row">Lobby: privat</h3>
+      <h3 v-else class="row">Lobby: öffentlich</h3>
+      <h3 class="row">Host: {{ lobbystate.host.name }}</h3>
+      <h1 v-if="lobbystate.istGestartet">{{ lobbystate.countdown }}</h1>
     </div>
-    <h1>{{ lobbystate.countdown }}</h1>
     <audio id="ticking">
       <source src="../../assets/sounds/ticking.mp3" type="audio/mpeg" />
     </audio>
@@ -66,14 +77,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, watchEffect, ref } from "vue";
-import { useLobbyStore } from "@/services/lobby/LobbyStore";
+import { defineComponent, watchEffect, ref, computed, onMounted } from "vue";
+import { useLobbyStore } from "@/services/lobby/lobbyService";
 import userStore from "@/stores/user";
-import router from "@/router";
 export default defineComponent({
   name: "Einstellungen",
   setup() {
-    const { lobbystate, starteLobby, einstellungsfunktionen } = useLobbyStore();
+    onMounted(() =>{
+      alleKartenLaden();
+    })
+
+    const { lobbystate, starteLobby, einstellungsfunktionen, alleKartenLaden, alleKartenState } = useLobbyStore();
     // DEFAULT max spielerlimit aktuell = 10
     const limitArray = ref(Array.from({ length: 10 }, (_, i) => i + 1));
     // das setzt spielerlimit immer auf das neuste lobbystate.spielerlimit
@@ -81,9 +95,15 @@ export default defineComponent({
     // watchEffect(() => limitArray.value = Array.from({length: lobbystate.karte.maxSpieler}, (_, i) => i + 1));
     // gibt es noch nicht -> ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+    const kartenArray = computed(() =>{
+      return alleKartenState.karten;
+    })
+
     let startbuttonUnsichtbar = ref(false);
 
     // ref's auf änderbare Einstellungen und watchEffects auf lobbystate parameter für den neusten Stand
+    const gewaehlteKarte = ref();
+    watchEffect(() => (gewaehlteKarte.value = lobbystate.gewaehlteKarte));
     const spielerlimit = ref();
     watchEffect(() => (spielerlimit.value = lobbystate.spielerlimit));
     const istPrivat = ref();
@@ -92,6 +112,9 @@ export default defineComponent({
     watchEffect(() => (host.value = lobbystate.host.name));
 
     // 3 FUNKTIONEN zum ändern der änderbare Einstellungen:
+    function changeKarte() {
+      einstellungsfunktionen["changeKarte"](gewaehlteKarte.value);
+    }
     function changeLimit() {
       einstellungsfunktionen["changeLimit"](spielerlimit.value);
     }
@@ -122,11 +145,14 @@ export default defineComponent({
       spielerlimit,
       changeLimit,
       limitArray,
+      kartenArray,
       istPrivat,
       changePrivacy,
       host,
       changeHost,
       startbuttonUnsichtbar,
+      gewaehlteKarte,
+      changeKarte,
     };
   },
 });

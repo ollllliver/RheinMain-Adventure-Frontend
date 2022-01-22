@@ -4,8 +4,10 @@ import LobbyView from '@/views/LobbyView.vue'
 import Register from "@/views/Register.vue";
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
 import Editor from "@/views/Editor.vue";
-import userStore from '@/stores/user'
 import { logout } from '@/requests';
+import AboutView from "@/views/AboutView.vue";
+import userStore from '@/stores/user'
+import Landingpage from '@views/Landingpage.vue';
 
 // Routen der Anwendung
 
@@ -36,13 +38,18 @@ const routes: Array<RouteRecordRaw> = [
     },
 
     {
+        path: '/landingpage',
+        name: 'Landingpage',
+        component: () => import('../views/Landingpage.vue')
+    },
+    
+
+    {
         path: '/uebersicht',
         name: 'Lobbyuebersicht',
         component: LobbyuebersichtView,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
-                console.log(from);
-                console.log(to);
                 next('/')
             }else{
                 next();
@@ -92,6 +99,12 @@ const routes: Array<RouteRecordRaw> = [
                 next();
             }
         }
+    },
+
+    {
+        path: '/about',
+        name: 'About',
+        component: AboutView
     }
 ]
 

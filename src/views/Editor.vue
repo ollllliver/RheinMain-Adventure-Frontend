@@ -1,67 +1,116 @@
 <!-- Editor View für den Level-Editor -->
 
 <template>
-    <div>
-      <h1> Level Editor </h1>
-      <button class="btn btn-primary" @click="$router.push('/')">
-        Home
-      </button>
-      <div>
-        <div>
-        <button class="btn btn-primary" @click="doSomething">
-          Addiere 1
-        </button>
-        <button class="btn btn-primary" @click="doSomethingElse">
-          Multipliziere
-        </button>
-        </div>
-        <button class="btn btn-primary" @click="undoSomething">
-          Undo Command
-        </button>
-        <button class="btn btn-primary" @click="redoSomething">
-          Redo Command
-        </button>
+  
+  <div class="container">
+
+    <!-- leerer Header -->
+    <div class="row justify-content-md-center" id="top">
+      <div class="col-md-auto">
       </div>
-      <span class="title">Wand X-Koordinate: {{wand.x}}</span>
+    </div>
+
+    <div class="row">
+
+      <!-- Editorfenster -->  
+      <div class="col" id="karte">
+        <Editorfenster />
+      </div>
+      
+      <!-- Aktionstasten -->  
+      <div class="col-col-lg-2" id="aktionstasten">
+        <Aktionstasten/>
+      </div>
 
     </div>
+
+    <div class="row">
+
+      <!-- Level Bausteine --> 
+      <div class="col" id ="bausteine">
+        <Bausteine />
+      </div>
+
+      <!-- Info Fenster -->
+      <div class="col col-lg-2" id="infofenster">
+        <p class="infotext">{{editorStore.getters.getInfo}}</p>
+      </div>
+
+    </div>
+
+  </div>
+  
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted } from 'vue';
-import { CommandStack } from '@/commands/CommandManager';
-import { ConcreteCommandTest, ConcreteMultiply } from '@/commands/Command';
+import Aktionstasten from '../components/editor/Aktionstasten.vue'
+import Bausteine from '../components/editor/Bausteine.vue'
+import Editorfenster from '../components/editor/EditorFenster.vue'
+import editorStore from '@/stores/editor'
 
 export default defineComponent({
   name: 'Editor',
-
-  //props: ['num'],
-  data() {   
-    return {
-        wand: {x: 0} //Wand objekt zur Testzwecken
-      }
-  },
-  
-  methods: {
-    doSomething(){ //Addiert 1 zur x-Koordinate
-      CommandStack.getInstance().execAndPush(new ConcreteCommandTest(this.wand));
-      console.log(CommandStack.getInstance().toString());
-    },
-    doSomethingElse(){ //Multipliziert x-Koordinate mit 10
-      CommandStack.getInstance().execAndPush(new ConcreteMultiply(this.wand, 10));
-      console.log(CommandStack.getInstance().toString());
-    },
-    undoSomething(){ //Macht rückgängig
-      CommandStack.getInstance().undo();
-    },
-    redoSomething(){ //Wiederholt rückgängig gemachtes
-      CommandStack.getInstance().redo();
-    }
-  },
+  components: { Aktionstasten, Bausteine, Editorfenster },
+  setup() {
+    return { editorStore }
+  }
 });
 </script>
 
 
 <style scoped>
+  html, body {
+    height: 100%;
+  }
+  
+  #top {
+    height: 40px;
+  }
+  #karte {
+    height: 500px;
+    width: 800px;
+    border: 2px black solid;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+  }
+ 
+  #aktionstasten {
+    margin-left: 60px;
+    margin-right: -60px;
+    height: 300px;
+    width: 30%;
+  }
+ 
+  #infofenster {
+    width: 30%;
+    margin-left: 10px;
+    margin-right: -60px;
+    margin-top: -140px;
+    margin-bottom: 90px;
+    border: 1px solid black;
+  }
+
+  #bausteine {
+    width: 70%;
+    margin-top: 20px;
+    margin-right: 50px;
+    height: 70px;
+    border: 1px black solid;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .infotext {
+    font-weight: 300;
+    color: black;
+    
+  }
+
+  #eigenschaften {
+    margin-top: 20px;
+  }
 
 </style>

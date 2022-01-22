@@ -4,7 +4,7 @@
         <div class="row">
             <div class="form-control">
                 <span class="title">{{link}}</span>
-                <button class="btn btn-info text-white" v-on:click="copyInviteLink">Link kopieren</button>
+                <button class="btn btn-success text-white" v-on:click="copyInviteLink">Link kopieren</button>
                 <input type="hidden" id="link-copy" :value="link">
             </div>
         </div>

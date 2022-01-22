@@ -6,39 +6,19 @@
   </div>
   <div v-else class="text-center">
     <h2>Welcome, {{ userStore.state.benutzername }}</h2>
-    <button class="btn btn-default" @click="$router.push('uebersicht')">
-      Lobbyübersicht
-    </button>
-    <button class="btn btn-default" @click="$router.push('create')">
-      Create Lobby
-    </button>
-    <button class="btn btn-default" @click="$router.push('environment')">
-      Game Environment
-    </button>
-    <button class="btn btn-default" @click="$router.push('editor')">
-      Level Editor
-    </button>
-    
-    <button class="btn btn-default" @click="$router.push('instructions')">
-      Anleitung
-    </button>
     <br>
-
-    <button class="btn btn-danger" @click="userStore.logout()">
-      Logout
-    </button>
-  </div> 
-  <!-- <Login /> -->
+    <MazeMenue/>
+  </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted, ref} from 'vue';
 import userStore from '@/stores/user'
 import Login from '@/components/Login.vue'
-import { useRouter } from "vue-router";
+import MazeMenue from "@/components/home/MazeMenue.vue"
 export default defineComponent({
   name: 'Home',
-  components: { Login },
+  components: { Login, MazeMenue },
   setup() {
 
     onMounted(userStore.getUser)

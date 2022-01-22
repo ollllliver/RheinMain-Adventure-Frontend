@@ -3,8 +3,7 @@
     <div >
         <center>
             <h3> Anleitung  </h3>
-                <table border="2"  bordercolordark="#800000" 
-                bordercolorlight="#FF0000">
+                <table id= "tabelle">
                 <tr>
                     <th>Steuerung</th>
                     <th>Funktion</th>
@@ -26,6 +25,8 @@
                     <td>Interaktion mit Dingen</td>
                 </tr>
                 </table> 
+
+                
        </center>
     </div>
 </template>
@@ -39,7 +40,27 @@ export default defineComponent({
 
 
 <style scoped>
-td {
-    border:2px solid black;
+
+
+#tabelle {
+
+  border-collapse: collapse;
+  width: 100%;
 }
+
+#tabelle td, #tabelle th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+
+#tabelle th {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  text-align: left;
+  background-color: #6d9466 ;
+  color: white;
+}
+
+
 </style>

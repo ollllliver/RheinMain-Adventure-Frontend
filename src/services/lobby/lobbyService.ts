@@ -9,14 +9,15 @@ import {NachrichtenCode} from '@/messaging/NachrichtenCode';
 import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
 import axios from 'axios';
+import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
-const wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
+let wsurl;
+if (location.protocol == 'http:') {
+    wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
+}else{
+    wsurl = `wss://${window.location.hostname}/messagebroker`;
+}
 const stompclient = new Client({brokerURL: wsurl});
-
-// verwendete StompSubscriptions:
-let lobbySubscription: StompSubscription;
-let lobbyChatSubscription: StompSubscription;
-let uebersichtSubscription: StompSubscription;
 
 /**
  * lobbystate ist ein reactive, das zu einer Lobby essentielle Infos hält + errormessage
@@ -34,8 +35,12 @@ const lobbystate = reactive({
     // dass in dem Moment, bevor man zurück zur Übersicht gepusht wird, nichts angezeigt wird.
     darfBeitreten: false,
     istPrivat: false,
-    countdown: 10,
+    countdown: 5,
+    //TODO: any zu Karte oder Level ändern, sobald es im selben Branch ist.
+    gewaehlteKarte: {} as any,
 })
+
+const {unsubscribeChat, subscribeChat} = useChatStore();
 
 /**
  * alleLobbiesState ist ein reactive, das die Liste von Lobbys hält + errormessage
@@ -44,6 +49,15 @@ const alleLobbiesState = reactive({
     lobbies: Array<Lobby>(),
     errormessage: ""
 })
+
+const alleKartenState = reactive({
+    //TODO: any zu Karte oder Level ändern, sobald es im selben Branch ist.
+    karten: {} as Array<any>,
+})
+
+// verwendete StompSubscriptions:
+let lobbySubscription: StompSubscription;
+let uebersichtSubscription: StompSubscription;
 
 /**
  * connectToStomp ist die Function, in der der stompclient sich beim MessageBroker aus dem Backend einschreibt.
@@ -55,13 +69,22 @@ const alleLobbiesState = reactive({
  *              Nicht gerade so, wie man es von typescript kennt. Klingt mehr nach javascript. aber gut...
  */
 async function connectToStomp(callb, param) {
-    // stompclient.onWebSocketError = () => { /* WS-Fehler */ }
-    // stompclient.onStompError = () => { /* STOMP-Fehler */ }
-    // stompclient.onDisconnect = () => { /* Verbindung abgebaut*/ }
+
+    stompclient.onWebSocketError = () => { 
+        console.log("AAAAAAAAAAAAAAAAAAAA websocket error")
+        leaveLobby(); }
+    stompclient.onStompError = (frame) => { 
+        console.log("AAAAAAAAAAAAAAAAAAAA stomp error" + frame)
+        leaveLobby();
+    }
+    stompclient.onDisconnect = () => {
+        console.log("AAAAAAAAAAAAAAAAAAAA on disconnect")
+        leaveLobby();
+    }
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
         callb(param)
-        console.log(callb.name + "()");
+        console.log("Subscribe to", callb.name + "()");
     };
     stompclient.activate();
 }
@@ -74,7 +97,7 @@ function connectToUebersicht() {
         connectToStomp(subscribeToUebersicht, null);
     }
     else {
-        console.log(subscribeToUebersicht.name + "()");
+        console.log("Subscribe to", subscribeToUebersicht.name + "()");
         subscribeToUebersicht();
     }
 }
@@ -121,29 +144,6 @@ async function tryJoin(lobby_id: string) {
     }).catch((e) => {
         console.log(e);
     });
-
-    // return fetch('/api/lobby/join/' + lobby_id, {
-    //     method: 'POST'
-    //     // ,headers: {
-    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
-    //     // }
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((jsondata) => {
-    //     // verarbeite jsondata
-    //     const lobbymessage = jsondata as LobbyMessage;
-    //     if (lobbymessage.istFehler) {
-    //         return lobbymessage.typ;
-    //     } else {
-    //         return lobbymessage.typ;
-    //     }
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
 }
 
 /*
@@ -182,6 +182,11 @@ async function connectToLobby(lobby_id: string) {
                 router.push("/uebersicht");
                 break;
 
+            case NachrichtenCode.BEREITS_IN_ANDERER_LOBBY:
+                alleLobbiesState.errormessage = "Du bist bereits in einer anderen Lobby";
+                router.push("/uebersicht");
+                break;
+
             case NachrichtenCode.SCHON_BEIGETRETEN:
             case NachrichtenCode.ERFOLGREICH_BEIGETRETEN:
                 lobbystate.darfBeitreten = true;
@@ -191,11 +196,12 @@ async function connectToLobby(lobby_id: string) {
                     connectToStomp(subscribeToLobby, lobby_id);
                 }
                 else {
-                    console.log('unsubscribe von uebersicht');
                     uebersichtSubscription.unsubscribe();
-                    console.log(subscribeToLobby.name + "()");
+                    console.log("Subscribe to", subscribeToLobby.name + "()");
                     subscribeToLobby(lobby_id);
                 }
+                // Chat fuer stomp subscriben:
+                subscribeChat(lobby_id, ChatTyp.LOBBY);
                 // und lobbydaten holen:
                 updateLobby(lobby_id);
                 alleLobbiesState.errormessage = '';
@@ -217,14 +223,9 @@ async function connectToLobby(lobby_id: string) {
  */
 function subscribeToLobby(lobby_id: string) {
     const DEST = "/topic/lobby/" + lobby_id;
-    const DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
     lobbySubscription = stompclient.subscribe(DEST, (message) => {
         const lobbymessage = JSON.parse(message.body) as LobbyMessage;
         empfangeLobbyMessageLobby(lobbymessage, lobby_id);
-    });
-    lobbyChatSubscription = stompclient.subscribe(DEST_CHAT, (message) => {
-        const chatmessage = JSON.parse(message.body) as ChatNachricht;
-        empfangeChatNachricht(chatmessage);
     });
 }
 
@@ -235,7 +236,7 @@ function subscribeToLobby(lobby_id: string) {
  * @param lobby_id zugehörige Lobby ID
  */
 function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string) {
-    console.log("message from broker:", lobbymessage);
+    console.log("message from broker topic lobby:", lobbymessage);
     if (lobbymessage.istFehler) {
         lobbystate.errormessage = lobbymessage.typ;
     }
@@ -244,6 +245,7 @@ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string)
             alleLobbiesState.errormessage = 'Du wurdest leider rausgeschmissen. :(';
             router.push("/uebersicht");
         } else if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET){
+            lobbystate.istGestartet = true;
             starteTimer();
         } else {
             updateLobby(lobby_id);
@@ -276,56 +278,13 @@ function starteTimer(delay = 1000) {
  * @param lobbymessage empfangene Lobbymessage
  */
 function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
-    console.log("message from broker:", lobbymessage);
+    console.log("message from broker topic uebersicht:", lobbymessage);
     // Es gibt keine errormessages, die über diesen Kanal geteilt werden.
     alleLobbiesladen();
 }
 
-// TODO: Chatfunktionen auslagern in seperates ChatStore.ts
-async function sendeChatNachricht(typ: NachrichtenTyp, inhalt: string, sender: string) {
-
-    const DEST_CHAT = "/topic/lobby/" + lobbystate.lobbyID + "/chat";
-    const nachricht: ChatNachricht = { typ: typ, inhalt: inhalt, sender: sender };
-    stompclient.publish({ destination: DEST_CHAT, body: JSON.stringify(nachricht) });
-    console.log("Gesendete Nachricht: ", nachricht);
-}
-
-async function empfangeChatNachricht(nachricht: ChatNachricht) {
-
-    console.log("Empfangene Nachricht: ", nachricht);
-    const messageArea = document.getElementById("messageArea");
-    const messageElement = document.createElement("li");
-
-    if (nachricht.typ == 'JOIN') {
-        messageElement.classList.add('event-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ' ist gejoined!';
-    } else if (nachricht.typ == 'LEAVE') {
-        messageElement.classList.add('event-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ' ist geleaved!';
-    } else {
-        messageElement.classList.add('chat-message');
-        messageElement.innerHTML = nachricht.sender.bold() + ": " + nachricht.inhalt;
-    }
-
-    let nachUntenGescrollt;
-
-    if (messageArea) {
-        if ((messageArea.offsetHeight + messageArea.scrollTop) >= messageArea.scrollHeight - 20) {
-            nachUntenGescrollt = true;
-        } else {
-            nachUntenGescrollt = false;
-        }
-
-        messageArea.appendChild(messageElement);
-    }
-
-    if (nachUntenGescrollt) {
-        messageElement.scrollIntoView({ behavior: 'smooth' });
-    }
-}
-
 /**
- * lädt die Lobby Daten der mitgegebenen Lobby neu in das lobbyState reactive.
+ * lädt die Lobby Date der mitgegebenen Lobby neu in das lobbyState reactive.
  * 
  * @param lobby_id ist die ID der neu zu ladenden Lobby
  */
@@ -341,7 +300,6 @@ async function updateLobby(lobby_id: string) {
         }
         return response.data;
     }).then((jsondata) => {
-        console.log(jsondata)
         // verarbeite jsondata
         lobbystate.teilnehmerliste = jsondata.teilnehmerliste;
         lobbystate.istGestartet = jsondata.istGestartet;
@@ -350,37 +308,11 @@ async function updateLobby(lobby_id: string) {
         lobbystate.spielerlimit = jsondata.spielerlimit;
         lobbystate.host = jsondata.host;
         lobbystate.istPrivat = jsondata.istPrivat;
-
+        lobbystate.gewaehlteKarte = jsondata.gewaehlteKarte;
     }).catch((e) => {
         console.log(e);
     });
 
-
-    // fetch('/api/lobby/' + lobby_id, {
-    //     method: 'GET'
-    //     // ,headers: {
-    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
-    //     // }
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((jsondata) => {
-    //     console.log(jsondata)
-    //     // verarbeite jsondata
-    //     lobbystate.teilnehmerliste = jsondata.teilnehmerliste;
-    //     lobbystate.istGestartet = jsondata.istGestartet;
-    //     lobbystate.istVoll = jsondata.istVoll;
-    //     lobbystate.lobbyID = jsondata.lobbyID;
-    //     lobbystate.spielerlimit = jsondata.spielerlimit;
-    //     lobbystate.host = jsondata.host;
-    //     lobbystate.istPrivat = jsondata.istPrivat;
-
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
 }
 
 async function joinRandomLobby() {
@@ -406,31 +338,6 @@ async function joinRandomLobby() {
             console.log(e);
         });
 
-
-    // return fetch('/api/lobby/joinRandom', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     }
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((jsondata) => {
-    //     const lobbyMsg = jsondata as LobbyMessage;
-    //     if (lobbyMsg.istFehler) {
-    //         alleLobbiesState.errormessage = "Keine passende Lobby gefunden. Erstell doch einfach selber eine.";
-    //     }
-    //     else {
-    //         router.push("/lobby/" + lobbyMsg.payload);
-    //     }
-    // })
-    //     .catch((e) => {
-    //         console.log(e);
-    //     });
-
 }
 
 async function starteLobby() {
@@ -446,34 +353,12 @@ async function starteLobby() {
         return response.data;
     }).then(async (jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
-        console.log(lobbyMsg);
         return lobbyMsg.payload;
 
     }).catch((e) => {
             console.log(e);
         });
 
-
-    // return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     }
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then(async (jsondata) => {
-    //     const lobbyMsg = jsondata as LobbyMessage;
-    //     console.log(lobbyMsg);
-    //     return lobbyMsg.payload;
-
-    // })
-    //     .catch((e) => {
-    //         console.log(e);
-    //     });
 }
 
 /**
@@ -498,10 +383,9 @@ function resetLobbyState() {
  * @returns bei erfolgreichem Fetch die response als json.
  */
 async function leaveLobby(): Promise<boolean> {
-    lobbySubscription.unsubscribe()
-    lobbyChatSubscription.unsubscribe()
+    lobbySubscription.unsubscribe();
+    unsubscribeChat();
 
-    console.log("Fetch auf: /leave/" + lobbystate.lobbyID)
     router.push("/uebersicht");
 
 
@@ -520,21 +404,6 @@ async function leaveLobby(): Promise<boolean> {
     
 
 
-    // return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
-    //     method: 'DELETE',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     resetLobbyState();
-    //     return response.json();
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
 }
 
 /**
@@ -545,6 +414,8 @@ async function leaveLobby(): Promise<boolean> {
 async function neueLobby() {
     console.log("Fetch auf: /api/lobby/neu")
 
+    
+
     return axios.post('/api/lobby/neu')
     .then((response) => {
         if (response.status != 200 ) {
@@ -552,28 +423,18 @@ async function neueLobby() {
             return;
         }
         return response.data;
-    })
-
-
-
-    // return fetch('/api/lobby/neu', {
-    //     method: 'POST'
-    //     // ,headers: {
-    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
-    //     // }
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((jsondata) => {
-    //     console.log(jsondata)
-    //     router.push("/lobby/" + jsondata.lobbyID);
-    //     return jsondata.lobbyID
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
+    }).then((jsondata) => {
+        const lobbymessage = jsondata as LobbyMessage;
+        if (lobbymessage.istFehler) {
+            alleLobbiesState.errormessage = "Du bist bereits in einer Lobby die ID lautet :" + lobbymessage.payload
+            router.push("/uebersicht");
+        } else {
+            router.push("/lobby/" + lobbymessage.payload);
+            return lobbymessage.payload
+        }
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 /**
@@ -606,32 +467,6 @@ async function alleLobbiesladen() {
         console.log(e);
     });
 
-
-
-
-    // return fetch('/api/lobby/alle', {
-    //     method: 'GET'
-    //     // ,headers: {
-    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
-    //     // }
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((jsondata: Array<Lobby>) => {
-    //     console.log(jsondata);
-    //     // verarbeite jsondata
-    //     jsondata.forEach(element => {
-    //         lobbyliste.push(element);
-    //     });
-    //     alleLobbiesState.lobbies = lobbyliste;
-
-    //     return lobbyliste
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
 }
 
 /**
@@ -649,33 +484,9 @@ function changeLimit(neuesLimit) {
             return;
         }
         return response;
-    }).then((json) => {
-        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
-
-
-    // fetch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', {
-    //     method: 'PATCH',
-    //     // ,headers: {
-    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
-    //     // }
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(neuesLimit)
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((json) => {
-    //     console.log(json);
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
 }
 
 /**
@@ -700,28 +511,6 @@ function changePrivacy(istPrivat) {
         console.log(e);
     });
 
-
-
-    // fetch('/api/lobby/' + lobbystate.lobbyID + '/privacy', {
-    //     method: 'PATCH',
-    //     // ,headers: {
-    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
-    //     // }
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(istPrivat)
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((json) => {
-    //     console.log(json);
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
 }
 
 /**
@@ -745,27 +534,6 @@ function changeHost(neuerHost) {
         console.log(e);
     });
 
-
-    // fetch('/api/lobby/' + lobbystate.lobbyID + '/host', {
-    //     method: 'PATCH',
-    //     // ,headers: {
-    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
-    //     // }
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(neuerHost)
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((json) => {
-    //     console.log(json);
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
 }
 
 /**
@@ -785,7 +553,6 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
         }
         return response.data;
     }).then((lobbyMessage: LobbyMessage) => {
-        console.log(lobbyMessage);
         if (lobbyMessage.istFehler) {
             lobbystate.errormessage = "Du darfst das nicht!";
             // Todo: vielleicht nen timer, der die nachricht nach 5 Sekunden entfernt?
@@ -794,32 +561,52 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
         console.log(e);
     });
 
-
-    // fetch('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', {
-    //     method: 'DELETE',
-    //     // ,headers: {
-    //     //     'Authorization': 'Bearer ' + loginstate.jwttoken
-    //     // }
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //     },
-    //     body: JSON.stringify(zuEntzfernenderSpieler)
-    // }).then((response) => {
-    //     if (!response.ok) {
-    //         console.log("error");
-    //         return;
-    //     }
-    //     return response.json();
-    // }).then((lobbyMessage: LobbyMessage) => {
-    //     console.log(lobbyMessage);
-    //     if (lobbyMessage.istFehler) {
-    //         lobbystate.errormessage = "Du darfst das nicht!";
-    //         // Todo: vielleicht nen timer, der die nachricht nach 5 Sekunden entfernt?
-    //     }
-    // }).catch((e) => {
-    //     console.log(e);
-    // });
 }
+
+/**
+ * Fragt im Backend per fetch das Ändern der gewählten Karte für die Lobby aus dem aktuellen lobbystate an.
+ * 
+ * @param neueKarte 
+ */
+ function changeKarte(neueKarte) {
+    fetch('/api/lobby/' + lobbystate.lobbyID + '/level', {
+        method: 'PATCH',
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(neueKarte.levelId)
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).catch((e) => {
+        console.log(e);
+    });
+}
+
+async function alleKartenLaden() {
+    fetch('/api/level/alle', {
+        method: 'GET'
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((level: Array<Lobby>) => {
+        // verarbeite jsondata
+        alleKartenState.karten = level;
+    }).catch((e) => {
+        console.log(e);
+    });}
 
 /**
  * stellt mit dem returnobjekt gewisse objekte und functionen für die Views und Componenten zur Verfügung
@@ -837,6 +624,7 @@ export function useLobbyStore() {
         // State-Variablen:
         alleLobbiesState: readonly(alleLobbiesState),
         lobbystate: readonly(lobbystate),
+        alleKartenState: readonly(alleKartenState),
 
         // Lobby Funktionen zum Informieren
         alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht,
@@ -845,9 +633,8 @@ export function useLobbyStore() {
         neueLobby, joinRandomLobby, leaveLobby, starteLobby, spielerEntfernen,
 
         // Funktionen zum ändern der Lobby Einstellungen:
-        einstellungsfunktionen: { changeLimit, changePrivacy, changeHost },
+        einstellungsfunktionen: { changeLimit, changePrivacy, changeHost, changeKarte },
 
-        // Chat Funktionen:
-        sendeChatNachricht, empfangeChatNachricht,
+        alleKartenLaden,
     }
 }

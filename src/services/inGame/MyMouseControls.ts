@@ -1,6 +1,8 @@
 import { Euler, Vector3, EventDispatcher } from 'three';
 import { Camera } from "three/src/cameras/Camera";
 import * as Three from "three";
+import { useGameEngine } from './gameEngine';
+
 
 const _euler = new Euler(0, 0, 0, 'YXZ');
 const _vector = new Vector3();
@@ -62,14 +64,18 @@ class MyMouseControls extends EventDispatcher {
 				this.dispatchEvent(_lockEvent);
 
 				this.isLocked = true;
+				// console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
 
 			} else {
 
 				this.dispatchEvent(_unlockEvent);
 
 				this.isLocked = false;
+				useGameEngine().disconnectController();
+				// console.log("MyMouseControls.onPointerlockChange: isLocked - "+ this.isLocked)
 
 			}
+			
 		}
 
 		function onPointerlockError() {
@@ -83,7 +89,7 @@ class MyMouseControls extends EventDispatcher {
 			this.domElement.ownerDocument.addEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.addEventListener('pointerlockchange', onPointerlockChange);
 			this.domElement.ownerDocument.addEventListener('pointerlockerror', onPointerlockError);
-			console.log("mouse controls connected")
+			// console.log("### MyMouseControls.connect: mouse controls connected")
 
 
 		};
@@ -92,11 +98,11 @@ class MyMouseControls extends EventDispatcher {
 		 * Achtet nicht mehr auf Änderungen Maus
 		 */
 		this.disconnect = function () {
+			this.unlock();
 			this.domElement.ownerDocument.removeEventListener('mousemove', onMouseMove);
 			this.domElement.ownerDocument.removeEventListener('pointerlockchange', onPointerlockChange);
 			this.domElement.ownerDocument.removeEventListener('pointerlockerror', onPointerlockError);
-			this.unlock();
-			console.log("mouse controls disconnect")
+			// console.log("### MyMouseControls.disconnect: mouse controls disconnected")
 
 
 		};
@@ -158,21 +164,16 @@ class MyMouseControls extends EventDispatcher {
 		 * "Lockt" die Maus 
 		 */
 		this.lock = () => {
-
 			this.domElement.requestPointerLock();
 			console.log("mouse controls: lock")
-
-
 		};
 
 		/**
 		 * Lässt die Maus wieder frei 
 		 */
 		this.unlock = () => {
-
 			this.domElement.ownerDocument.exitPointerLock();
 			console.log("mouse controls: unlock")
-
 		};
 
 		/**
