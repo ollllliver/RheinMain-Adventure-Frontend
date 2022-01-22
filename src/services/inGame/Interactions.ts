@@ -86,7 +86,8 @@ export class Interactions {
                     console.log("publish: " + interaktion.object.id + "auf /topic/spiel/" + this.lobbyID + '/schluessel');
                     this.DEST = "/topic/spiel/" + this.lobbyID + '/key';
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/key
-                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.id, skipContentLengthHeader: true,});
+                    console.log('###POINT###', Math.round(interaktion.point.x), Math.round(interaktion.point.z))
+                    this.stompclient.publish({destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()}`, skipContentLengthHeader: true,});
                     
                     break;
                 case "Tür":

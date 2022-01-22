@@ -43,8 +43,8 @@ export function subscribeToSchluesselUpdater(stompclient: Client): void{
             //Jenachdem wie viele Schluessel eingesammelt wurden:
             if (update.anzSchluessel != 0){
                 //entweder SchluesselCOunter hochzaehler...
-                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.id)
-                setzteSchluesselAnz(update.anzSchluessel, update.id); 
+                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.koordinatenArray)
+                setzteSchluesselAnz(update.anzSchluessel, update.koordinatenArray); 
 
             }else{
                 //... oder keine Schluessel meldung

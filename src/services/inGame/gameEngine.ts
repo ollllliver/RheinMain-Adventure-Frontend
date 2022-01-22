@@ -63,6 +63,8 @@ const gamestate = reactive({
 })
 const mitspieler3dObjektListe = new Map();
 
+const interagierbar3dObjektListe = new Map();
+
 const {unsubscribeChat, subscribeChat} = useChatStore();
 
 let startPosition: Position;
@@ -141,8 +143,10 @@ const initLoader = () => {
                             //Tür und Schlüssel bestehen aus mehreren Objekten,
                             //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
                             console.log(res.scene.children[0])
+                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene);
                             interactableList.push(res.scene.children[0]);
                         } else {
+                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene);
                             interactableList.push(res.scene);
                         }
                     }
@@ -504,13 +508,13 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
-function setzteSchluesselAnz(anzSchluessel: number, id: number){
+function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
     schluesselText.textContent = "Keys x" + anzSchluessel;
     schluesselText.style.display = "block";
 
-    const removeObject = scene.getObjectById(id);
+    const removeObject = interagierbar3dObjektListe.get(koordinaten);
     console.log("DAS OBJECT MUSS WEG:")
     console.log(removeObject);
 
