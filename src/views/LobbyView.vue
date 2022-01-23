@@ -37,7 +37,7 @@ export default defineComponent({
     lobby_id: { type: String, required: true },
   },
   setup(props) {
-    const { lobbystate, connectToLobby, leaveLobby} = useLobbyStore();
+    const { lobbystate, connectToLobby, leaveLobby, getScore} = useLobbyStore();
     const { sendeChatNachricht, empfangeChatNachricht} = useChatStore();
 
     window.addEventListener('beforeunload',function(e){
@@ -48,6 +48,7 @@ export default defineComponent({
 
     onMounted(async () => {
       connectToLobby(String(props.lobby_id));
+      getScore(props.lobby_id);
     });
 
     return {
