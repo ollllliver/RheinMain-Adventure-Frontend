@@ -6,6 +6,9 @@ import { Client, StompSubscription } from '@stomp/stompjs';
 import router from '@/router';
 import userStore from '@/stores/user'
 import {NachrichtenCode} from '@/messaging/NachrichtenCode';
+import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
+import {ChatNachricht} from '@/messaging/ChatNachricht';
+import axios from 'axios';
 import { ChatTyp, useChatStore } from "@/services/ChatStore";
 
 let wsurl;
@@ -70,10 +73,14 @@ let uebersichtSubscription: StompSubscription;
 async function connectToStomp(callb, param) {
 
     stompclient.onWebSocketError = () => { 
+        console.log("AAAAAAAAAAAAAAAAAAAA websocket error")
         leaveLobby(); }
-    stompclient.onStompError = () => { 
-        leaveLobby();}
+    stompclient.onStompError = (frame) => { 
+        console.log("AAAAAAAAAAAAAAAAAAAA stomp error" + frame)
+        leaveLobby();
+    }
     stompclient.onDisconnect = () => {
+        console.log("AAAAAAAAAAAAAAAAAAAA on disconnect")
         leaveLobby();
     }
     stompclient.onConnect = async (frame) => {
@@ -119,17 +126,16 @@ function subscribeToUebersicht() {
  * Bei Misserfolg, steht in der Lobbymessage das istFehler Flag auf true.
  */
 async function tryJoin(lobby_id: string) {
-    return fetch('/api/lobby/join/' + lobby_id, {
-        method: 'POST'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-    }).then((response) => {
-        if (!response.ok) {
+    console.log("Fetch auf: /api/lobby/join/" + lobby_id);
+
+
+    return axios.post('/api/lobby/join/' + lobby_id)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((jsondata) => {
         // verarbeite jsondata
         const lobbymessage = jsondata as LobbyMessage;
@@ -298,17 +304,16 @@ function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
  * @param lobby_id ist die ID der neu zu ladenden Lobby
  */
 async function updateLobby(lobby_id: string) {
-    fetch('/api/lobby/' + lobby_id, {
-        method: 'GET'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-    }).then((response) => {
-        if (!response.ok) {
+    console.log("Fetch auf: /api/lobby/" + lobby_id);
+
+
+    axios.get('/api/lobby/' + lobby_id)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((jsondata) => {
         // verarbeite jsondata
         lobbystate.teilnehmerliste = jsondata.teilnehmerliste;
@@ -322,20 +327,19 @@ async function updateLobby(lobby_id: string) {
     }).catch((e) => {
         console.log(e);
     });
+
 }
 
 async function joinRandomLobby() {
-    return fetch('/api/lobby/joinRandom', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    }).then((response) => {
-        if (!response.ok) {
+    console.log("Fetch auf: /api/lobby/joinRandom");
+
+    return axios.post('/api/lobby/joinRandom')
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
         if (lobbyMsg.istFehler) {
@@ -354,25 +358,23 @@ async function joinRandomLobby() {
 // starteSpiel?
 async function starteLobby() {
 
-    return fetch('/api/lobby/'+lobbystate.lobbyID+'/start', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
-    }).then((response) => {
-        if (!response.ok) {
+    console.log("Fetch auf: /api/lobby/{lobbyId}/start")
+
+    return axios.post('/api/lobby/'+lobbystate.lobbyID+'/start')
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then(async (jsondata) => {
         const lobbyMsg = jsondata as LobbyMessage;
         return lobbyMsg.payload;
 
-    })
-        .catch((e) => {
+    }).catch((e) => {
             console.log(e);
         });
+
 }
 
 async function resetLobbyID() {
@@ -416,25 +418,30 @@ function resetLobbyState() {
  * @returns bei erfolgreichem Fetch die response als json.
  */
 async function leaveLobby(): Promise<boolean> {
-    lobbySubscription.unsubscribe()
+    if (lobbySubscription){
+        lobbySubscription.unsubscribe();
+    }
+    
     unsubscribeChat();
     resetLobbyID();
     router.push("/uebersicht");
-    return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-    }).then((response) => {
-        if (!response.ok) {
+
+
+
+    return axios.delete('/api/lobby/leave/' + lobbystate.lobbyID)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
         resetLobbyState();
-        return response.json();
+        return response.data;
     }).catch((e) => {
         console.log(e);
     });
+    
+
+
 }
 
 /**
@@ -443,17 +450,17 @@ async function leaveLobby(): Promise<boolean> {
  * @returns bei erfolgreichem Fetch die LobbyID der im Backend neu erstellten Lobby
  */
 async function neueLobby() {
-    return fetch('/api/lobby/neu', {
-        method: 'POST'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-    }).then((response) => {
-        if (!response.ok) {
-            console.log("error");
+    console.log("Fetch auf: /api/lobby/neu")
+
+    
+
+    return axios.post('/api/lobby/neu')
+    .then((response) => {
+        if (response.status != 200 ) {
+            console.log("Fetch Error /api/lobby/alle");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((jsondata) => {
         const lobbymessage = jsondata as LobbyMessage;
         if (lobbymessage.istFehler) {
@@ -475,18 +482,19 @@ async function neueLobby() {
  */
 async function alleLobbiesladen() {
     const lobbyliste = new Array<Lobby>();
-    return fetch('/api/lobby/alle', {
-        method: 'GET'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-    }).then((response) => {
-        if (!response.ok) {
-            console.log("error");
+    
+
+    console.log("Fetch auf: /api/lobby/alle")
+    return axios.get('/api/lobby/alle')
+    .then((response) => {
+        if (response.status != 200 ) {
+            console.log("Fetch Error /api/lobby/alle");
             return;
         }
-        return response.json();
-    }).then((jsondata: Array<Lobby>) => {
+        console.log("Fetchdaten /api/lobby/alle: " + response);
+        return response.data;
+    }).then((jsondata : Array<Lobby>)=> {
+        console.log("Fetchdaten /api/lobby/alle: " + jsondata);
         // verarbeite jsondata
         jsondata.forEach(element => {
             lobbyliste.push(element);
@@ -497,6 +505,7 @@ async function alleLobbiesladen() {
     }).catch((e) => {
         console.log(e);
     });
+
 }
 
 /**
@@ -505,21 +514,15 @@ async function alleLobbiesladen() {
  * @param neuesLimit 
  */
 function changeLimit(neuesLimit) {
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', {
-        method: 'PATCH',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(neuesLimit)
-    }).then((response) => {
-        if (!response.ok) {
+    console.log('change limit:', neuesLimit);
+
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', neuesLimit)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response;
     }).catch((e) => {
         console.log(e);
     });
@@ -531,24 +534,22 @@ function changeLimit(neuesLimit) {
  * @param istPrivat 
  */
 function changePrivacy(istPrivat) {
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/privacy', {
-        method: 'PATCH',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(istPrivat)
-    }).then((response) => {
-        if (!response.ok) {
+    console.log('change privacy:', istPrivat);
+
+
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/privacy', istPrivat)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response;
+    }).then((json) => {
+        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
+
 }
 
 /**
@@ -557,24 +558,21 @@ function changePrivacy(istPrivat) {
  * @param neuerHost 
  */
 function changeHost(neuerHost) {
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/host', {
-        method: 'PATCH',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(neuerHost)
-    }).then((response) => {
-        if (!response.ok) {
+    console.log('change host:', neuerHost);
+
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/host', neuerHost)
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response;
+    }).then((json) => {
+        console.log(json);
     }).catch((e) => {
         console.log(e);
     });
+
 }
 
 /**
@@ -583,21 +581,16 @@ function changeHost(neuerHost) {
  * @param zuEntzfernenderSpieler 
  */
 function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', {
-        method: 'DELETE',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(zuEntzfernenderSpieler)
-    }).then((response) => {
-        if (!response.ok) {
+    console.log('entferne Mitspieler:', zuEntzfernenderSpieler);
+
+    
+    axios.delete('/api/lobby/' + lobbystate.lobbyID + '/teilnehmer', { data: zuEntzfernenderSpieler })
+    .then((response) => {
+        if (response.status != 200) {
             console.log("error");
             return;
         }
-        return response.json();
+        return response.data;
     }).then((lobbyMessage: LobbyMessage) => {
         if (lobbyMessage.istFehler) {
             lobbystate.errormessage = "Du darfst das nicht!";
@@ -606,6 +599,7 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
     }).catch((e) => {
         console.log(e);
     });
+
 }
 
 /**

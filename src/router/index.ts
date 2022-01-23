@@ -1,9 +1,10 @@
-import {createRouter, createWebHashHistory, RouteRecordRaw} from 'vue-router'
+import {createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw} from 'vue-router'
 import Home from '../views/Home.vue'
 import LobbyView from '@/views/LobbyView.vue'
 import Register from "@/views/Register.vue";
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
 import Editor from "@/views/Editor.vue";
+import { logout } from '@/requests';
 import AboutView from "@/views/AboutView.vue";
 import userStore from '@/stores/user'
 import Landingpage from '@views/Landingpage.vue';
@@ -21,11 +22,19 @@ const routes: Array<RouteRecordRaw> = [
         name: 'SignUp',
         component: Register
     },
-
     {
         path: '/instructions',
         name: 'Instructions',
-        component: () => import('../views/Instructions.vue')
+        component: () => import('../views/Instructions.vue'),
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                console.log(from);
+                console.log(to);
+                next('/')
+            }else{
+                next();
+            }
+        }
     },
 
     {
@@ -66,7 +75,16 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/environment',
         name: 'Environment',
-        component: () => import('../views/Environment.vue')
+        component: () => import('../views/Environment.vue'),
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                console.log(from);
+                console.log(to);
+                next('/')
+            }else{
+                next();
+            }
+        }
     },
     {
         path: '/editor',

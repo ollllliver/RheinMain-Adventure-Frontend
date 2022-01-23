@@ -55,6 +55,7 @@
 <script lang="ts">
 import { defineComponent, reactive } from 'vue'
 import userStore from '@/stores/user'
+import router from '@/router'
 export default defineComponent({
   setup() {
     const form = reactive({
@@ -62,9 +63,14 @@ export default defineComponent({
       passwort: ''
     })
     const onSubmit = () => {
-      userStore.signup(form.benutzername, form.passwort)
-      form.benutzername = ''
-      form.passwort = ''
+      userStore.signup(form.benutzername, form.passwort).then((response)=>{
+        form.benutzername = ''
+        form.passwort = ''
+        router.push('/')
+      }).catch((error)=>{
+        console.log(error)
+      })
+      
     }
     return { form, userStore, onSubmit }
   }
