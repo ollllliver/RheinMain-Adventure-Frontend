@@ -38,6 +38,7 @@ export default defineComponent({
       initChat,
       startAnimate,
       stopAnimate,
+      clearMapContent,
       connect,
       disconnect,
       setContainer,
@@ -60,10 +61,11 @@ export default defineComponent({
       startAnimate();
     });
 
-    return {connect, disconnect, stopAnimate, sendeChatNachricht, empfangeChatNachricht}
+    return {connect, disconnect, stopAnimate, clearMapContent, sendeChatNachricht, empfangeChatNachricht}
   },
   beforeUnmount() {
     this.stopAnimate();
+    this.clearMapContent();
     this.disconnect();
     console.log("unmounted");
   },

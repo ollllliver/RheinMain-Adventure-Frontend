@@ -28,8 +28,8 @@ const loader = new GraphicLoader();
 // let moveRight = false;
 // let moveUp = false;
 // let moveDown = false;
-const collidableList: Array<any> = [];
-const interactableList: Array<any> = [];
+let collidableList: Array<any> = [];
+let interactableList: Array<any> = [];
 const developer = false;
 const minimap = true;
 const minimapWidth = 250;
@@ -53,16 +53,16 @@ let prevTime = performance.now();
 
 const velocity = new Three.Vector3();
 const direction = new Three.Vector3();
-const mitspieler3dObjektListe = new Map();
 const stompClient = gamebrokerStompclient;
 const stompClient2 = schluesselStompclient;
 
 const {lobbystate} = useLobbyStore();
 const gamestate = reactive({
     anzSchluessel:0
-})
+});
 
-const interagierbar3dObjektListe = new Map();
+let mitspieler3dObjektListe = new Map();
+let interagierbar3dObjektListe = new Map();
 
 
 const {unsubscribeChat, subscribeChat} = useChatStore();
@@ -517,6 +517,14 @@ const startAnimate = () => {
     doAnimate();
 }
 
+const clearMapContent = () => {
+    collidableList = new Array<any>();
+    interactableList = new Array<any>();
+    mitspieler3dObjektListe = new Map();
+    interagierbar3dObjektListe = new Map();
+    console.log("Mapstate: cleared");
+}
+
 function zeigeInteraktionText(interaktion: any) {
     if (interaktionText != null /*&& interaktionText.style.display == "none"*/) {
         interaktionText.textContent = "[E] Interagiere mit " + interaktion.object.name
@@ -571,9 +579,7 @@ function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
         }
     }
     
-    removeObject.parent.remove(removeObject);
-   
-    
+    removeObject.parent.remove(removeObject);    
 }
 
 /**
@@ -600,7 +606,6 @@ function oeffneTuer(anzSchluessel: number, koordinaten: string){
     const tuer = interagierbar3dObjektListe.get(koordinaten);
     console.log("DAS OBJECT MUSS AUF GEHEN:")
     console.log(tuer);
-
 
     tuer.rotation.x = Math.PI / 2;
     //collidableList.pop(tuer)
@@ -643,6 +648,7 @@ export function useGameEngine() {
         initChat,
         startAnimate,
         stopAnimate,
+        clearMapContent,
         connect, disconnect, disconnectController,
         setContainer,
         scene,
