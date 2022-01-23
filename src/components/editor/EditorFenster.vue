@@ -195,7 +195,7 @@ export default defineComponent({
           const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
           
           const ele = {y:y,x:x,e:e}
-          if (e !== 0) {
+          if (liste[y][x]!== 0) {
             CommandStack.getInstance().execAndPush(
               new ElementEntfernenCommand(
                 karte,
