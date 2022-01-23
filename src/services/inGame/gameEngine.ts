@@ -141,10 +141,10 @@ const initLoader = () => {
                             //Tür und Schlüssel bestehen aus mehreren Objekten,
                             //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
                             console.log(res.scene.children[0])
-                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene);
+                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene.children[0]);
                             interactableList.push(res.scene.children[0]);
                         } else {
-                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene);
+                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene.children[0]);
                             interactableList.push(res.scene);
                         }
                     }
@@ -560,6 +560,17 @@ function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
     console.log("DAS OBJECT MUSS WEG:")
     console.log(removeObject);
 
+    for (const interagierObj of interactableList ){
+        if ( removeObject.id === interagierObj.id){
+            console.log("Remove gefunden " + interagierObj)
+            const index = interactableList.indexOf(interagierObj)
+            if(index > -1){
+                interactableList.splice(index, 1)
+            }
+            
+        }
+    }
+    
     removeObject.parent.remove(removeObject);
    
     
@@ -591,7 +602,7 @@ function oeffneTuer(anzSchluessel: number, koordinaten: string){
     console.log(tuer);
 
 
-    tuer.rotation.y = Math.PI / 2;
+    tuer.rotation.x = Math.PI / 2;
     //collidableList.pop(tuer)
     //tuer.parent.remove(tuer)
 }
