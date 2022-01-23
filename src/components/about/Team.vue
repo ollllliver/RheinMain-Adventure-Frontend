@@ -51,7 +51,7 @@
       </div>
       <div class="teilnehmer" >
         <div class="d-flex justify-content-center" >
-          <!-- <img height="100" src="@/assets/img/avatare/Pakisa_Naurozi.png" alt=""> -->
+          <img height="100" src="@/assets/img/avatare/Pakisa_Naurozi.png" alt="">
         </div>
         <strong class="d-flex justify-content-center" style="text-align: center;">Pakisa Naurozi</strong>
       </div>
