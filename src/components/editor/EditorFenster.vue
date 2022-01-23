@@ -33,8 +33,7 @@ export default defineComponent({
 
     // Kartenklasse mit liste als Array aus editorStore
     var karte: any;
-    
-    var liste: any[][];
+    var liste: any[][];    
     karte = editorStore.getters.getGrid;
 
     const target_copy1 = Object.assign({}, karte);

@@ -2,7 +2,12 @@ import { Client, StompSubscription } from '@stomp/stompjs';
 import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
 
-const wsurl = `ws://localhost:8080/messagebroker`;
+let wsurl;
+if (location.protocol == 'http:') {
+    wsurl = `ws://${window.location.hostname}:8080/messagebroker`;
+}else{
+    wsurl = `wss://${window.location.hostname}/messagebroker`;
+}
 const stompclient = new Client({brokerURL: wsurl});
 
 // verwendete StompSubscription

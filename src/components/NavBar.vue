@@ -1,6 +1,6 @@
 <template>
   <div class="p-2 border-bottom border-success d-flex align-items-center justify-content-between" style="background-color: #BDD3B9;">
-    <router-link class="mr-auto" to="/" >
+    <router-link class="mr-auto" to="/home" >
         <img src="/assets/RMA_Logo.png" height="40" alt="">
     </router-link>
     <div>
