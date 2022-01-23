@@ -259,16 +259,6 @@ const initChat = () => {
         };
         closeChat(chat, chatButton);
     }
-
-    // TestCube zum Spiel beenden
-    const geometry = new Three.BoxGeometry(1, 1, 1);
-    const material = new Three.MeshBasicMaterial({ color: 0x00ff00 });
-    const cube = new Three.Mesh(geometry, material);
-
-    cube.name = "Ziel";
-    cube.position.x = -10;
-    interactableList.push(cube);
-    scene.add(cube);
 }
 
 /**
