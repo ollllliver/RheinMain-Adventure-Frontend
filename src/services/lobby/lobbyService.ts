@@ -256,6 +256,8 @@ function subscribeToLobby(lobby_id: string) {
             starteTimer();
         } else if (lobbymessage.typ == NachrichtenCode.BEENDE_SPIEL) {
             lobbystate.istGestartet = false;
+            lobbySubscription.unsubscribe();
+            unsubscribeChat();
             router.push("/lobby/" + lobbystate.lobbyID);
         }else if(lobbymessage.typ == NachrichtenCode.SCORE){
             const nachricht: ChatNachricht = { typ: NachrichtenTyp.CHAT, inhalt: lobbymessage.payload, sender: "Server" };

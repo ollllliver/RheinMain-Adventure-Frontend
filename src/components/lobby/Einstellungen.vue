@@ -3,21 +3,20 @@
     <div v-if="lobbystate.host.name == userStore.state.benutzername">
       <!-- TITEL -->
       <h1 class="row">Einstellungen</h1>
-
       <!-- INFOS -->
-      <h3>
-        Teilnehmer: {{ lobbystate.teilnehmerliste.length }} \
-        {{ lobbystate.spielerlimit }}
-      </h3>
-
+      <h3>Teilnehmer: {{ lobbystate.teilnehmerliste.length }} \ {{ lobbystate.spielerlimit }}</h3>
       <!-- AUSWAHL - Karte -->
       <div>
         <label class="h3">Karte:&nbsp;</label>
         <select class="h4" v-model="gewaehlteKarte" @change="changeKarte">
-          <option :text="karte.name" :value="karte" v-for="karte in kartenArray" :key="karte"></option>
+          <option
+            :text="karte.name"
+            :value="karte"
+            v-for="karte in kartenArray"
+            :key="karte"
+          ></option>
         </select>
       </div>
-
       <!-- AUSWAHL - Spielerlimit -->
       <div>
         <label class="h3">Spielerlimit:&nbsp;</label>
@@ -30,7 +29,6 @@
           ></option>
         </select>
       </div>
-
       <!-- AUSWAHL - Privatsphäre -->
       <div>
         <label class="h3">Lobby&nbsp;</label>
@@ -39,7 +37,6 @@
           <option value="false">öffentlich</option>
         </select>
       </div>
-
       <!-- AUSWAHL - Host -->
       <div>
         <label class="h3">Host:&nbsp;</label>
@@ -51,15 +48,11 @@
           ></option>
         </select>
       </div>
-
-    <div class="row">
-      <!-- START BUTTON -->
-      <button class="m-4  col btn btn-success" v-on:click="starten" :disabled="startbuttonUnsichtbar">
-        SPIEL STARTEN
-      </button>
-      <h1 v-if="lobbystate.istGestartet" class="m-4 col">{{ lobbystate.countdown }}</h1>
-    </div>
-
+      <div class="row">
+        <!-- START BUTTON -->
+        <button class="m-4 col btn btn-success" v-on:click="starten" :disabled="startbuttonUnsichtbar">SPIEL STARTEN</button>
+        <h1 v-if="lobbystate.istGestartet" class="m-4 col">{{ lobbystate.countdown }}</h1>
+      </div>
     </div>
     <div v-else>
       <h1 class="row">Einstellungen</h1>
@@ -70,9 +63,6 @@
       <h3 class="row">Host: {{ lobbystate.host.name }}</h3>
       <h1 v-if="lobbystate.istGestartet">{{ lobbystate.countdown }}</h1>
     </div>
-    <audio id="ticking">
-      <source src="../../assets/sounds/ticking.mp3" type="audio/mpeg" />
-    </audio>
   </div>
 </template>
 
@@ -83,21 +73,24 @@ import userStore from "@/stores/user";
 export default defineComponent({
   name: "Einstellungen",
   setup() {
-    onMounted(() =>{
+    onMounted(() => {
       alleKartenLaden();
-    })
+    });
 
-    const { lobbystate, starteLobby, einstellungsfunktionen, alleKartenLaden, alleKartenState } = useLobbyStore();
-    // DEFAULT max spielerlimit aktuell = 10
+    const {
+      lobbystate,
+      starteLobby,
+      einstellungsfunktionen,
+      alleKartenLaden,
+      alleKartenState,
+    } = useLobbyStore();
+
+    // Setzt das Spielerlimit immer auf das neuste lobbystate.spielerlimit
     const limitArray = ref(Array.from({ length: 10 }, (_, i) => i + 1));
-    // das setzt spielerlimit immer auf das neuste lobbystate.spielerlimit
-    // eventuell eine art lobbystate.karte mit maxSpieler?
-    // watchEffect(() => limitArray.value = Array.from({length: lobbystate.karte.maxSpieler}, (_, i) => i + 1));
-    // gibt es noch nicht -> ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-    const kartenArray = computed(() =>{
+    const kartenArray = computed(() => {
       return alleKartenState.karten;
-    })
+    });
 
     let startbuttonUnsichtbar = ref(false);
 
@@ -135,7 +128,6 @@ export default defineComponent({
         .catch((err) => {
           console.log(err);
         });
-
     }
 
     return {
