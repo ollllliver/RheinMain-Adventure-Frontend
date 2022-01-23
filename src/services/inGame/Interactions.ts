@@ -1,3 +1,4 @@
+import user from '@/stores/user';
 import { Client } from '@stomp/stompjs';
 import {Raycaster, Vector3} from 'three';
 import { useLobbyStore } from '../lobby/lobbyService';
@@ -17,6 +18,7 @@ export class Interactions {
     lobbyID:any
     DEST:string
     index:number
+    spielername:string
     update: (cameraPosition: any) => void
     keyDisconnect: () => void
 
@@ -28,7 +30,7 @@ export class Interactions {
         const {gamestate} = useGameEngine()
         // let hatSchluessel = false
         let popupFenster: any;
-
+        this.spielername = user.state.benutzername;
         this.domElement = domElement
         this.cameraCollidable = cameraCollidable
         this.interaktionsListe = interaktionsListe
@@ -81,15 +83,17 @@ export class Interactions {
                 case "Schlüssel":
                     //interaktion.object.parent.remove(interaktion.object);
                     //console.log(interaktion.object)
-                    console.log("publish: " + interaktion.object.id + "auf /topic/spiel/" + this.lobbyID + '/schluessel');
-                    this.DEST = "/topic/spiel/" + this.lobbyID + '/key';
+                    console.log("publish: " + interaktion.object.id + "auf /topic/spiel/" + this.lobbyID );
+                    this.DEST = "/topic/spiel/" + this.lobbyID +"/"+ interaktion.object.name;
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/key
-                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.id, skipContentLengthHeader: true,});
+                    console.log("Spieler " + this.spielername + "will den Schlüssel aufheben")
+                    this.stompclient.publish({destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true,});
+                    
                     break;
                 case "Tür":
                     if(gamestate.anzSchluessel !=  0){
                         // öffne Tür
-                        interaktion.object.rotation.z = Math.PI / 2;
+                        //object.rotation.z = Math.PI / 2;
 
                         // entferne Tür aus interaktionsListe
                         this.index = interaktionsListe.indexOf(interaktion.object);
@@ -98,10 +102,10 @@ export class Interactions {
                                                                                 }
                     }
 
-                    console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/tuer');
-                    this.DEST = "/topic/spiel/" + this.lobbyID + '/tuer';
+                    console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/' + interaktion.object.name);
+                    this.DEST = "/topic/spiel/" + this.lobbyID +"/"+ interaktion.object.name;
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/tuer
-                    this.stompclient.publish({destination: this.DEST, body: interaktion.object.uuid, skipContentLengthHeader: true,});
+                    this.stompclient.publish({destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true,});
                     break;
                 case "Ziel":
                     popupFenster = document.getElementById('ziel');

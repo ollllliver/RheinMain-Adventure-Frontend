@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent, onMounted, ref} from 'vue';
 import userStore from '@/stores/user'
 import Login from '@/components/Login.vue'
 import MazeMenue from "@/components/home/MazeMenue.vue"
@@ -20,8 +20,10 @@ export default defineComponent({
   name: 'Home',
   components: { Login, MazeMenue },
   setup() {
+
     onMounted(userStore.getUser)
     return { userStore }
+    
   }
 });
 </script>
