@@ -232,14 +232,21 @@ function subscribeToLobby(lobby_id: string) {
  * @param lobbymessage empfangene Lobbymessage
  * @param lobby_id zugehörige Lobby ID
  */
-function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string) {
+ function empfangeLobbyMessageLobby(lobbymessage: LobbyMessage, lobby_id: string) {
     console.log("message from broker topic lobby:", lobbymessage);
     if (lobbymessage.istFehler) {
-        lobbystate.errormessage = lobbymessage.typ;
+        if(lobbymessage.typ == NachrichtenCode.LOBBYZEIT_ABGELAUFEN){
+            alleLobbiesState.errormessage = "Die Lobby wurde aufgeloest da das Spiel nicht rechtzeitig gestartet wurde";
+            resetLobbyID()
+            router.push("/uebersicht");
+        }else{
+            lobbystate.errormessage = lobbymessage.typ;
+        }
     }
     else {
         if (lobbymessage.typ == NachrichtenCode.MITSPIELER_VERLAESST && lobbymessage.payload == userStore.state.benutzername) {
             alleLobbiesState.errormessage = 'Du wurdest leider rausgeschmissen. :(';
+            resetLobbyID()
             router.push("/uebersicht");
         } else if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET){
             lobbystate.istGestartet = true;
@@ -368,6 +375,19 @@ async function starteLobby() {
         });
 }
 
+async function resetLobbyID() {
+    return fetch('/api/lobby/reset', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+        }
+    })
+}
+
 function beendeSpiel() {
     const destination = "/topic/lobby/" + lobbystate.lobbyID;
     console.log(destination);
@@ -398,7 +418,7 @@ function resetLobbyState() {
 async function leaveLobby(): Promise<boolean> {
     lobbySubscription.unsubscribe()
     unsubscribeChat();
-
+    resetLobbyID();
     router.push("/uebersicht");
     return fetch('/api/lobby/leave/' + lobbystate.lobbyID, {
         method: 'DELETE',

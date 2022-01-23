@@ -3,24 +3,22 @@
     <div class="fenster__inner">
       <div class="fenster__top">
         <h1 class="title">{{ titel }}</h1>
-        <div :class="closeButton" @click="schließen()">&times;</div>
+        <div :class="close__button" @click="schließen()">&times;</div>
         <span class="helper"></span>
       </div>
       <div :class="fenster__frage">
-        <button class="button" @click="falsch">{{ antworten.get(false) }}</button>
-        <button class="button" @click="richtig">{{ antworten.get(true) }}</button>
-        <button class="button" @click="falsch">{{ antworten.get(false) }}</button>
+        <input id="antwortInput" class="text__input" v-model="eingabe.antwort" required />
+        <button class="ok__button" @click="beantworten()">Ok</button>
       </div>
       <div :class="fenster__beende">
-        <button class="button" @click="beenden">Spiel beenden</button
-        ><br />
+        <button class="beenden__button" @click="beenden">Spiel beenden</button><br />
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, reactive, ref } from "vue";
 import { useGameEngine } from "@/services/inGame/gameEngine";
 import { useLobbyStore } from "@/services/lobby/lobbyService";
 
@@ -28,55 +26,43 @@ export default defineComponent({
   setup() {
     const { beendeSpiel } = useLobbyStore();
     const { connect, disconnect } = useGameEngine();
-    
-    const closeButton = ref('closeButton');
-    const fenster__inner = ref('fenster__inner');
-    const fenster__frage = ref('fenster__frage');
-    const fenster__beende = ref('hidden');
 
-    const antworten = new Map<boolean, number>();
+    const eingabe = reactive({ antwort: "" });
+    const close__button = ref("close__button");
+    const fenster__inner = ref("fenster__inner");
+    const fenster__frage = ref("fenster__frage");
+    const fenster__beende = ref("hidden");
 
     let titel: string;
     let byteString: string;
-    let buttonString: string;
-    let counter: number;
+    let loesung: number;
 
-    counter = 0;
+    loesung = 0;
     byteString = "";
 
+    /**
+     * Hier wird der Binärwert für die Frage 
+     * mit der dazu gehörigen Dezimalzahl generiert
+     */
     for (let i = 1; i <= 8; i = i * 2) {
       let rnd = getRandomInt(0, 1);
       byteString = byteString + rnd.toString();
       if (rnd !== 0) {
-        counter += i;
+        loesung += i;
       }
     }
 
     getReverseString(byteString);
-    titel = "Welche Dezimalzahl befindet sich hier hinter -> " + byteString;
-
-    antworten.set(true, counter);
-    antworten.set(false, shuffleAntworten());
-    antworten.set(false, shuffleAntworten());
-
-    buttonString = counter.toString();
-
-    function shuffleAntworten(): number {
-      let rndNumb = getRandomInt(0, 15);
-      do {
-        rndNumb = getRandomInt(0, 15);
-      } while (rndNumb === counter);
-      return rndNumb;
-    }
+    titel = "Welche Zahl befindet sich hinter diesem Binärwert? -> " + byteString;
 
     function aktualisiereFenster() {
-      closeButton.value = 'hidden';
-      fenster__frage.value = 'hidden';
-      fenster__beende.value = 'fenster__beende';
+      close__button.value = "hidden";
+      fenster__frage.value = "hidden";
+      fenster__beende.value = "fenster__beende";
     }
 
     function versteckeFenster() {
-      fenster__inner.value = 'hidden';
+      fenster__inner.value = "hidden";
     }
 
     function getReverseString(str: string) {
@@ -92,7 +78,6 @@ export default defineComponent({
 
     return {
       beendeSpiel,
-      shuffleAntworten,
       aktualisiereFenster,
       versteckeFenster,
       connect,
@@ -100,22 +85,23 @@ export default defineComponent({
       fenster__inner,
       fenster__frage,
       fenster__beende,
-      closeButton,
-      buttonString,
+      close__button,
+      byteString,
+      eingabe,
+      loesung,
       titel,
-      antworten
     };
   },
   methods: {
-    richtig() {
-      this.titel = "Richtig! Ihr habt das Spiel gewonnen";
+    beantworten() {
       this.disconnect();
-      this.aktualisiereFenster();
-    },
-    falsch() {
-      this.titel = "Falsch! Ihr habt das Spiel leider verloren";
-      this.disconnect();
-      this.aktualisiereFenster();
+      if (this.eingabe.antwort === this.loesung.toString()) {
+        this.titel = "Richtig! Ihr habt das Spiel gewonnen";
+        this.aktualisiereFenster();
+      } else {
+        this.titel = "Falsch! Ihr habt das Spiel leider verloren";
+        this.aktualisiereFenster();
+      }
     },
     schließen() {
       this.versteckeFenster();
@@ -129,13 +115,13 @@ export default defineComponent({
 </script>
 
 <style>
-.helper{
-  display:inline-block;
+.helper {
+  display: inline-block;
   width: 1%;
-  vertical-align:middle;
+  vertical-align: middle;
 }
 
-.hidden{
+.hidden {
   display: none;
 }
 
@@ -144,29 +130,6 @@ export default defineComponent({
   padding: var(--gap) var(--gap) 0 var(--gap);
   font-size: 20px;
   /* color: #fff; */
-}
-
-.button:hover {
-  background: #e4e4e4;
-}
-
-.closeButton {
-    background-color: #fff;
-    border: 1px solid #999;
-    border-radius: 50px;
-    cursor: pointer;
-    display: inline-block;
-    font-family: arial;
-    font-weight: bold;
-    font-size: 30px;
-    line-height: 30px;
-    width: 30px;
-    height: 30px;
-    text-align: center;
-}
-.closeButton:hover {
-    background-color: #ccc;
-    color: red;
 }
 
 .fenster__inner {
@@ -193,7 +156,22 @@ export default defineComponent({
   padding: var(--gap) var(--gap) var(--gap) var(--gap);
 }
 
-.button {
+.ok__button {
+  display: inline-block;
+  background: #ffffff;
+  border: none;
+  outline: none;
+  border-radius: 3px;
+  color: #000000;
+  cursor: pointer;
+  font-size: 18px;
+  width: 40px;
+  height: 30px;
+  margin: 3px;
+  text-align: center;
+}
+
+.beenden__button {
   display: inline-block;
   padding: 6px 12px;
   background: #ffffff;
@@ -205,5 +183,33 @@ export default defineComponent({
   font-size: 18px;
   width: 150px;
   margin: 2px;
+}
+
+.beenden__button:hover, .ok__button:hover {
+  background: #e4e4e4;
+}
+
+.close__button {
+  background-color: #fff;
+  border: 1px solid #999;
+  border-radius: 50px;
+  cursor: pointer;
+  display: inline-block;
+  font-family: arial;
+  font-weight: bold;
+  font-size: 30px;
+  line-height: 30px;
+  width: 30px;
+  height: 30px;
+  text-align: center;
+}
+
+.close__button:hover {
+  background-color: #ccc;
+  color: red;
+}
+
+.text__input {
+  width: 50px;
 }
 </style>

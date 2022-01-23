@@ -65,13 +65,9 @@ export class Interactions {
         const interaktionErkennung = (blickVektor: any, originPoint: any) => {
 
             this.rayCaster.set(originPoint, blickVektor)
-
             const collisionResult = this.rayCaster.intersectObjects(interaktionsListe)
 
-            
-
             if (collisionResult.length > 0) {
-                
                 return collisionResult[0]
             }
 
@@ -89,7 +85,6 @@ export class Interactions {
                     this.DEST = "/topic/spiel/" + this.lobbyID + '/key';
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/key
                     this.stompclient.publish({destination: this.DEST, body: interaktion.object.id, skipContentLengthHeader: true,});
-                    
                     break;
                 case "Tür":
                     if(gamestate.anzSchluessel !=  0){
