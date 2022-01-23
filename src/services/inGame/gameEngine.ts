@@ -112,7 +112,7 @@ const initLoader = () => {
                     collidableList.push(res.scene)
 
                     // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
-                    if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
+                    if (['SCHLUESSEL', 'NPC', 'TUER', 'AUSGANG'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
                         res.scene.children[0].name = raumMobiliar.mobiliar.name;
                         if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
                             //Tür und Schlüssel bestehen aus mehreren Objekten,
