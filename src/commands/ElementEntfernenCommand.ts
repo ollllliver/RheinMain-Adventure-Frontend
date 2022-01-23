@@ -21,8 +21,8 @@ export class ElementEntfernenCommand implements ICommand {
     this._event = event;
     if (xPos !== undefined && yPos !== undefined) {
       this._element = { posY: yPos, posX: xPos, e: element};
-    } else {
-      this._element = { posY: this._event.target.__vnode.key.y, posX: this._event.target.__vnode.key.x, e: element };
+    } else{
+      this._element = { posY: 0, posX: 0, e: 0};
     }
   }
 

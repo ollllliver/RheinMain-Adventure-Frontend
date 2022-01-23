@@ -25,11 +25,11 @@ export class ElementHinzufuegenCommand implements ICommand {
    * @param event event auf dem das Einfügen stattfindet (kann man bestimmt besser lösen)
    */
 
-  constructor(karte: Karte, element: number, state: number, event: any, ausrichtung?: number) {
+  constructor(karte: Karte, element: number, state: number, event: any, ele: any, ausrichtung?: number) {
     this._state = state;
     this._karte = karte;
     this._event = event;
-    this._element = { posY: event.target.__vnode.key.y, posX: event.target.__vnode.key.x, e: element };
+    this._element = { posY: ele.y, posX: ele.x, e: element};
     if (ausrichtung !== undefined) {
       this._ausrichtung = ausrichtung
     } else {
@@ -41,7 +41,8 @@ export class ElementHinzufuegenCommand implements ICommand {
    * Befehl ausführen
    */
   execute = () => {
-    
+    console.log(this._karte.liste[this._element.posY][this._element.posX].e)
+    console.log(this._element.e)
     // Braucht man für CommandManager ?
     this._state += 1;
     if (this._karte.liste[this._element.posY][this._element.posX].e !== this._element.e) {

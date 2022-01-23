@@ -5,15 +5,16 @@
     -->
 
   <div class="drop-zone" @drop="onDrop($event)" @dragenter.prevent @dragover.prevent>
-    <div v-for="row in liste" :key="row?.values" class="reihe" draggable="false">
+    <div v-for="(row, index) in liste" :key="index" class="reihe" draggable="false">
       <div
         v-for="col in row"
         :key="col"
-        v-bind="col.id"
+        v-bind:id="col.id"
         class="element"
         v-on:click="wegPunkt"
         draggable="false"
-      ></div>
+        
+      > {{col}}</div>
     </div>
   </div>
 </template>
@@ -101,14 +102,20 @@ export default defineComponent({
      */
     const onDrop = (event: any) => {
       const itemID = parseInt(event.dataTransfer.getData("itemID"));
+      const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
+      const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
+      const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
+
+      const ele = {y:y,x:x,e:e}
       // wenn an der Stelle ein Weg ist
-      if (liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e === 1) {
+      if (liste[ele.y][ele.x].e === 1) {
         CommandStack.getInstance().execAndPush(
           new ElementHinzufuegenCommand(
             karte,
             itemID,
             editorStore.getters.getStackindex,
             event,
+            ele,
             editorStore.getters.getAusrichtung
           )
         );
@@ -182,14 +189,22 @@ export default defineComponent({
         }
 
         if (editorStore.getters.getEntfernen) {
-          let storeElement = liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e;
-          if (storeElement !== 0) {
+          
+          const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
+          const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
+          const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
+          
+          const ele = {y:y,x:x,e:e}
+          if (e !== 0) {
             CommandStack.getInstance().execAndPush(
               new ElementEntfernenCommand(
                 karte,
-                storeElement,
+                e,
                 editorStore.getters.getStackindex,
-                event
+                event,
+                ele.x,
+                ele.y
+                
               )
             );
           } else {
@@ -197,15 +212,21 @@ export default defineComponent({
           }
         }
         if (!editorStore.getters.getEntfernen) {
+          const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
+          const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
+          const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
           
-          let storeElement = liste[event.target.__vnode.key.y][event.target.__vnode.key.x].e;
-          if (storeElement === 0) {
+          const ele = {y:y,x:x,e:e}
+          console.log(ele)
+          //
+          if (e === 0) {
             CommandStack.getInstance().execAndPush(
               new ElementHinzufuegenCommand(
                 karte,
                 editorStore.getters.getElement,
                 editorStore.getters.getStackindex,
-                event
+                event,
+                ele
               )
             );
           } else {
@@ -254,5 +275,9 @@ body {
   height: 35.428px;
   border: 1px solid rgb(0, 0, 0);
   background-color: rgba(92, 92, 92, 0.658);
+
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
 }
 </style>
