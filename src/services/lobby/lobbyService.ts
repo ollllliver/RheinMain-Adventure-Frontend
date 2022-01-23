@@ -7,6 +7,8 @@ import router from '@/router';
 import userStore from '@/stores/user'
 import {NachrichtenCode} from '@/messaging/NachrichtenCode';
 import { ChatTyp, useChatStore } from "@/services/ChatStore";
+import {ChatNachricht} from '@/messaging/ChatNachricht';
+import { NachrichtenTyp } from '@/messaging/NachrichtenTyp';
 
 let wsurl;
 if (location.protocol == 'http:') {
@@ -14,6 +16,7 @@ if (location.protocol == 'http:') {
 }else{
     wsurl = `wss://${window.location.hostname}/messagebroker`;
 }
+const { empfangeChatNachricht} = useChatStore();
 const stompclient = new Client({brokerURL: wsurl});
 const countdownDuration = 5;
 
@@ -256,11 +259,39 @@ function subscribeToLobby(lobby_id: string) {
             lobbySubscription.unsubscribe();
             unsubscribeChat();
             router.push("/lobby/" + lobbystate.lobbyID);
+        }else if(lobbymessage.typ == NachrichtenCode.SCORE){
+            const nachricht: ChatNachricht = { typ: NachrichtenTyp.CHAT, inhalt: lobbymessage.payload, sender: "Server" };
+            console.log(lobbymessage.payload);
+            empfangeChatNachricht(nachricht);
         } else {
             updateLobby(lobby_id);
             lobbystate.errormessage = '';
         }
     }
+}
+
+/**
+ * Holt sich den Score String aus dem Backend und schickt ihn in den Chat.
+ * 
+ * @param lobby_id die ID der Lobby
+ */
+function getScore(lobby_id: string){
+    fetch('/api/lobby/' + lobby_id + "/score", {
+        method: 'GET'
+        // ,headers: {
+        //     'Authorization': 'Bearer ' + loginstate.jwttoken
+        // }
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((lobbyMessage: LobbyMessage) => {
+        empfangeLobbyMessageLobby(lobbyMessage, lobby_id);
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 /**
@@ -674,7 +705,7 @@ export function useLobbyStore() {
         alleKartenState: readonly(alleKartenState),
 
         // Lobby Funktionen zum Informieren
-        alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht,
+        alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht, getScore,
 
         // Lobby Funktionen zum Ändern
         neueLobby, joinRandomLobby, leaveLobby, starteLobby, beendeSpiel, spielerEntfernen,
