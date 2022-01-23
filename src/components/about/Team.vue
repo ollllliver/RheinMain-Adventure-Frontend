@@ -1,9 +1,71 @@
 <template>
   <div class="container">
     <div class="d-flex flex-wrap">
-      <div :person="person" v-for="person in personen" :key="person" class="teilnehmer" >
-        <div v-html="generateProfilbild(person)" class="d-flex justify-content-center" ></div>
-        <b class="d-flex justify-content-center" style="text-align: center;">{{ person }}</b>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Andreas_Leipe.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Andreas Leipe</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Chand_Mandru.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Chand Mandru</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Friedrich_Roskosch.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Friedrich Roskosch</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Hans_Lakos.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Hans Lakos</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Julian_Gräber.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Julian Gräber</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Lukas_Lambertz.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Lukas Lambertz</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Marvin_Lindner.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Marvin Lindner</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Oliver_Renth.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Oliver Renth</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <!-- <img height="100" src="@/assets/img/avatare/Pakisa_Naurozi.png" alt=""> -->
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Pakisa Naurozi</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Raoul_Sudiana.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Raoul Sudiana</strong>
+      </div>
+      <div class="teilnehmer" >
+        <div class="d-flex justify-content-center" >
+          <img height="100" src="@/assets/img/avatare/Timothy_Tjong-Ayong.png" alt="">
+        </div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">Timothy Tjong-Ayong</strong>
       </div>
     </div>
   </div>
@@ -12,7 +74,6 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { toSvg } from "jdenticon";
 
 export default defineComponent({
   name: "Teilnehmerliste",
@@ -24,12 +85,21 @@ export default defineComponent({
     }
   },
   setup(props) {
-    function generateProfilbild(user) {
-      return toSvg(user, 100);
-    }
+        const  mitwirkende = [{"name":"Andreas Leipe", "url":"/assets/img/avatare/Andreas_Leipe.png"},
+    {"name":"Chand Mandru", "url":"Chand_Mandru"},
+    {"name":"Friedrich Roskosch", "url":"Friedrich_Roskosch"},
+    {"name":"Hans Lakos", "url":"Hans_Lakos"},
+    {"name":"Julian Gräber", "url":"Julian_Gräber"},
+    {"name":"Lukas Lambertz", "url":"Lukas_Lambertz"},
+    {"name":"Marvin Lindner", "url":"Marvin_Lindner"},
+    {"name":"Oliver Renth", "url":"Oliver_Renth"},
+    {"name":"Pakisa Naurozi", "url":"Pakisa_Naurozi"},
+    {"name":"Raoul Sudiana", "url":"Raoul_Sudiana"},
+    {"name":"Timothy Tjong-Ayong", "url":"Timothy_Tjong-Ayong"}];
+
     
     return {
-      personen: props.personenListe, generateProfilbild,
+      personen: props.personenListe,
     };
   },
 });
