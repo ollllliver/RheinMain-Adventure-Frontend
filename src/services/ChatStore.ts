@@ -81,7 +81,9 @@ function subscribeChat(lobby_id: string, typ: ChatTyp){
  * Trennt die Verbindung der Chat-Subscription
  */
 function unsubscribeChat(){
-    chatSubscription.unsubscribe(); //{ headers: "schwanzball" }
+    if (chatSubscription){
+        chatSubscription.unsubscribe(); 
+    }
     aktLobbyID = "";
     DEST_CHAT = "";
 }

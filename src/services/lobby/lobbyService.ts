@@ -383,7 +383,10 @@ function resetLobbyState() {
  * @returns bei erfolgreichem Fetch die response als json.
  */
 async function leaveLobby(): Promise<boolean> {
-    lobbySubscription.unsubscribe();
+    if (lobbySubscription){
+        lobbySubscription.unsubscribe();
+    }
+    
     unsubscribeChat();
 
     router.push("/uebersicht");
@@ -453,9 +456,10 @@ async function alleLobbiesladen() {
             console.log("Fetch Error /api/lobby/alle");
             return;
         }
+        console.log("Fetchdaten /api/lobby/alle: " + response);
         return response.data;
     }).then((jsondata : Array<Lobby>)=> {
-        console.log(jsondata);
+        console.log("Fetchdaten /api/lobby/alle: " + jsondata);
         // verarbeite jsondata
         jsondata.forEach(element => {
             lobbyliste.push(element);
