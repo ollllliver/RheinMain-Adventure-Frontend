@@ -62,6 +62,9 @@ const gamestate = reactive({
     anzSchluessel:0
 })
 
+const interagierbar3dObjektListe = new Map();
+
+
 const {unsubscribeChat, subscribeChat} = useChatStore();
 
 function setContainer(element: HTMLElement | null) {
@@ -138,8 +141,10 @@ const initLoader = () => {
                             //Tür und Schlüssel bestehen aus mehreren Objekten,
                             //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
                             console.log(res.scene.children[0])
+                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene.children[0]);
                             interactableList.push(res.scene.children[0]);
                         } else {
+                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene.children[0]);
                             interactableList.push(res.scene);
                         }
                     }
@@ -538,20 +543,73 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
     objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
 }
 
-function setzteSchluesselAnz(anzSchluessel: number, id: number){
+/**
+ * 
+ * @param anzSchluessel anzahl der Schluessel in der Lobby
+ * 
+ * @param koordinaten koorinaten des Schlüssels der verschindet
+ */
+
+function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
     schluesselText.textContent = "Keys x" + anzSchluessel;
     schluesselText.style.display = "block";
 
-    const removeObject = scene.getObjectById(id);
+    const removeObject = interagierbar3dObjektListe.get(koordinaten);
     console.log("DAS OBJECT MUSS WEG:")
     console.log(removeObject);
 
+    for (const interagierObj of interactableList ){
+        if ( removeObject.id === interagierObj.id){
+            console.log("Remove gefunden " + interagierObj)
+            const index = interactableList.indexOf(interagierObj)
+            if(index > -1){
+                interactableList.splice(index, 1)
+            }
+            
+        }
+    }
+    
     removeObject.parent.remove(removeObject);
    
     
 }
+
+/**
+ * Methode zum öffnen der Tür, da wir die Tür nicht von der Braunen Wand trennen
+ * könnten, lassen wir sie jetzt doch nur verschinden.
+ * 
+ * 
+ * Das könnte man dann auch in der setzteSchluesselAnz Methode machen aber falls 
+ * wir uns doch umentscheiden habe ich die Methode erstmal so gelassen
+ * 
+ * 
+ * @param anzSchluessel anzahl der Schlüssel
+ * @param koordinaten koorinaten der Tür
+ * 
+ * 
+*/
+
+function oeffneTuer(anzSchluessel: number, koordinaten: string){
+    gamestate.anzSchluessel = anzSchluessel;
+    console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
+    schluesselText.textContent = "Keys x" + anzSchluessel;
+    schluesselText.style.display = "block";
+
+    const tuer = interagierbar3dObjektListe.get(koordinaten);
+    console.log("DAS OBJECT MUSS AUF GEHEN:")
+    console.log(tuer);
+
+
+    tuer.rotation.x = Math.PI / 2;
+    //collidableList.pop(tuer)
+    //tuer.parent.remove(tuer)
+}
+
+/**
+ * Methode zum setzten des "Kein Schlueseel Textes"
+ */
 
 function setzteWarnText(){
     schluesselText.textContent = "Ihr habt noch keinen Schlüssel!";
@@ -570,6 +628,7 @@ function closeChat(chat:any, chatButton:any){
 
 export function useGameEngine() {
     return {
+        oeffneTuer,
         setzteSchluesselAnz,
         setzteWarnText,
         setzeMitspielerAufPosition,

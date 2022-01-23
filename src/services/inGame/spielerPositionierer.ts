@@ -14,7 +14,7 @@ const { lobbystate } = useLobbyStore();
 import userStore from '@/stores/user'
 import { useGameEngine } from './gameEngine';
 
-const {setzeMitspielerAufPosition, setzteSchluesselAnz, setzteWarnText} = useGameEngine();
+const {setzeMitspielerAufPosition, setzteSchluesselAnz, oeffneTuer, setzteWarnText} = useGameEngine();
 
 /**
  * Schribt sich bei STOMP auf das Topic /topic/spiel/{lobbyID} ein
@@ -41,20 +41,24 @@ export function subscribeToSchluesselUpdater(stompclient: Client): void{
         stompclient.subscribe(DEST, (message) => {
             const update: any = JSON.parse(message.body);
             //Jenachdem wie viele Schluessel eingesammelt wurden:
-            if (update.anzSchluessel != 0){
-                //entweder SchluesselCOunter hochzaehler...
-                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.id)
-                setzteSchluesselAnz(update.anzSchluessel, update.id); 
+            //TODO Abfrage lieber im Backend??
 
-            }else{
-                //... oder keine Schluessel meldung
-                console.log("KEINE SCHLÜSSEL");
-                setzteWarnText();
-
+            switch (update.objectName) {
+                case "Schlüssel":
+                    //Wenn mit Schluessel interagiert wurde dann wird der Zaehler bei allen erhoeht
+                    console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.koordinatenArray + "::::::" + update.objectName)
+                    setzteSchluesselAnz(update.anzSchluessel, update.koordinatenArray); 
+                    break;
+                case "Tür":
+                    //wenn mit Tuer interagiert wurde wird Sie geöffnet 
+                    console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.koordinatenArray + "::::::" + update.objectName)
+                    oeffneTuer(update.anzSchluessel, update.koordinatenArray); 
+                    break;
+                case "Warnung":
+                    console.log("KEINE SCHLÜSSEL");
+                    setzteWarnText();
+                    break;
             }
-            
-
-
         });
     }
 }
