@@ -1,6 +1,8 @@
-import {Spieler } from '@/models/Spieler';
+import { Spieler } from '@/models/Spieler';
 import { Client } from '@stomp/stompjs';
 import { useLobbyStore } from '@/services/lobby/lobbyService';
+import { useGameEngine } from './gameEngine';
+import userStore from '@/stores/user'
 
 let wsurl;
 if (location.protocol == 'http:') {
@@ -8,13 +10,11 @@ if (location.protocol == 'http:') {
 }else{
     wsurl = `wss://${window.location.hostname}/gamebroker`;
 }
+
 export const gamebrokerStompclient = new Client({ brokerURL: wsurl });
 export const schluesselStompclient = new Client({ brokerURL: wsurl });
+const { setzeMitspielerAufPosition, setzteSchluesselAnz, oeffneTuer, setzteWarnText } = useGameEngine();
 const { lobbystate } = useLobbyStore();
-import userStore from '@/stores/user'
-import { useGameEngine } from './gameEngine';
-
-const {setzeMitspielerAufPosition, setzteSchluesselAnz, oeffneTuer, setzteWarnText} = useGameEngine();
 
 /**
  * Schribt sich bei STOMP auf das Topic /topic/spiel/{lobbyID} ein
@@ -22,12 +22,10 @@ const {setzeMitspielerAufPosition, setzteSchluesselAnz, oeffneTuer, setzteWarnTe
  * @param stompclient 
  */
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
-    
     const DEST = "/topic/spiel/" + lobbystate.lobbyID;
     stompclient.onConnect = async () => {
         stompclient.subscribe(DEST, (message) => {
             const spieler: Spieler = JSON.parse(message.body);
-            // console.log(`Neue Position von ${spieler.name}:`, spieler.eigenschaften.position);
             if (spieler.name!= userStore.state.benutzername){
                 setzeMitspielerAufPosition(spieler)
             }
@@ -42,7 +40,6 @@ export function subscribeToSchluesselUpdater(stompclient: Client): void{
             const update: any = JSON.parse(message.body);
             //Jenachdem wie viele Schluessel eingesammelt wurden:
             //TODO Abfrage lieber im Backend??
-
             switch (update.objectName) {
                 case "Schlüssel":
                     //Wenn mit Schluessel interagiert wurde dann wird der Zaehler bei allen erhoeht

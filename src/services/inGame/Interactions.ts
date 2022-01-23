@@ -1,6 +1,6 @@
 import user from '@/stores/user';
 import { Client } from '@stomp/stompjs';
-import {Raycaster, Vector3} from 'three';
+import { Raycaster, Vector3 } from 'three';
 import { useLobbyStore } from '../lobby/lobbyService';
 import { useGameEngine } from './gameEngine';
 
@@ -14,31 +14,32 @@ export class Interactions {
     interaktionsListe: any
     erkannteInteraktion: any
     rayCaster: any
-    stompclient:Client
-    lobbyID:any
-    DEST:string
-    index:number
-    spielername:string
+    stompclient: Client
+    lobbyID: any
+    DEST: string
+    index: number
+    spielername: string
     update: (cameraPosition: any) => void
     keyDisconnect: () => void
 
     constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document, client: Client) {
 
         const { disconnectController } = useGameEngine();
+        const { lobbystate } = useLobbyStore()
+        const { gamestate } = useGameEngine()
+        
         const interaktionReichweite = 2
-        const {lobbystate} = useLobbyStore()
-        const {gamestate} = useGameEngine()
-        // let hatSchluessel = false
         let popupFenster: any;
+
         this.spielername = user.state.benutzername;
-        this.domElement = domElement
-        this.cameraCollidable = cameraCollidable
-        this.interaktionsListe = interaktionsListe
-        this.erkannteInteraktion = null
-        this.lobbyID = lobbystate.lobbyID
+        this.domElement = domElement;
+        this.cameraCollidable = cameraCollidable;
+        this.interaktionsListe = interaktionsListe;
+        this.erkannteInteraktion = null;
+        this.lobbyID = lobbystate.lobbyID;
         this.stompclient = client;
-        this.DEST = ""
-        this.index = 0
+        this.DEST = "";
+        this.index = 0;
 
         /**
          * Wird ausgelöst wenn eine Taste gedrückt wird
@@ -46,12 +47,11 @@ export class Interactions {
          */
         const onKeyDown = (event: KeyboardEvent) => {
             switch (event.code) {
-
                 case 'KeyE':
                     if (this.erkannteInteraktion) {
-                        interagiere(this.erkannteInteraktion)
+                        interagiere(this.erkannteInteraktion);
                     }
-                    break
+                    break;
 
             }
         };
@@ -65,47 +65,42 @@ export class Interactions {
         };
 
         const interaktionErkennung = (blickVektor: any, originPoint: any) => {
-
             this.rayCaster.set(originPoint, blickVektor)
             const collisionResult = this.rayCaster.intersectObjects(interaktionsListe)
 
             if (collisionResult.length > 0) {
                 return collisionResult[0]
             }
-
             return null
         }
 
         const interagiere = (interaktion: any) => {
-            //TODO: Überprüfung nicht anhand vom Namen machen & hatSchluessel in eigene Inventar Klasse
+            // TODO: Überprüfung nicht anhand vom Namen machen & hatSchluessel in eigene Inventar Klasse
             switch (interaktion.object.name) {
-                //Jenachdem womit man interagiert wird eine StompNachricht an eine andere DEST gepublisht
+                // Jenachdem womit man interagiert wird eine StompNachricht an eine andere DEST gepublisht
                 case "Schlüssel":
-                    //interaktion.object.parent.remove(interaktion.object);
-                    //console.log(interaktion.object)
-                    console.log("publish: " + interaktion.object.id + "auf /topic/spiel/" + this.lobbyID );
-                    this.DEST = "/topic/spiel/" + this.lobbyID +"/"+ interaktion.object.name;
-                    //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/key
+                    console.log("publish: " + interaktion.object.id + "auf /topic/spiel/" + this.lobbyID);
+                    this.DEST = "/topic/spiel/" + this.lobbyID + "/" + interaktion.object.name;
+
+                    // publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/key
                     console.log("Spieler " + this.spielername + "will den Schlüssel aufheben")
-                    this.stompclient.publish({destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true,});
-                    
+                    this.stompclient.publish({ destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true, });
+
                     break;
                 case "Tür":
-                    if(gamestate.anzSchluessel !=  0){
-                        // öffne Tür
-                        //object.rotation.z = Math.PI / 2;
+                    if (gamestate.anzSchluessel != 0) {
 
-                        // entferne Tür aus interaktionsListe
+                        // öffne Tür (entferne Tür aus interaktionsListe)
                         this.index = interaktionsListe.indexOf(interaktion.object);
                         if (this.index > -1) {
                             interaktionsListe.splice(this.index, 1);
-                                                                                }
+                        }
                     }
-
                     console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/' + interaktion.object.name);
-                    this.DEST = "/topic/spiel/" + this.lobbyID +"/"+ interaktion.object.name;
-                    //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/tuer
-                    this.stompclient.publish({destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true,});
+                    this.DEST = "/topic/spiel/" + this.lobbyID + "/" + interaktion.object.name;
+
+                    // publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/tuer
+                    this.stompclient.publish({ destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true, });
                     break;
                 case "Ziel":
                     popupFenster = document.getElementById('ziel');
