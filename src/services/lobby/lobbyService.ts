@@ -253,6 +253,8 @@ function subscribeToLobby(lobby_id: string) {
             starteTimer();
         } else if (lobbymessage.typ == NachrichtenCode.BEENDE_SPIEL) {
             lobbystate.istGestartet = false;
+            lobbySubscription.unsubscribe();
+            unsubscribeChat();
             router.push("/lobby/" + lobbystate.lobbyID);
         } else {
             updateLobby(lobby_id);
