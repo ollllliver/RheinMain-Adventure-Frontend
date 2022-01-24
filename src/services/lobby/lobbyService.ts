@@ -311,11 +311,11 @@ function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
  * @param lobby_id ist die ID der neu zu ladenden Lobby
  */
 async function updateLobby(lobby_id: string) {
-    axios.get('/api/lobby/' + lobby_id)
+    return axios.get('/api/lobby/' + lobby_id)
     .then((response) => {
         if (response.status != 200) {
             console.log("error");
-            return;
+            return false;
         }
         return response.data;
     }).then((jsondata) => {
@@ -328,6 +328,7 @@ async function updateLobby(lobby_id: string) {
         lobbystate.host = jsondata.host;
         lobbystate.istPrivat = jsondata.istPrivat;
         lobbystate.gewaehlteKarte = jsondata.gewaehlteKarte;
+        return true;
     }).catch((e) => {
         console.log(e);
     });
