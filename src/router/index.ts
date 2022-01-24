@@ -2,8 +2,6 @@ import {createRouter, createWebHashHistory, RouteRecordRaw} from 'vue-router'
 import Home from '../views/Home.vue'
 import LobbyView from '@/views/LobbyView.vue'
 import Register from "@/views/Register.vue";
-import LogInView from "@/views/LogInView.vue";
-import Instructions from "@/views/Instructions.vue";
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
 import Editor from "@/views/Editor.vue";
 import AboutView from "@/views/AboutView.vue";
@@ -12,51 +10,28 @@ import Landingpage from '@views/Landingpage.vue';
 
 // Routen der Anwendung
 
-// ziellobby wird befüllt, wenn man per einladungslink einer Lobby beitreten will, aber man ist noch nicht angemeldet.
-// nach anmelden wird man, wenn ziellobby befüllt ist, zu der ziellobby weitergeleitet.
-let zielLobby = '';
-
 const routes: Array<RouteRecordRaw> = [
     {
         path: '/home',
         name: 'Home',
-        component: Home,
-        beforeEnter: (to, from, next) => {
-            if (zielLobby != ''){
-                next(zielLobby);
-                zielLobby = '';
-            }else{
-                next();
-            }
-        }
+        component: Home
     },
     {
         path: '/signup',
         name: 'SignUp',
         component: Register
     },
-    {
-        path: '/login',
-        name: 'LogInView',
-        component: LogInView
-    },
+
     {
         path: '/instructions',
         name: 'Instructions',
-        component: Instructions
+        component: () => import('../views/Instructions.vue')
     },
 
     {
         path: '/',
         name: 'Landingpage',
-        component: () => import('../views/Landingpage.vue'),
-        beforeEnter: (to, from, next) => {
-            if (userStore.state.istEingeloggt){
-                next('/home');
-            }else{
-                next();
-            }
-        }
+        component: () => import('../views/Landingpage.vue')
     },
     
 
@@ -66,7 +41,7 @@ const routes: Array<RouteRecordRaw> = [
         component: LobbyuebersichtView,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
-                next('/');
+                next('/')
             }else{
                 next();
             }
@@ -80,8 +55,9 @@ const routes: Array<RouteRecordRaw> = [
         props: true,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
-                zielLobby = to.path;
-                next('/login');
+                console.log(from);
+                console.log(to);
+                next('/')
             }else{
                 next();
             }

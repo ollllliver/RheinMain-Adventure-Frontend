@@ -7,7 +7,7 @@
       <h1>Willkommen bei<br /><span>Rhein-Main Adventure!</span></h1>
         <p align="left" class="text">Du liebst Labyrinthe bauen und knackst sie am liebsten mit anderen? 
         Dann bist du hier genau richtig!</p>
-          <button type="button" class=" btn-lg btn-block rounded-0" id="button" @click="$router.push('/login')">Jetzt Anmelden</button>
+          <button type="button" class=" btn-lg btn-block rounded-0" id="button" @click="$router.push('/home')">Jetzt Anmelden</button>
     </div>
     <div class="col-md-5">
       <img src="../assets/img/logos/RMA_heart.png" class="float-left" width="400" height="400">

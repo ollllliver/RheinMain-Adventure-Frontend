@@ -2,7 +2,6 @@
 
 import { computed, reactive } from 'vue'
 import * as Request from '@/requests'
-import router from '@/router';
 
 const state = reactive({
   benutzername: '',
@@ -34,20 +33,19 @@ const actions = {
 
   // versucht Login durchzuführen, falls erfolglos -> false
   async login(benutzername: string, passwort: string) {
-    Request.login(benutzername, passwort).then((res) => {
-      if (!res) {
-        console.log("fehler");
-        state.error = 'Anmelden fehlgeschlagen.';
-        return false;
-      }else{
-        state.benutzername = benutzername;
-        state.istEingeloggt = true;
-        router.push("/");
+    try {
+      const user = await Request.login(benutzername, passwort)
+      if (user == null) {
+        console.log("fehler")
+        state.error = 'Could not find user.'
+        return false
       }
-    }).catch ((err) => {
+      state.benutzername = benutzername
+      state.istEingeloggt = true
+    } catch (err) {
       console.log(err)
-      return true
-    })
+    }
+    return true
   },
 
   // registriert Benutzer, falls erfolglos -> false
