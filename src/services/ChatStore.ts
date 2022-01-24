@@ -1,4 +1,4 @@
-import { Client, StompHeaders, StompSubscription } from '@stomp/stompjs';
+import { Client, StompSubscription } from '@stomp/stompjs';
 import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
 
@@ -9,8 +9,8 @@ if (location.protocol == 'http:') {
     wsurl = `wss://${window.location.hostname}/messagebroker`;
 }
 const stompclient = new Client({brokerURL: wsurl});
-var headerName = "${_csrf.headerName}";
-var token = "${_csrf.token}";
+const headerName = "${_csrf.headerName}";
+const token = "${_csrf.token}";
 
 // verwendete StompSubscription
 let chatSubscription: StompSubscription;
@@ -59,7 +59,7 @@ function subscribeChat(lobby_id: string, typ: ChatTyp){
  *              Scheinbar muss die in callb mitgegebene Function aber keinen Parameter erwarten.
  *              Nicht gerade so, wie man es von typescript kennt. Klingt mehr nach javascript. aber gut...
  */
- async function connectChatToStomp(callb, param) {
+ async function connectChatToStomp(callb: any, param: any) {
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
         callb(param)
@@ -74,8 +74,8 @@ function subscribeChat(lobby_id: string, typ: ChatTyp){
  * @param lobby_id ist die Lobby ID, für die sich eingeschrieben werden soll.
  */
  function subscribeStompChat(lobby_id: string){
-    var headers = {}
-    headers[headerName] = token;
+    const headers = {}
+    // headers[headerName] = token;
     chatSubscription = stompclient.subscribe(DEST_CHAT, (message) => {
         const chatmessage = JSON.parse(message.body) as ChatNachricht;
         empfangeChatNachricht(chatmessage);

@@ -14,7 +14,7 @@
           <button class="btn btn-success col" v-on:click="leaveLobby">LEAVE LOBBY</button>
         </div>
         <Teilnehmerliste class="row border border-secondary rounded px-4 mt-3" />
-        <InviteCopy :link="link" class="row border border-secondary rounded px-4 mt-3" />
+        <Einladungslink :link="link" class="row border border-secondary rounded px-4 mt-3" />
         <Chat :sendeNachricht="sendeChatNachricht" class="row border border-secondary rounded px-4 mt-3" />
       </div>
   </div>
@@ -25,19 +25,19 @@
 import { defineComponent, onMounted} from "vue";
 import { useLobbyStore } from "@/services/lobby/lobbyService";
 import { useChatStore } from "@/services/ChatStore";
-import InviteCopy from "@/components/lobby/InviteCopy.vue";
+import Einladungslink from "@/components/lobby/Einladungslink.vue";
 import Chat from "@/components/lobby/Chat.vue";
 import Einstellungen from "@/components/lobby/Einstellungen.vue";
 import Teilnehmerliste from "@/components/lobby/Teilnehmerliste.vue";
 
 export default defineComponent({
   name: "Lobby",
-  components: { InviteCopy, Chat, Einstellungen, Teilnehmerliste },
+  components: { Einladungslink, Chat, Einstellungen, Teilnehmerliste },
   props: {
     lobby_id: { type: String, required: true },
   },
   setup(props) {
-    const { lobbystate, connectToLobby, leaveLobby} = useLobbyStore();
+    const { lobbystate, connectToLobby, leaveLobby, getScore} = useLobbyStore();
     const { sendeChatNachricht, empfangeChatNachricht} = useChatStore();
 
     window.addEventListener('beforeunload',function(e){
@@ -48,6 +48,7 @@ export default defineComponent({
 
     onMounted(async () => {
       connectToLobby(String(props.lobby_id));
+      getScore(props.lobby_id);
     });
 
     return {

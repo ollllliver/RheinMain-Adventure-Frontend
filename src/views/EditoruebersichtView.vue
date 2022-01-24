@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import Karten from '@/components/editor/Karten.vue';
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 export default defineComponent({
   name: 'Editoruebersicht',
   components:{Karten}

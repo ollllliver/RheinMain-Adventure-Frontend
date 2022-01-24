@@ -1,62 +1,48 @@
-import {createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw} from 'vue-router'
-import Home from '../views/Home.vue'
-import LobbyView from '@/views/LobbyView.vue'
-import Register from "@/views/Register.vue";
+import {createRouter, createWebHashHistory, RouteRecordRaw} from 'vue-router'
+import EditoruebersichtView from '@/views/EditoruebersichtView.vue';
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
-import Editor from "@/views/Editor.vue";
-import { logout } from '@/requests';
-import AboutView from "@/views/AboutView.vue";
+import SpieleUmgebungView from '@/views/SpieleUmgebungView.vue';
+import RegistrierenView from "@/views/RegistrierenView.vue";
+import LandingpageView from '@/views/LandingpageView.vue';
+import AnleitungView from '@/views/AnleitungView.vue';
+import AboutView from "@/views/UeberUnsView.vue";
+import EditorView from "@/views/EditorView.vue";
+import MenueView from '@/views/MenueView.vue'
+import LobbyView from '@/views/LobbyView.vue'
+import LoginView from "@/views/LoginView.vue";
 import userStore from '@/stores/user'
-import Landingpage from '@views/Landingpage.vue';
 
 // Routen der Anwendung
 
-const routes: Array<RouteRecordRaw> = [
-    {
-        path: '/home',
-        name: 'Home',
-        component: Home
-    },
-    {
-        path: '/signup',
-        name: 'SignUp',
-        component: Register
-    },
-    {
-        path: '/instructions',
-        name: 'Instructions',
-        component: () => import('../views/Instructions.vue'),
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                console.log(from);
-                console.log(to);
-                next('/')
-            }else{
-                next();
-            }
-        }
-    },
+let zielLobby = "";
 
+const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: 'Landingpage',
-        component: () => import('../views/Landingpage.vue')
-    },
-    
-
-    {
-        path: '/uebersicht',
-        name: 'Lobbyuebersicht',
-        component: LobbyuebersichtView,
+        component: LandingpageView,
         beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                next('/')
+            if (zielLobby!=""){
+                next(zielLobby);
+                zielLobby="";
             }else{
                 next();
             }
         }
     },
-
+    {
+        path: '/home',
+        name: 'MenueView',
+        component: MenueView,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                zielLobby = to.path;
+                next('/login');
+            }else{
+                next();
+            }
+        }
+    },
     {
         path: '/lobby/:lobby_id',
         name: 'LobbyView',
@@ -64,37 +50,20 @@ const routes: Array<RouteRecordRaw> = [
         props: true,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
-                console.log(from);
-                console.log(to);
-                next('/')
+                zielLobby = to.path;
+                next('/login');
             }else{
                 next();
             }
         }
     },
     {
-        path: '/environment',
-        name: 'Environment',
-        component: () => import('../views/Environment.vue'),
+        path: '/uebersicht',
+        name: 'Lobbyuebersicht',
+        component: LobbyuebersichtView,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
-                console.log(from);
-                console.log(to);
-                next('/')
-            }else{
-                next();
-            }
-        }
-    },
-    {
-        path: '/editor',
-        name: 'Editor',
-        component: Editor,
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                console.log(from);
-                console.log(to);
-                next('/')
+                next('/');
             }else{
                 next();
             }
@@ -103,14 +72,59 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/editoruebersicht',
         name: 'Editoruebersicht',
-        component: () => import('../views/Editoruebersicht.vue')
+        component: EditoruebersichtView,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                next('/');
+            }else{
+                next();
+            }
+        }
     },
-
+    {
+        path: '/editor',
+        name: 'Editor',
+        component: EditorView,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                next('/');
+            }else{
+                next();
+            }
+        }
+    },
+    {
+        path: '/environment',
+        name: 'Environment',
+        component: SpieleUmgebungView,
+        beforeEnter: (to, from, next) => {
+            if (!userStore.state.istEingeloggt){
+                next('/');
+            }else{
+                next();
+            }
+        }
+    },
+    {
+        path: '/login',
+        name: 'Login',
+        component: LoginView
+    },
+    {
+        path: '/signup',
+        name: 'SignUp',
+        component: RegistrierenView
+    },
+    {
+        path: '/anleitung',
+        name: 'AnleitungView',
+        component: AnleitungView
+    },
     {
         path: '/about',
         name: 'About',
         component: AboutView
-    }
+    },
 ]
 
 const router = createRouter({

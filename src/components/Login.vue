@@ -1,9 +1,8 @@
 <!-- Login-Formular Komponente -->
 
 <template>
-
-<section class="container">
-  <div class="row content d-flex justify-content-center">
+  <section class="d-flex justify-content-center">
+  <div class="row content d-flex justify-content-center m-5 w-25">
     <div class="col-md-12">
       <div class="box shadow bg-white p-4">
         <h3 class="mb-4 text-center fs-1">Einloggen</h3>
@@ -44,7 +43,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive } from 'vue'
-import { SpielerLokal } from '@/models/SpielerLokal';
 import userStore from '@/stores/user'
 import router from "@/router"
 export default defineComponent({

@@ -1,71 +1,53 @@
 import * as Three from "three";
-import {GraphicLoader} from '@/services/inGame/GraphicLoader';
-import {MyMouseControls} from '@/services/inGame/MyMouseControls';
-import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
-import {Interactions} from '@/services/inGame/Interactions';
-//import { OrbitControls } from "three/examples/jsm/controls/OrbitControls"; // Wird benutzt fuer Developersicht in bspw. initRenderer
-import {SpielerLokal} from '@/models/SpielerLokal';
-import {gamebrokerStompclient,schluesselStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater} from "@/services/inGame/spielerPositionierer";
-import {Position, Spieler} from "@/models/Spieler";
-import {useLobbyStore} from "../lobby/lobbyService";
-import userStore from '@/stores/user'
+import { GraphicLoader } from '@/services/inGame/GraphicLoader';
+import { MyMouseControls } from '@/services/inGame/MyMouseControls';
+import { MyKeyboardControls } from '@/services/inGame/MyKeyboardControls';
+import { Interactions } from '@/services/inGame/Interactions';
+import { SpielerLokal } from '@/models/SpielerLokal';
+import { Position, Spieler } from "@/models/Spieler";
+import { useLobbyStore } from "../lobby/lobbyService";
 import { ChatTyp, useChatStore } from "@/services/ChatStore";
+import { gamebrokerStompclient, schluesselStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 import { reactive } from "vue";
+import userStore from '@/stores/user'
 
+const { subscribeChat } = useChatStore();
+const { lobbystate } = useLobbyStore();
 
-let container: any;
-let camera: any;
-let cameraCollidable: any;
-let scene: any;
-let renderer: any;
-let meshPlane: any;
-let meshCube: any;
-let raycaster: any;
+const gamestate = reactive({ anzSchluessel: 0 });
+const velocity = new Three.Vector3();
 const loader = new GraphicLoader();
-// let moveForward = false;
-// let moveBackward = false;
-// let moveLeft = false;
-// let moveRight = false;
-// let moveUp = false;
-// let moveDown = false;
-const collidableList: Array<any> = [];
-const interactableList: Array<any> = [];
 const developer = false;
 const minimap = true;
 const minimapWidth = 250;
 const minimapHeight = 250;
 const minimapCamYPos = 30;
-let minimapCamera: any;
-let minimapMarker: any;
-let developerCamera: any;
-let controls: any;
-let requestID: number;
-
-let mouseControls: MyMouseControls;
-let keyControls: MyKeyboardControls;
-let interactions: Interactions;
-let interaktionText: any;
-let schluesselText:any;
-
-let spieler: SpielerLokal;
-let startPosition: Position;
-let prevTime = performance.now();
-
-const velocity = new Three.Vector3();
-const direction = new Three.Vector3();
-const mitspieler3dObjektListe = new Map();
 const stompClient = gamebrokerStompclient;
 const stompClient2 = schluesselStompclient;
 
-const {lobbystate} = useLobbyStore();
-const gamestate = reactive({
-    anzSchluessel:0
-})
-
-const interagierbar3dObjektListe = new Map();
-
-
-const {unsubscribeChat, subscribeChat} = useChatStore();
+let container: HTMLElement | null;
+let camera: Three.PerspectiveCamera;
+let cameraCollidable: Three.Mesh;
+let scene: Three.Scene;
+let renderer: Three.WebGLRenderer;
+let meshPlane: Three.Mesh;
+let raycaster: Three.Raycaster;
+let collidableList: Array<Three.Object3D> = [];
+let interactableList: Array<Three.Object3D> = [];
+let minimapCamera: Three.OrthographicCamera;
+let minimapMarker: Three.Mesh;
+let developerCamera: Three.PerspectiveCamera;
+let requestID: number;
+let mouseControls: MyMouseControls;
+let keyControls: MyKeyboardControls;
+let interactions: Interactions;
+let interaktionText: HTMLElement | null;
+let schluesselText: HTMLElement | null;
+let spieler: SpielerLokal;
+let startPosition: Position;
+let prevTime = performance.now();
+let mitspieler3dObjektListe = new Map<string, Three.Object3D>();
+let interagierbar3dObjektListe = new Map<any, Three.Object3D>();
 
 function setContainer(element: HTMLElement | null) {
     container = element
@@ -83,15 +65,10 @@ const initScene = () => {
 };
 
 /**
- * Initialisiert Loader Klasse, lädt Raum
+ * Initialisiert Loader-Klassen (lädt Raum)
  */
 const initLoader = () => {
     const positionsSkalierungsfaktor = 4;
-
-    // TODO: Level-ID dynamisch bestimmen
-
-    const { lobbystate } = useLobbyStore()
-    // const levelId : string = lobbystate.levelID
 
     fetch(`/api/level/${lobbystate.gewaehlteKarte.levelId}/0`, {
         method: 'GET',
@@ -104,20 +81,17 @@ const initLoader = () => {
 
     }).then((RaumMobiliarListe) => {
         console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.")
-        RaumMobiliarListe.forEach(function (raumMobiliar) {
+        RaumMobiliarListe.forEach(function (raumMobiliar: any) {
             const posX = raumMobiliar.positionX;
             const posY = raumMobiliar.positionY;
 
-            // Startposition ermitteln und hier festlegen. Ginge auch per fetch auf
-            // /api/level/startposition/{levelID}/{raumindex}, so ist es aber stabiler und schneller
+            // Startposition ermitteln und hier festlegen. Ginge auch per fetch auf /api/level/startposition/{levelID}/{raumindex}, so ist es aber stabiler und schneller
             if (raumMobiliar.mobiliar.mobiliartyp == "EINGANG") {
                 startPosition = new Position(positionsSkalierungsfaktor * posX, spieler.height * 3, positionsSkalierungsfaktor * posY);
             }
 
             // Idee von Olli:
-            // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platzieren
-            // Davor müsste man zu begin ein Set des Mobiliars erstellen
-
+            // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platziere. Davor müsste man zu begin ein Set des Mobiliars erstellen
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
             console.log("GLTF-URL für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
 
@@ -135,7 +109,7 @@ const initLoader = () => {
                     collidableList.push(res.scene)
 
                     // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
-                    if (['SCHLUESSEL', 'NPC', 'TUER'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
+                    if (['SCHLUESSEL', 'NPC', 'TUER', 'AUSGANG'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
                         res.scene.children[0].name = raumMobiliar.mobiliar.name;
                         if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
                             //Tür und Schlüssel bestehen aus mehreren Objekten,
@@ -153,12 +127,12 @@ const initLoader = () => {
             })
 
         });
-        console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
 
+        console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
         camera.position.set(startPosition.x, startPosition.y, startPosition.z);
 
-        lobbystate.teilnehmerliste.forEach(function (spieler) {
-            if (spieler.name != userStore.state.benutzername) {
+        lobbystate.teilnehmerliste.forEach(function (mitspieler) {
+            if (mitspieler.name != userStore.state.benutzername) {
                 loader.ladeDatei('/assets/blender/player.gltf').then((spieler3D: any) => {
 
                     const objektInScene = spieler3D.scene;
@@ -168,7 +142,7 @@ const initLoader = () => {
                     objektInScene.position.x = positionsSkalierungsfaktor * startPosition.x;
                     objektInScene.position.z = positionsSkalierungsfaktor * startPosition.z;
 
-                    mitspieler3dObjektListe.set(spieler.name, objektInScene);
+                    mitspieler3dObjektListe.set(mitspieler.name, objektInScene);
                 });
             }
         });
@@ -180,7 +154,6 @@ const initLoader = () => {
  * Initialisiert Kamera
  */
 const initCamera = () => {
-
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
     subscribeToSpielerPositionenUpdater(stompClient);
@@ -191,7 +164,6 @@ const initCamera = () => {
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
     camera.position.set(0, spieler.height * 3, 0);
-    // camera.position.set(-2, spieler.height * 3, -5);
     camera.lookAt(new Three.Vector3(-2, spieler.height * 3, 0));
 
     // Developer Kamera Main (camera2)
@@ -203,11 +175,10 @@ const initCamera = () => {
         // Axes Helper (x,y,z)
         const axesHelper = new Three.AxesHelper(30);
         scene.add(axesHelper)
-
     }
 
     // Minimap Kamera
-    if(minimap){
+    if (minimap) {
         // initialisiere Kamera der Minimap
         minimapCamera = new Three.OrthographicCamera();
         minimapCamera.layers.enable(1);
@@ -218,21 +189,18 @@ const initCamera = () => {
 
         // initialisiere roten Punkt auf der Minimap
         const geometry = new Three.SphereGeometry(0.5, 15, 15);
-        const material = new Three.MeshBasicMaterial( { color: new Three.Color("rgb(255, 0, 0)") } );
-        minimapMarker = new Three.Mesh( geometry, material );
+        const material = new Three.MeshBasicMaterial({ color: new Three.Color("rgb(255, 0, 0)") });
+        minimapMarker = new Three.Mesh(geometry, material);
         minimapMarker.layers.set(1);
         scene.add(minimapMarker);
     }
 
     // Kamera Collision objekt init
-
     const cubeGeometry = new Three.BoxGeometry(1, 1, 1);
-    const wireMaterial = new Three.MeshBasicMaterial({color: 0xff0000, wireframe: true});
+    const wireMaterial = new Three.MeshBasicMaterial({ color: 0xff0000, wireframe: true });
     cameraCollidable = new Three.Mesh(cubeGeometry, wireMaterial);
     cameraCollidable.position.set(0, spieler.height / 2, 0);
     cameraCollidable.lookAt(new Three.Vector3(0, spieler.height, 0))
-
-
 };
 
 /**
@@ -268,13 +236,13 @@ const initInteractions = () => {
 /**
 * Initialisiert den InGame-Chat
 */
-const initChat = () =>{
+const initChat = () => {
     subscribeChat(lobbystate.lobbyID, ChatTyp.INGAME);
 
     const chat = document.getElementById("Chat");
     const chatButton = document.getElementById("ChatButton");
 
-    if(chat != null && chatButton != null){
+    if (chat != null && chatButton != null) {
         const btn = document.createElement("button");
         btn.id = "CloseButton";
         btn.innerHTML = "x";
@@ -283,23 +251,11 @@ const initChat = () =>{
         };
         chat.appendChild(btn);
 
-        chatButton.onclick = function (){
+        chatButton.onclick = function () {
             openChat(chat, chatButton);
         };
-
         closeChat(chat, chatButton);
     }
-    
-    // TestCube zum Spiel beenden
-    const geometry = new Three.BoxGeometry( 1, 1, 1 );
-    const material = new Three.MeshBasicMaterial( {color: 0x00ff00} );
-    const cube = new Three.Mesh( geometry, material );
-
-    cube.name = "Ziel";
-    cube.position.x = -10;
-    interactableList.push(cube);
-
-    scene.add( cube );
 }
 
 /**
@@ -307,7 +263,7 @@ const initChat = () =>{
  */
 const connect = () => {
     window.addEventListener('click', mouseControls.lock); //locked die Maus     
-    
+
     keyControls.connect();
     mouseControls.connect();
 
@@ -315,7 +271,7 @@ const connect = () => {
     if (pauseFenster != null) {
         pauseFenster.style.display = "none";
     }
-    
+
     const zielFenster = document.getElementById('ziel');
     if (zielFenster != null) {
         zielFenster.style.display = "none";
@@ -325,18 +281,14 @@ const connect = () => {
 }
 
 /**
- *  und öffnet das Spielunterbrechungsfenster
+ *  Trennen aller Controller und öffnen des Spielunterbrechungsfenster 
  */
-const disconnect = () => { //nur aufrufen wenn man die Seite verlässt
+const disconnect = () => {
     disconnectController();
-
     //TODO: unsubscirben wenn man das Spiel wirklich verlaesst
     //unsubscribeChat();
     //interactions.disconnect();
-
     window.removeEventListener('click', mouseControls.lock);
-
-    disconnectController();
     interactions.keyDisconnect();
 }
 
@@ -373,7 +325,7 @@ const disconnectController = (element?: string) => {
 
 const initPlane = () => {
     const plane = new Three.PlaneGeometry(100, 100);
-    const material = new Three.MeshBasicMaterial({color: 0xB4A290, side: Three.DoubleSide});
+    const material = new Three.MeshBasicMaterial({ color: 0xB4A290, side: Three.DoubleSide });
 
     meshPlane = new Three.Mesh(plane, material);
     meshPlane.rotateX(1 / 2 * Math.PI)
@@ -386,21 +338,10 @@ const initRaycaster = () => {
 }
 
 const initRenderer = () => {
-
-
-    // main scene (oben ansicht)
-    renderer = new Three.WebGLRenderer({antialias: true});
+    renderer = new Three.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
-
-    // Fuer automatische Verfolgung des Blocks im Level in Developersicht, funktioniert noch nicht ganz
-    // (auskommentierter Code auch in doAnimate controls.target...)
-    // controls = new OrbitControls(developerCamera, renderer.domElement);
-    // controls.minDistance = 50;
-    // controls.maxDistance = 300;
-
-
+    container?.appendChild(renderer.domElement);
 };
 
 const doAnimate = () => {
@@ -408,12 +349,12 @@ const doAnimate = () => {
 
     const time = performance.now();
     const delta = (time - prevTime) / 1000;
-    //entweder hier oder in MyKeyboardControl
+
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
-    velocity.y -= velocity.y * 10.0 * delta;
+    //velocity.y -= velocity.y * 10.0 * delta;
 
-    mouseControls.update(velocity, delta); //Maus Steuerung
+    mouseControls.update(velocity, delta); // Maus Steuerung
     keyControls.update(camera, velocity, delta) //Tastatur Steuerung
     interactions.update(camera) //Interaktionen
 
@@ -435,7 +376,8 @@ const doAnimate = () => {
         scene.add(cameraCollidable);
 
         // BoxHelper (geladene Objekte, erstmal nur IntroLevel)
-        const boxHelper = new Three.BoxHelper(collidableList[0], new Three.MeshBasicMaterial(0xff0000))
+        const material = new Three.Color(0xff0000);
+        const boxHelper = new Three.BoxHelper(collidableList[0], material)
         scene.add(boxHelper)
 
         // Hauptkamera (POV)
@@ -444,28 +386,20 @@ const doAnimate = () => {
         renderer.setScissor(30, 30, window.innerWidth / 4, window.innerHeight / 4);
         renderer.setViewport(30, 30, window.innerWidth / 4, window.innerHeight / 4);
         renderer.setClearColor(0x222222, 1);
-
-        //controls.target.copy(camera.position);
-
         renderer.render(scene, camera);
-
         renderer.setScissorTest(false);
-    } else { // standard pov sicht
+    } else {
         renderer.render(scene, camera);
     }
 
-    if(minimap){
-        // Hauptansicht:
-
+    if (minimap) {
+        //// Hauptansicht:
         // Render-Einstellungen der Hauptansicht
         renderer.setClearColor(0x000000, 0);
         renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
         renderer.render(scene, camera);
 
-
-
-        // Minimapansicht:
-
+        //// Minimapansicht:
         // aktualisiere Position der Karte
         minimapCamera.position.set(spieler.eigenschaften.position.x, minimapCamYPos, spieler.eigenschaften.position.z);
 
@@ -481,9 +415,9 @@ const doAnimate = () => {
         minimapMarker.position.set(spieler.eigenschaften.position.x, minimapCamYPos - 1, spieler.eigenschaften.position.z);
 
         // Minimap Hintergrund (Outline)
-        renderer.setScissorTest( true );
+        renderer.setScissorTest(true);
         renderer.setScissor(window.innerWidth - minimapWidth - 30 - 3, 30 - 3, minimapWidth + 6, minimapHeight + 6);
-        renderer.setClearColor( new Three.Color("rgb(50, 50, 50)"), 1 ); // Outline-Farbe
+        renderer.setClearColor(new Three.Color("rgb(50, 50, 50)"), 1); // Outline-Farbe
         renderer.clearColor();
 
         // Render-Einstellungen der Minimapansicht
@@ -492,19 +426,14 @@ const doAnimate = () => {
         renderer.setScissor(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
         renderer.setViewport(window.innerWidth - minimapWidth - 30, 30, minimapWidth, minimapHeight);
         renderer.setClearColor(0x000000, 1);
-
         renderer.render(scene, minimapCamera);
-
         renderer.setScissorTest(false);
-    }else{
+    } else {
         renderer.render(scene, camera);
     }
-
-    //wohin damit?
-    spieler.eigenschaften.position.x = camera.position.x.toFixed(2);
-    spieler.eigenschaften.position.y = camera.position.y.toFixed(2);
-    spieler.eigenschaften.position.z = camera.position.z.toFixed(2);
-
+    spieler.eigenschaften.position.x = Math.round(camera.position.x * 100) / 100;
+    spieler.eigenschaften.position.z = Math.round(camera.position.z * 100) / 100;
+    //spieler.eigenschaften.position.y = Math.round(camera.position.y * 100) / 100;
 };
 
 const stopAnimate = () => {
@@ -515,6 +444,14 @@ const stopAnimate = () => {
 const startAnimate = () => {
     requestID = requestAnimationFrame(doAnimate);
     doAnimate();
+}
+
+const clearMapContent = () => {
+    collidableList = new Array<Three.Object3D>();
+    interactableList = new Array<Three.Object3D>();
+    mitspieler3dObjektListe = new Map<string, Three.Object3D>();
+    interagierbar3dObjektListe = new Map<any, Three.Object3D>();
+    console.log("Mapstate: cleared");
 }
 
 function zeigeInteraktionText(interaktion: any) {
@@ -536,11 +473,13 @@ function verbergeInteraktionText() {
  *
  * @param spieler neu zu Positionierender Mitspieler.
  */
-function setzeMitspielerAufPosition(spieler: Spieler) {
-    const objektInScene = mitspieler3dObjektListe.get(spieler.name);
+function setzeMitspielerAufPosition(mitspieler: Spieler) {
+    const objektInScene = mitspieler3dObjektListe.get(mitspieler.name);
 
-    objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
-    objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
+    if(objektInScene){
+        objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
+        objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
+    }
 }
 
 /**
@@ -549,79 +488,76 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
  * 
  * @param koordinaten koorinaten des Schlüssels der verschindet
  */
-
-function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
+function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string) {
     gamestate.anzSchluessel = anzSchluessel;
-    console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
-    schluesselText.textContent = "Keys x" + anzSchluessel;
-    schluesselText.style.display = "block";
+    console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel)
+    if(schluesselText){
+        schluesselText.textContent = "Keys x" + anzSchluessel;
+        schluesselText.style.display = "block";
+    }
 
     const removeObject = interagierbar3dObjektListe.get(koordinaten);
     console.log("DAS OBJECT MUSS WEG:")
     console.log(removeObject);
 
-    for (const interagierObj of interactableList ){
-        if ( removeObject.id === interagierObj.id){
-            console.log("Remove gefunden " + interagierObj)
-            const index = interactableList.indexOf(interagierObj)
-            if(index > -1){
-                interactableList.splice(index, 1)
+    if(removeObject){
+        for (const interagierObj of interactableList) {
+            if (removeObject.id === interagierObj.id) {
+                console.log("Remove gefunden " + interagierObj)
+                const index = interactableList.indexOf(interagierObj)
+                if (index > -1) {
+                    interactableList.splice(index, 1)
+                }
+
             }
-            
         }
+        removeObject.parent?.remove(removeObject);
+    } else {
+        console.log("gameEndine.setzeSchluesselAnz: Zu entfernenden Schluessel nicht gefunden")
     }
-    
-    removeObject.parent.remove(removeObject);
-   
-    
 }
 
 /**
  * Methode zum öffnen der Tür, da wir die Tür nicht von der Braunen Wand trennen
  * könnten, lassen wir sie jetzt doch nur verschinden.
  * 
- * 
- * Das könnte man dann auch in der setzteSchluesselAnz Methode machen aber falls 
- * wir uns doch umentscheiden habe ich die Methode erstmal so gelassen
- * 
- * 
  * @param anzSchluessel anzahl der Schlüssel
  * @param koordinaten koorinaten der Tür
  * 
  * 
 */
-
-function oeffneTuer(anzSchluessel: number, koordinaten: string){
+function oeffneTuer(anzSchluessel: number, koordinaten: string) {
     gamestate.anzSchluessel = anzSchluessel;
-    console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
-    schluesselText.textContent = "Keys x" + anzSchluessel;
-    schluesselText.style.display = "block";
+    console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel)
+    if(schluesselText){
+        schluesselText.textContent = "Keys x" + anzSchluessel;
+        schluesselText.style.display = "block";
+    }
 
     const tuer = interagierbar3dObjektListe.get(koordinaten);
     console.log("DAS OBJECT MUSS AUF GEHEN:")
     console.log(tuer);
-
-
-    tuer.rotation.x = Math.PI / 2;
-    //collidableList.pop(tuer)
-    //tuer.parent.remove(tuer)
+    if(tuer){
+        tuer.rotation.x = Math.PI / 2;
+    }
 }
 
 /**
  * Methode zum setzten des "Kein Schlueseel Textes"
  */
-
-function setzteWarnText(){
-    schluesselText.textContent = "Ihr habt noch keinen Schlüssel!";
-    schluesselText.style.display = "block";
+function setzteWarnText() {
+    if(schluesselText){
+        schluesselText.textContent = "Ihr habt noch keinen Schlüssel!";
+        schluesselText.style.display = "block";
+    }
 }
 
-function openChat(chat:any, chatButton:any){
+function openChat(chat: HTMLElement, chatButton: HTMLElement) {
     chat.style.display = "block";
     chatButton.style.display = "none";
 }
 
-function closeChat(chat:any, chatButton:any){
+function closeChat(chat: HTMLElement, chatButton: HTMLElement) {
     chat.style.display = "none";
     chatButton.style.display = "block";
 }
@@ -643,6 +579,7 @@ export function useGameEngine() {
         initChat,
         startAnimate,
         stopAnimate,
+        clearMapContent,
         connect, disconnect, disconnectController,
         setContainer,
         scene,

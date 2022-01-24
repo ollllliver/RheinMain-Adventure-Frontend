@@ -1,5 +1,5 @@
 import { reactive, readonly } from 'vue'
-import { Lobby } from '../../models/Lobby'
+import { Lobby } from '@/services/lobby/LobbyInterface'
 import { Spieler } from '@/models/Spieler'
 import { LobbyMessage } from '@/messaging/LobbyMessage'
 import { Client, StompSubscription } from '@stomp/stompjs';
@@ -17,6 +17,7 @@ if (location.protocol == 'http:') {
 }else{
     wsurl = `wss://${window.location.hostname}/messagebroker`;
 }
+const { empfangeChatNachricht} = useChatStore();
 const stompclient = new Client({brokerURL: wsurl});
 const countdownDuration = 5;
 
@@ -70,7 +71,7 @@ let uebersichtSubscription: StompSubscription;
  *              Scheinbar muss die in callb mitgegebene Function aber keinen Parameter erwarten.
  *              Nicht gerade so, wie man es von typescript kennt. Klingt mehr nach javascript. aber gut...
  */
-async function connectToStomp(callb, param) {
+async function connectToStomp(callb: any, param: any) {
 
     stompclient.onWebSocketError = () => { 
         console.log("AAAAAAAAAAAAAAAAAAAA websocket error")
@@ -126,9 +127,6 @@ function subscribeToUebersicht() {
  * Bei Misserfolg, steht in der Lobbymessage das istFehler Flag auf true.
  */
 async function tryJoin(lobby_id: string) {
-    console.log("Fetch auf: /api/lobby/join/" + lobby_id);
-
-
     return axios.post('/api/lobby/join/' + lobby_id)
     .then((response) => {
         if (response.status != 200) {
@@ -139,23 +137,11 @@ async function tryJoin(lobby_id: string) {
     }).then((jsondata) => {
         // verarbeite jsondata
         const lobbymessage = jsondata as LobbyMessage;
-        if (lobbymessage.istFehler) {
-            return lobbymessage.typ;
-        } else {
-            return lobbymessage.typ;
-        }
+        return lobbymessage.typ;
     }).catch((e) => {
         console.log(e);
     });
 }
-
-/*
-function checkCountdown(lobbymessage: LobbyMessage) {
-    if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET) {
-        lobbystate.countdownGestartet = true;
-    }
-}
-*/
 
 /**
  * Versucht, der mitgegebenen Lobby zu joinen und subscribt sich bei Erfolg
@@ -259,12 +245,39 @@ function subscribeToLobby(lobby_id: string) {
             starteTimer();
         } else if (lobbymessage.typ == NachrichtenCode.BEENDE_SPIEL) {
             lobbystate.istGestartet = false;
+            lobbySubscription.unsubscribe();
+            unsubscribeChat();
             router.push("/lobby/" + lobbystate.lobbyID);
+        }else if(lobbymessage.typ == NachrichtenCode.SCORE){
+            const nachricht: ChatNachricht = { typ: NachrichtenTyp.CHAT, inhalt: lobbymessage.payload, sender: "Server" };
+            console.log(lobbymessage.payload);
+            empfangeChatNachricht(nachricht);
         } else {
             updateLobby(lobby_id);
             lobbystate.errormessage = '';
         }
     }
+}
+
+/**
+ * Holt sich den Score String aus dem Backend und schickt ihn in den Chat.
+ * 
+ * @param lobby_id die ID der Lobby
+ */
+function getScore(lobby_id: string){
+    axios.get('/api/lobby/' + lobby_id + "/score").then((res)=>{
+        return res.data;
+    }).then((response) => {
+        if (!response.ok) {
+            console.log("error");
+            return;
+        }
+        return response.json();
+    }).then((lobbyMessage: LobbyMessage) => {
+        empfangeLobbyMessageLobby(lobbyMessage, lobby_id);
+    }).catch((e) => {
+        console.log(e);
+    });
 }
 
 /**
@@ -304,9 +317,6 @@ function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
  * @param lobby_id ist die ID der neu zu ladenden Lobby
  */
 async function updateLobby(lobby_id: string) {
-    console.log("Fetch auf: /api/lobby/" + lobby_id);
-
-
     axios.get('/api/lobby/' + lobby_id)
     .then((response) => {
         if (response.status != 200) {
@@ -331,8 +341,6 @@ async function updateLobby(lobby_id: string) {
 }
 
 async function joinRandomLobby() {
-    console.log("Fetch auf: /api/lobby/joinRandom");
-
     return axios.post('/api/lobby/joinRandom')
     .then((response) => {
         if (response.status != 200) {
@@ -357,9 +365,6 @@ async function joinRandomLobby() {
 
 // starteSpiel?
 async function starteLobby() {
-
-    console.log("Fetch auf: /api/lobby/{lobbyId}/start")
-
     return axios.post('/api/lobby/'+lobbystate.lobbyID+'/start')
     .then((response) => {
         if (response.status != 200) {
@@ -378,11 +383,8 @@ async function starteLobby() {
 }
 
 async function resetLobbyID() {
-    return fetch('/api/lobby/reset', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+    return axios.post('/api/lobby/reset').then((res)=>{
+        return res.data;
     }).then((response) => {
         if (!response.ok) {
             console.log("error");
@@ -450,14 +452,9 @@ async function leaveLobby(): Promise<boolean> {
  * @returns bei erfolgreichem Fetch die LobbyID der im Backend neu erstellten Lobby
  */
 async function neueLobby() {
-    console.log("Fetch auf: /api/lobby/neu")
-
-    
-
     return axios.post('/api/lobby/neu')
     .then((response) => {
         if (response.status != 200 ) {
-            console.log("Fetch Error /api/lobby/alle");
             return;
         }
         return response.data;
@@ -482,19 +479,13 @@ async function neueLobby() {
  */
 async function alleLobbiesladen() {
     const lobbyliste = new Array<Lobby>();
-    
-
-    console.log("Fetch auf: /api/lobby/alle")
     return axios.get('/api/lobby/alle')
     .then((response) => {
         if (response.status != 200 ) {
-            console.log("Fetch Error /api/lobby/alle");
             return;
         }
-        console.log("Fetchdaten /api/lobby/alle: " + response);
         return response.data;
     }).then((jsondata : Array<Lobby>)=> {
-        console.log("Fetchdaten /api/lobby/alle: " + jsondata);
         // verarbeite jsondata
         jsondata.forEach(element => {
             lobbyliste.push(element);
@@ -513,9 +504,7 @@ async function alleLobbiesladen() {
  * 
  * @param neuesLimit 
  */
-function changeLimit(neuesLimit) {
-    console.log('change limit:', neuesLimit);
-
+function changeLimit(neuesLimit: number) {
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', neuesLimit)
     .then((response) => {
         if (response.status != 200) {
@@ -533,10 +522,7 @@ function changeLimit(neuesLimit) {
  * 
  * @param istPrivat 
  */
-function changePrivacy(istPrivat) {
-    console.log('change privacy:', istPrivat);
-
-
+function changePrivacy(istPrivat: boolean) {
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/privacy', istPrivat)
     .then((response) => {
         if (response.status != 200) {
@@ -557,9 +543,7 @@ function changePrivacy(istPrivat) {
  * 
  * @param neuerHost 
  */
-function changeHost(neuerHost) {
-    console.log('change host:', neuerHost);
-
+function changeHost(neuerHost: any) {
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/host', neuerHost)
     .then((response) => {
         if (response.status != 200) {
@@ -607,25 +591,8 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
  * 
  * @param neueKarte 
  */
- function changeKarte(neueKarte) {
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/level', {
-        method: 'PATCH',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(neueKarte.levelId)
-    }).then((response) => {
-        if (!response.ok) {
-            console.log("error");
-            return;
-        }
-        return response.json();
-    }).catch((e) => {
-        console.log(e);
-    });
+ function changeKarte(neueKarte: any) {
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/level', neueKarte.levelId);
 }
 
 async function alleKartenLaden() {
@@ -666,7 +633,7 @@ export function useLobbyStore() {
         alleKartenState: readonly(alleKartenState),
 
         // Lobby Funktionen zum Informieren
-        alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht,
+        alleLobbiesladen, connectToLobby, updateLobby, connectToUebersicht, getScore,
 
         // Lobby Funktionen zum Ändern
         neueLobby, joinRandomLobby, leaveLobby, starteLobby, beendeSpiel, spielerEntfernen,

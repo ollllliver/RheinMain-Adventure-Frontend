@@ -43,7 +43,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 import Aktionstasten from '../components/editor/Aktionstasten.vue'
 import Bausteine from '../components/editor/Bausteine.vue'
 import Editorfenster from '../components/editor/EditorFenster.vue'

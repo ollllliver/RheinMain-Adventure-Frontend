@@ -22,7 +22,8 @@
             <th>{{ lobby.gewaehlteKarte.name }}</th>
             <th>{{ lobby.host.name }}</th>
             <th>{{ lobby.teilnehmerliste.length }}/{{ lobby.spielerlimit }}</th>
-            <td class="list-group-item list-group-item-action list-group-item-success btn rounded-0" v-on:click="redirectToLobby(lobby.lobbyID)"> beitreten</td>
+            <td class="list-group-item list-group-item-action">
+              <button class="btn btn-success w-100 m-0" v-on:click="redirectToLobby(lobby.lobbyID)">beitreten</button></td>
           </tr>
         </tbody>
       </table>
@@ -44,7 +45,7 @@ export default defineComponent({
     function refresh(){
       alleLobbiesladen();
     }
-    function redirectToLobby(id){
+    function redirectToLobby(id: string){
       router.push("/lobby/"+ id);
     }
     return {

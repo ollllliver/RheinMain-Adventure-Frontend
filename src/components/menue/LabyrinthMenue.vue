@@ -28,22 +28,22 @@
         <polyline class="wand path" points="0,0 1200,0 1200,200 900,200 900,400 1300,400 1300,100"/>
 
         <!-- HOME -->
-        <a href="/home" class="POI">
-            <text href="#" x="120" y="75" >Home</text>
+        <!-- <a href="/home" class="POI">
+            <text href="#" x="120" y="75" >Menü</text>
         </a>
-        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,50 450,50 450,150 350,150 350,150 350,50 320,50"/>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,50 450,50 450,150 350,150 350,150 350,50 290,50"/> -->
 
         <!-- ABOUT -->
         <a href="/#/about" class="POI">
-            <text href="#" x="990" y="375" >About</text>
+            <text href="#" x="930" y="375" >Über uns</text>
         </a>
-        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1350,450 1350,50 1250,50 1250,250 950,250 950,350 980,350"/>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1350,450 1350,50 1250,50 1250,250 950,250 950,310"/>
 
         <!-- HOWTO -->
-        <a href="/#/instructions" class="POI">
-            <text href="#" x="570" y="675" >HowTo</text>
+        <a href="/#/anleitung" class="POI">
+            <text href="#" x="520" y="675" >Anleitung</text>
         </a>
-        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,750 150,750 150,650 250,650 250,750 850,750 850,550 550,550 550,650 565,650"/>
+        <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,750 150,750 150,650 250,650 250,750 850,750 850,550 550,550 550,620"/>
 
         <!-- EDITORÜBERSICH -->
         <a v-if="angemeldet" href="/#/editoruebersicht" class="POI">
@@ -53,9 +53,9 @@
 
         <!-- PLAY -->
         <a v-if="angemeldet" href="/#/uebersicht" class="POI">
-            <text href="#" x="750" y="75" >Play</text>
+            <text href="#" x="680" y="75" >Spielen</text>
         </a>
-        <polyline v-if="angemeldet" class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 850,450 850,350 650,350 650,250 750,250 750,150 650,150 650,50 740,50"/>
+        <polyline v-if="angemeldet" class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 850,450 850,350 650,350 650,250 750,250 750,150 650,150 650,50 670,50"/>
 
         <!-- ITEMS -->
         <!-- Key -->
@@ -75,7 +75,7 @@
         <!-- Tupel -->
         <image class="POI" @click="tupelClick" x="860" y="620" width="180" height="180" href="@/assets/img/maze-items/tupel.svg" alt=""/>
         <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,750 150,750 150,650 250,650 250,750 850,750 850,550 1150,550 1150,750 1050,750 1050,650 1000,650"/>
-        
+
     </svg>
 
     <div :class="popup">
@@ -187,7 +187,7 @@ export default defineComponent({
 }
 
 text{
-    font-size: 4em;
+    font-size: 3.5em;
     font-weight: 700;
 }
 
