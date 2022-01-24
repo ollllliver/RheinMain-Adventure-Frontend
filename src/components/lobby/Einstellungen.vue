@@ -86,7 +86,7 @@ export default defineComponent({
     } = useLobbyStore();
 
     // Setzt das Spielerlimit immer auf das neuste lobbystate.spielerlimit
-    const limitArray = ref(Array.from({ length: 10 }, (_, i) => i + 1));
+    const limitArray = ref(Array.from({ length: 9 }, (_, i) => (i+1) + 1));
 
     const kartenArray = computed(() => {
       return alleKartenState.karten;
