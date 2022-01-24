@@ -477,8 +477,8 @@ function setzeMitspielerAufPosition(mitspieler: Spieler) {
     const objektInScene = mitspieler3dObjektListe.get(mitspieler.name);
 
     if(objektInScene){
-        objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
-        objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
+        objektInScene.position.x = 1 * mitspieler.eigenschaften.position.x;
+        objektInScene.position.z = 1 * mitspieler.eigenschaften.position.z;
     }
 }
 

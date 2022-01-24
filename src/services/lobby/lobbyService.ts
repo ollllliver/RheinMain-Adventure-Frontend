@@ -267,12 +267,6 @@ function subscribeToLobby(lobby_id: string) {
 function getScore(lobby_id: string){
     axios.get('/api/lobby/' + lobby_id + "/score").then((res)=>{
         return res.data;
-    }).then((response) => {
-        if (!response.ok) {
-            console.log("error");
-            return;
-        }
-        return response.json();
     }).then((lobbyMessage: LobbyMessage) => {
         empfangeLobbyMessageLobby(lobbyMessage, lobby_id);
     }).catch((e) => {
