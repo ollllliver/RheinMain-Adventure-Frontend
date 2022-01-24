@@ -15,7 +15,7 @@ export class GraphicLoader {
      * @param datei Pfad zur GLTF Datei die geladen werden soll
      * @returns geladenes GLTF Objekt
      */
-    public ladeDatei = (datei: string) => {
+    public ladeDatei = (datei: string):Promise<JSON> => {
         return new Promise<JSON>((resolve) => {
             this.loader.load(datei, (gltf: Promise<JSON>) => {
                 resolve(gltf)

@@ -499,8 +499,9 @@ async function alleLobbiesladen() {
  * @param neuesLimit 
  */
 function changeLimit(neuesLimit: number) {
-    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', neuesLimit)
-    .then((response) => {
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', neuesLimit,
+        {headers: {'Content-Type': 'application/json'}
+    }).then((response) => {
         if (response.status != 200) {
             console.log("error");
             return;
@@ -517,8 +518,9 @@ function changeLimit(neuesLimit: number) {
  * @param istPrivat 
  */
 function changePrivacy(istPrivat: boolean) {
-    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/privacy', istPrivat)
-    .then((response) => {
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/privacy', istPrivat,
+        {headers: {'Content-Type': 'application/json'}
+    }).then((response) => {
         if (response.status != 200) {
             console.log("error");
             return;
@@ -538,8 +540,9 @@ function changePrivacy(istPrivat: boolean) {
  * @param neuerHost 
  */
 function changeHost(neuerHost: any) {
-    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/host', neuerHost)
-    .then((response) => {
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/host', neuerHost,
+        {headers: {'Content-Type': 'application/json'}
+    }).then((response) => {
         if (response.status != 200) {
             console.log("error");
             return;
@@ -586,7 +589,8 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
  * @param neueKarte 
  */
  function changeKarte(neueKarte: any) {
-    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/level', neueKarte.levelId);
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/level', neueKarte.levelId,
+        {headers: {'Content-Type': 'application/json'}});
 }
 
 async function alleKartenLaden() {

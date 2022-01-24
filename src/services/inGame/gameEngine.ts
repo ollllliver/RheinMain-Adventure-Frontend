@@ -10,6 +10,7 @@ import { ChatTyp, useChatStore } from "@/services/ChatStore";
 import { gamebrokerStompclient, schluesselStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
 import { reactive } from "vue";
 import userStore from '@/stores/user'
+import axios from "axios";
 
 const { subscribeChat } = useChatStore();
 const { lobbystate } = useLobbyStore();
@@ -47,7 +48,9 @@ let spieler: SpielerLokal;
 let startPosition: Position;
 let prevTime = performance.now();
 let mitspieler3dObjektListe = new Map<string, Three.Object3D>();
-let interagierbar3dObjektListe = new Map<any, Three.Object3D>();
+let interagierbar3dObjektListe = new Map<string, Three.Object3D>();
+const gltfFiles = new Map<number, any>();
+const GLF_FILE_ID_LIST = [0,1,2,3,4,5,6,7];
 
 function setContainer(element: HTMLElement | null) {
     container = element
@@ -65,13 +68,43 @@ const initScene = () => {
 };
 
 /**
+ * lädt jedes gltf file schon 1 mal runter
+ * 
+ * @returns Promise, dass alles runtergeladen ist
+ */
+async function gltfFilesVorladen(){
+    return new Promise((resolve) => {
+        if (gltfFiles.values.length<0){
+            resolve(true);
+        }
+        GLF_FILE_ID_LIST.forEach(function (mobiliarId: number, index: number, array: Array<number>) {
+            axios.get(`/api/level/` + mobiliarId)
+            .then((response) => {
+                return response.data;
+            }).then((URLPfad) => {
+                if (URLPfad.gltfPfad!=''){
+                    return loader.ladeDatei(URLPfad.gltfPfad).then((res: any) => {
+                        gltfFiles.set(mobiliarId,res.scene)
+                    });
+                }
+            }).then(()=>{
+                if (index === array.length -1) resolve(true);
+            })
+        })
+    });
+}
+
+
+/**
  * Initialisiert Loader-Klassen (lädt Raum)
  */
 const initLoader = () => {
     const positionsSkalierungsfaktor = 4;
 
-    fetch(`/api/level/${lobbystate.gewaehlteKarte.levelId}/0`, {
-        method: 'GET',
+    gltfFilesVorladen().then(()=>{
+        return fetch(`/api/level/${lobbystate.gewaehlteKarte.levelId}/0`, {
+            method: 'GET',
+        })
     }).then((response) => {
         if (!response.ok) {
             console.log("Fehler beim Abfragen der Level+Raum Kombo. Antwort war nicht 200 OK :(");
@@ -92,41 +125,41 @@ const initLoader = () => {
 
             // Idee von Olli:
             // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platziere. Davor müsste man zu begin ein Set des Mobiliars erstellen
+
+            // Jetzt werden nicht mehr alle gltfs runtergeladen, wäre ja unnötig!
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
-            console.log("GLTF-URL für Mobiliar " + raumMobiliar.mobiliar.name + " wird geholt.")
-
-            fetch(`/api/level/` + mobiliarId, {
-                method: 'GET',
-            }).then((response) => {
-                return response.json();
-            }).then((URLPfad) => {
-
-                loader.ladeDatei(URLPfad.gltfPfad).then((res: any) => {
-
-                    // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
-                    res.scene.position.x = positionsSkalierungsfaktor * posX
-                    res.scene.position.z = positionsSkalierungsfaktor * posY
-                    collidableList.push(res.scene)
-
-                    // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
-                    if (['SCHLUESSEL', 'NPC', 'TUER', 'AUSGANG'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
-                        res.scene.children[0].name = raumMobiliar.mobiliar.name;
-                        if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
-                            //Tür und Schlüssel bestehen aus mehreren Objekten,
-                            //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
-                            console.log(res.scene.children[0])
-                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene.children[0]);
-                            interactableList.push(res.scene.children[0]);
-                        } else {
-                            interagierbar3dObjektListe.set(`${res.scene.position.x};${res.scene.position.z}`, res.scene.children[0]);
-                            interactableList.push(res.scene);
-                        }
+            
+            console.log(mobiliarId);
+            let res;
+            try {
+                res = gltfFiles.get(mobiliarId).clone();
+                
+                // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
+                res.position.x = positionsSkalierungsfaktor * posX
+                res.position.z = positionsSkalierungsfaktor * posY
+                collidableList.push(res)
+                
+                // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
+                if (['SCHLUESSEL', 'NPC', 'TUER', 'AUSGANG'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
+                    res.children[0].name = raumMobiliar.mobiliar.name;
+                    if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
+                        //Tür und Schlüssel bestehen aus mehreren Objekten,
+                        //aber jeweils nur die Tür und der Schlüssel soll interactable sein (z.B kein Türrahmen)
+                        interagierbar3dObjektListe.set(`${res.position.x};${res.position.z}`, res.children[0]);
+                        interactableList.push(res.children[0]);
+                    } else {
+                        interagierbar3dObjektListe.set(`${res.position.x};${res.position.z}`, res.children[0]);
+                        interactableList.push(res);
                     }
-                    scene.add(res.scene)
-                });
-            })
+                }
+                scene.add(res)
+
+            } catch (error) {
+                console.log(error);                
+            }
 
         });
+    }).then(()=>{
 
         console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
         camera.position.set(startPosition.x, startPosition.y, startPosition.z);
@@ -147,6 +180,8 @@ const initLoader = () => {
             }
         });
 
+    }).catch((e)=>{
+        console.log(e);
     });
 };
 
@@ -352,7 +387,7 @@ const doAnimate = () => {
 
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
-    //velocity.y -= velocity.y * 10.0 * delta;
+    velocity.y -= velocity.y * 10.0 * delta;
 
     mouseControls.update(velocity, delta); // Maus Steuerung
     keyControls.update(camera, velocity, delta) //Tastatur Steuerung
