@@ -355,7 +355,7 @@ const doAnimate = () => {
 
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
-    velocity.y -= velocity.y * 10.0 * delta;
+    //velocity.y -= velocity.y * 10.0 * delta;
 
     mouseControls.update(velocity, delta); // Maus Steuerung
     keyControls.update(camera, velocity, delta) //Tastatur Steuerung
@@ -435,8 +435,8 @@ const doAnimate = () => {
         renderer.render(scene, camera);
     }
     spieler.eigenschaften.position.x = Math.round(camera.position.x * 100) / 100;
-    spieler.eigenschaften.position.y = Math.round(camera.position.y * 100) / 100;
     spieler.eigenschaften.position.z = Math.round(camera.position.z * 100) / 100;
+    //spieler.eigenschaften.position.y = Math.round(camera.position.y * 100) / 100;
 };
 
 const stopAnimate = () => {
