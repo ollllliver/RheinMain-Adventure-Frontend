@@ -57,7 +57,7 @@ function subscribeChat(lobby_id: string, typ: ChatTyp){
  *              Scheinbar muss die in callb mitgegebene Function aber keinen Parameter erwarten.
  *              Nicht gerade so, wie man es von typescript kennt. Klingt mehr nach javascript. aber gut...
  */
- async function connectChatToStomp(callb, param) {
+ async function connectChatToStomp(callb: any, param: any) {
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
         callb(param)

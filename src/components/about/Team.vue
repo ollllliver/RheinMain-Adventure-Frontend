@@ -24,7 +24,7 @@ export default defineComponent({
     }
   },
   setup(props) {
-    function generateProfilbild(user) {
+    function generateProfilbild(user: string) {
       return toSvg(user, 100);
     }
     

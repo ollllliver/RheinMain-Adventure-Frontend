@@ -25,29 +25,29 @@ const minimapCamYPos = 30;
 const stompClient = gamebrokerStompclient;
 const stompClient2 = schluesselStompclient;
 
-let container: any;
-let camera: any;
-let cameraCollidable: any;
-let scene: any;
-let renderer: any;
-let meshPlane: any;
-let raycaster: any;
-let collidableList: Array<any> = [];
-let interactableList: Array<any> = [];
-let minimapCamera: any;
-let minimapMarker: any;
-let developerCamera: any;
+let container: HTMLElement | null;
+let camera: Three.PerspectiveCamera;
+let cameraCollidable: Three.Mesh;
+let scene: Three.Scene;
+let renderer: Three.WebGLRenderer;
+let meshPlane: Three.Mesh;
+let raycaster: Three.Raycaster;
+let collidableList: Array<Three.Object3D> = [];
+let interactableList: Array<Three.Object3D> = [];
+let minimapCamera: Three.OrthographicCamera;
+let minimapMarker: Three.Mesh;
+let developerCamera: Three.PerspectiveCamera;
 let requestID: number;
 let mouseControls: MyMouseControls;
 let keyControls: MyKeyboardControls;
 let interactions: Interactions;
-let interaktionText: any;
-let schluesselText: any;
+let interaktionText: HTMLElement | null;
+let schluesselText: HTMLElement | null;
 let spieler: SpielerLokal;
 let startPosition: Position;
 let prevTime = performance.now();
-let mitspieler3dObjektListe = new Map();
-let interagierbar3dObjektListe = new Map();
+let mitspieler3dObjektListe = new Map<string, Three.Object3D>();
+let interagierbar3dObjektListe = new Map<any, Three.Object3D>();
 
 function setContainer(element: HTMLElement | null) {
     container = element
@@ -84,7 +84,7 @@ const initLoader = () => {
 
     }).then((RaumMobiliarListe) => {
         console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.")
-        RaumMobiliarListe.forEach(function (raumMobiliar) {
+        RaumMobiliarListe.forEach(function (raumMobiliar: any) {
             const posX = raumMobiliar.positionX;
             const posY = raumMobiliar.positionY;
 
@@ -292,7 +292,6 @@ const disconnect = () => {
     //unsubscribeChat();
     //interactions.disconnect();
     window.removeEventListener('click', mouseControls.lock);
-    disconnectController();
     interactions.keyDisconnect();
 }
 
@@ -345,7 +344,7 @@ const initRenderer = () => {
     renderer = new Three.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
-    container.appendChild(renderer.domElement);
+    container?.appendChild(renderer.domElement);
 };
 
 const doAnimate = () => {
@@ -380,7 +379,8 @@ const doAnimate = () => {
         scene.add(cameraCollidable);
 
         // BoxHelper (geladene Objekte, erstmal nur IntroLevel)
-        const boxHelper = new Three.BoxHelper(collidableList[0], new Three.MeshBasicMaterial(0xff0000))
+        const material = new Three.Color(0xff0000);
+        const boxHelper = new Three.BoxHelper(collidableList[0], material)
         scene.add(boxHelper)
 
         // Hauptkamera (POV)
@@ -434,9 +434,9 @@ const doAnimate = () => {
     } else {
         renderer.render(scene, camera);
     }
-    spieler.eigenschaften.position.x = camera.position.x.toFixed(2);
-    spieler.eigenschaften.position.y = camera.position.y.toFixed(2);
-    spieler.eigenschaften.position.z = camera.position.z.toFixed(2);
+    spieler.eigenschaften.position.x = Math.round(camera.position.x * 100) / 100;
+    spieler.eigenschaften.position.y = Math.round(camera.position.y * 100) / 100;
+    spieler.eigenschaften.position.z = Math.round(camera.position.z * 100) / 100;
 };
 
 const stopAnimate = () => {
@@ -450,10 +450,10 @@ const startAnimate = () => {
 }
 
 const clearMapContent = () => {
-    collidableList = new Array<any>();
-    interactableList = new Array<any>();
-    mitspieler3dObjektListe = new Map();
-    interagierbar3dObjektListe = new Map();
+    collidableList = new Array<Three.Object3D>();
+    interactableList = new Array<Three.Object3D>();
+    mitspieler3dObjektListe = new Map<string, Three.Object3D>();
+    interagierbar3dObjektListe = new Map<any, Three.Object3D>();
     console.log("Mapstate: cleared");
 }
 
@@ -479,8 +479,10 @@ function verbergeInteraktionText() {
 function setzeMitspielerAufPosition(spieler: Spieler) {
     const objektInScene = mitspieler3dObjektListe.get(spieler.name);
 
-    objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
-    objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
+    if(objektInScene){
+        objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
+        objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
+    }
 }
 
 /**
@@ -492,24 +494,30 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
 function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string) {
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel)
-    schluesselText.textContent = "Keys x" + anzSchluessel;
-    schluesselText.style.display = "block";
+    if(schluesselText){
+        schluesselText.textContent = "Keys x" + anzSchluessel;
+        schluesselText.style.display = "block";
+    }
 
     const removeObject = interagierbar3dObjektListe.get(koordinaten);
     console.log("DAS OBJECT MUSS WEG:")
     console.log(removeObject);
 
-    for (const interagierObj of interactableList) {
-        if (removeObject.id === interagierObj.id) {
-            console.log("Remove gefunden " + interagierObj)
-            const index = interactableList.indexOf(interagierObj)
-            if (index > -1) {
-                interactableList.splice(index, 1)
-            }
+    if(removeObject){
+        for (const interagierObj of interactableList) {
+            if (removeObject.id === interagierObj.id) {
+                console.log("Remove gefunden " + interagierObj)
+                const index = interactableList.indexOf(interagierObj)
+                if (index > -1) {
+                    interactableList.splice(index, 1)
+                }
 
+            }
         }
+        removeObject.parent?.remove(removeObject);
+    } else {
+        console.log("gameEndine.setzeSchluesselAnz: Zu entfernenden Schluessel nicht gefunden")
     }
-    removeObject.parent.remove(removeObject);
 }
 
 /**
@@ -524,22 +532,27 @@ function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string) {
 function oeffneTuer(anzSchluessel: number, koordinaten: string) {
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel)
-    schluesselText.textContent = "Keys x" + anzSchluessel;
-    schluesselText.style.display = "block";
+    if(schluesselText){
+        schluesselText.textContent = "Keys x" + anzSchluessel;
+        schluesselText.style.display = "block";
+    }
 
     const tuer = interagierbar3dObjektListe.get(koordinaten);
     console.log("DAS OBJECT MUSS AUF GEHEN:")
     console.log(tuer);
-
-    tuer.rotation.x = Math.PI / 2;
+    if(tuer){
+        tuer.rotation.x = Math.PI / 2;
+    }
 }
 
 /**
  * Methode zum setzten des "Kein Schlueseel Textes"
  */
 function setzteWarnText() {
-    schluesselText.textContent = "Ihr habt noch keinen Schlüssel!";
-    schluesselText.style.display = "block";
+    if(schluesselText){
+        schluesselText.textContent = "Ihr habt noch keinen Schlüssel!";
+        schluesselText.style.display = "block";
+    }
 }
 
 function openChat(chat: any, chatButton: any) {

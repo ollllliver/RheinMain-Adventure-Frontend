@@ -26,7 +26,7 @@ export default defineComponent({
       return lobbystate.teilnehmerliste;
     });
 
-    function generateProfilbild(user) {
+    function generateProfilbild(user: string) {
       return toSvg(user, 100);
     }
     

@@ -1,5 +1,4 @@
-import { Euler, Vector3, EventDispatcher } from 'three';
-import { Camera } from "three/src/cameras/Camera";
+import { Euler, Vector3, EventDispatcher, Camera } from 'three';
 import { useGameEngine } from './gameEngine';
 
 const _euler = new Euler(0, 0, 0, 'YXZ');
@@ -13,6 +12,20 @@ const _PI_2 = Math.PI / 2;
  * Verwertet Mauseingaben 
  */
 class MyMouseControls extends EventDispatcher {
+	domElement: HTMLElement;
+	isLocked: boolean;
+	minPolarAngle: number;
+	maxPolarAngle: number;
+	connect: () => void;
+	disconnect: () => void;
+	dispose: () => void;
+	getObject: () => Camera;
+	getDirection: (v: any) => any;
+	moveForward: (distance: any) => void;
+	moveRight: (distance: any) => void;
+	lock: () => void;
+	unlock: () => void;
+	update: (velocity: any, delta: number) => void;
 
 	constructor(camera: Camera, owner: Document) {
 		super();

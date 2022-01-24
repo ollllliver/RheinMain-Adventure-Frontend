@@ -70,7 +70,7 @@ let uebersichtSubscription: StompSubscription;
  *              Scheinbar muss die in callb mitgegebene Function aber keinen Parameter erwarten.
  *              Nicht gerade so, wie man es von typescript kennt. Klingt mehr nach javascript. aber gut...
  */
-async function connectToStomp(callb, param) {
+async function connectToStomp(callb: any, param: any) {
 
     stompclient.onWebSocketError = () => { 
         leaveLobby(); }
@@ -537,7 +537,7 @@ async function alleLobbiesladen() {
  * 
  * @param neuesLimit 
  */
-function changeLimit(neuesLimit) {
+function changeLimit(neuesLimit: number) {
     fetch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', {
         method: 'PATCH',
         // ,headers: {
@@ -563,7 +563,7 @@ function changeLimit(neuesLimit) {
  * 
  * @param istPrivat 
  */
-function changePrivacy(istPrivat) {
+function changePrivacy(istPrivat: boolean) {
     fetch('/api/lobby/' + lobbystate.lobbyID + '/privacy', {
         method: 'PATCH',
         // ,headers: {
@@ -589,7 +589,7 @@ function changePrivacy(istPrivat) {
  * 
  * @param neuerHost 
  */
-function changeHost(neuerHost) {
+function changeHost(neuerHost: any) {
     fetch('/api/lobby/' + lobbystate.lobbyID + '/host', {
         method: 'PATCH',
         // ,headers: {
@@ -646,7 +646,7 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
  * 
  * @param neueKarte 
  */
- function changeKarte(neueKarte) {
+ function changeKarte(neueKarte: any) {
     fetch('/api/lobby/' + lobbystate.lobbyID + '/level', {
         method: 'PATCH',
         // ,headers: {
