@@ -49,7 +49,7 @@ export default defineComponent({
             editorStore.info("Karte wird eingereicht. Schluessel=" + editorStore.getters.getSchluessel + " Tueren=" + editorStore.getters.getTuer);
             const inhalt = editorStore.getters.getGrid.wandleKarteZuInt()
             const pojo = editorStore.getters.getGrid
-            
+            console.log(inhalt)
             fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+editorStore.getters.getGrid._levelID+"/0", {
               method: "PUT",
               headers: {
