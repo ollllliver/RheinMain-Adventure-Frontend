@@ -47,6 +47,7 @@ const routes: Array<RouteRecordRaw> = [
         path: '/lobby/:lobby_id',
         name: 'LobbyView',
         component: LobbyView,
+        props: true,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
                 zielLobby = to.path;

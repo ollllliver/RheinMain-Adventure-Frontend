@@ -40,7 +40,7 @@
         <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 550,250 550,450 1350,450 1350,50 1250,50 1250,250 950,250 950,310"/>
 
         <!-- HOWTO -->
-        <a href="/#/instructions" class="POI">
+        <a href="/#/anleitung" class="POI">
             <text href="#" x="520" y="675" >Anleitung</text>
         </a>
         <polyline class="wand" points="0,50 50,50 50,150 250,150 250,250 50,250 50,750 150,750 150,650 250,650 250,750 850,750 850,550 550,550 550,620"/>
