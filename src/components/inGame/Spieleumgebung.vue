@@ -2,19 +2,19 @@
   <div>
     <Ziel id="ziel" />
     <Pause id="pause" />
-    <div id="container">
-      <h2 id="interaktionText"></h2>
-      <h2 id="schluesselText"></h2>
-      <div class="GameChat">
-        <button type="button" id="ChatButton">Chat</button>
-        <Chat :sendeNachricht="sendeChatNachricht" class="row border border-secondary rounded px-4 mt-3" id="Chat" />
-      </div>
+    <h2 id="interaktionText"></h2>
+    <h2 id="schluesselText">x 0</h2>
+    <div class="GameChat">
+      <button type="button" id="ChatButton">Chat</button>
+      <Chat :sendeNachricht="sendeChatNachricht" class="row border border-secondary rounded px-4 mt-3" id="Chat" />
     </div>
+    <img src="@/assets/img/key.png" class="key" alt="" width="50" height="50"/>
+    <div id="container" class="m-0 p-0"/>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from "vue";
+import { defineComponent, onMounted } from "vue";
 import { useGameEngine } from "@/services/inGame/gameEngine";
 import Pause from "./Pause.vue";
 import Chat from "@/components/lobby/Chat.vue";
