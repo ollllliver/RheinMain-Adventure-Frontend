@@ -3,7 +3,7 @@
     <div class="d-flex flex-wrap">
       <div :person="person" v-for="person in personen" :key="person" class="teilnehmer" >
         <div v-html="generateProfilbild(person)" class="d-flex justify-content-center" ></div>
-        <b class="d-flex justify-content-center" style="text-align: center;">{{ person }}</b>
+        <strong class="d-flex justify-content-center" style="text-align: center;">{{ person }}</strong>
       </div>
     </div>
   </div>

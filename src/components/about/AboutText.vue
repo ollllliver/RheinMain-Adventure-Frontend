@@ -90,26 +90,26 @@
     </p>
     <p>
       Für die Verwendung von Scrum haben wir unser Team aufgeteilt in einen
-      <b>Product Owner</b> und zehn <b>Developer</b>. Einer der Developer hat
-      außerdem noch die Rolle des <b>Scrum Masters</b> übernommen. Da wir ja
+      <strong>Product Owner</strong> und zehn <strong>Developer</strong>. Einer der Developer hat
+      außerdem noch die Rolle des <strong>Scrum Masters</strong> übernommen. Da wir ja
       noch parallel alle andere Module belegt haben, haben wir unser "Daily
       Scrum" zwei mal wöchentlich abgehalten und unser gesamtes Projekt in vier
       Zwei-Wochen-Sprints aufgeteilt. Für das Planen und Koordinieren unserer
       Sprints verwendeten wir das Open-Source-Projektmanagementsystem
-      <b>Taiga</b>.
+      <strong>Taiga</strong>.
     </p>
     <p>
-      Ein Sprint begann bei uns immer mit dem <b>Sprint Planning</b> in dem wir
+      Ein Sprint begann bei uns immer mit dem <strong>Sprint Planning</strong> in dem wir
       uns zu erreichende Ziele für den Sprint setzten. In den darauf folgenden
-      <b>Daylies</b>
+      <strong>Daylies</strong>
       haben wir uns gegenseitig mitgeteilt, was wir erreicht haben und was wir
       weiterhin bis zum nächsten Treffen errreichen wollen.
       <br />
       Nach zwei Wochen neigt sich der Springt dann dem Ende und wir trafen uns
-      zu unserem <b>Sprint Review</b>, in dem wir uns gegenseitig dann das
+      zu unserem <strong>Sprint Review</strong>, in dem wir uns gegenseitig dann das
       Erreichte vorstellten und uns die Workitems im bessten Falle von dem
       Product Owner abnehmen lassen konnten. Zu guter letzt haben wir noch in
-      der <b>Sprint Retrospective</b> besprochen, was gut und was schlecht lief
+      der <strong>Sprint Retrospective</strong> besprochen, was gut und was schlecht lief
       und was wir im nächsten Sprint besser machen können.
     </p>
     <h2>Umsetzung</h2>

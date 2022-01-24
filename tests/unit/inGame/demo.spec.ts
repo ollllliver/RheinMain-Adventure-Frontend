@@ -1,11 +1,11 @@
 import { mount } from '@vue/test-utils'
-import Demo from '@/components/inGame/Demo.vue'
+import Spieleumgebung from '@/components/inGame/Spieleumgebung.vue'
 import Pause from '@/components/inGame/Pause.vue'
 
 
-describe('Demo', () => {
+describe('Spieleumgebung', () => {
   test('rendert Pause Komponente', async () => {
-    const wrapper = mount(Demo)
+    const wrapper = mount(Spieleumgebung)
 
     expect(wrapper.findComponent(Pause)).toBeTruthy()
 

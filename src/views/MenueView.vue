@@ -7,18 +7,18 @@
   <div v-else class="text-center">
     <h2>Welcome, {{ userStore.state.benutzername }}</h2>
     <br>
-    <MazeMenue/>
+    <LabyrinthMenue/>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref} from 'vue';
+import { defineComponent, onMounted} from 'vue';
 import userStore from '@/stores/user'
 import Login from '@/components/Login.vue'
-import MazeMenue from "@/components/home/MazeMenue.vue"
+import LabyrinthMenue from "@/components/menue/LabyrinthMenue.vue"
 export default defineComponent({
   name: 'Home',
-  components: { Login, MazeMenue },
+  components: { Login, LabyrinthMenue },
   setup() {
 
     onMounted(userStore.getUser)

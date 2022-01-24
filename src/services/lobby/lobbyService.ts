@@ -1,5 +1,5 @@
 import { reactive, readonly } from 'vue'
-import { Lobby } from '../../models/Lobby'
+import { Lobby } from '@/services/lobby/LobbyInterface'
 import { Spieler } from '@/models/Spieler'
 import { LobbyMessage } from '@/messaging/LobbyMessage'
 import { Client, StompSubscription } from '@stomp/stompjs';
@@ -10,8 +10,6 @@ import {NachrichtenTyp} from '@/messaging/NachrichtenTyp';
 import {ChatNachricht} from '@/messaging/ChatNachricht';
 import axios from 'axios';
 import { ChatTyp, useChatStore } from "@/services/ChatStore";
-import {ChatNachricht} from '@/messaging/ChatNachricht';
-import { NachrichtenTyp } from '@/messaging/NachrichtenTyp';
 
 let wsurl;
 if (location.protocol == 'http:') {
@@ -142,23 +140,11 @@ async function tryJoin(lobby_id: string) {
     }).then((jsondata) => {
         // verarbeite jsondata
         const lobbymessage = jsondata as LobbyMessage;
-        if (lobbymessage.istFehler) {
-            return lobbymessage.typ;
-        } else {
-            return lobbymessage.typ;
-        }
+        return lobbymessage.typ;
     }).catch((e) => {
         console.log(e);
     });
 }
-
-/*
-function checkCountdown(lobbymessage: LobbyMessage) {
-    if (lobbymessage.typ == NachrichtenCode.COUNTDOWN_GESTARTET) {
-        lobbystate.countdownGestartet = true;
-    }
-}
-*/
 
 /**
  * Versucht, der mitgegebenen Lobby zu joinen und subscribt sich bei Erfolg

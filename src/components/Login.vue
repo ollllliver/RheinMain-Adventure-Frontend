@@ -44,7 +44,6 @@
 </template>
 <script lang="ts">
 import { defineComponent, reactive } from 'vue'
-import { SpielerLokal } from '@/models/SpielerLokal';
 import userStore from '@/stores/user'
 import router from "@/router"
 export default defineComponent({

@@ -1,34 +1,17 @@
 <template>
   <div class="p-2 border-bottom border-success d-flex align-items-center justify-content-between" style="background-color: #BDD3B9;">
     <router-link class="mr-auto" to="/home" >
-        <img src="/assets/RMA_Logo.png" height="40" alt="">
+    <img src="/assets/RMA_Logo.png" height="40" alt="">
     </router-link>
     <div>
-        <div v-if="userStore.state.istEingeloggt" class="btn-success dropdown">
-          <button class="dropbtn" v-text="userStore.state.benutzername"></button>
-          <div class="dropdown-content">
-            <!-- <button class="grey-btn w-100" @click="router.push('/')">Home</button>
-            <button class="grey-btn w-100" @click="router.push('/uebersicht')">Spiele</button>
-            <button class="grey-btn w-100" @click="router.push('/editoruebersicht')">Editor</button>
-            <button class="grey-btn w-100" @click="router.push('/instructions')">Anleitung</button>
-            <button class="grey-btn w-100" @click="router.push('/about')">About</button> -->
-            <button class="red-btn w-100" @click="userStore.logout()">Logout</button>
-          </div>
+      <div v-if="userStore.state.istEingeloggt" class="btn-success dropdown">
+        <button class="dropbtn" v-text="userStore.state.benutzername"></button>
+        <div class="dropdown-content">
+          <button class="red-btn w-100" @click="userStore.logout()">Logout</button>
         </div>
-        <!-- TODO: Entweder Oder einblenden! -->
-        <!-- <div class="btn-success dropdown">
-          <button class="dropbtn">Menü</button>
-          <div class="dropdown-content">
-            <button class="grey-btn w-100" @click="router.push('/')">Home</button>
-            <button class="grey-btn w-100" @click="router.push('/instructions')">Anleitung</button>
-            <button class="grey-btn w-100" @click="router.push('/about')">About</button>
-            <button class="dropbtn w-100" @click="router.push('/login')">Login</button>
-          </div>
-        </div> -->
-        <router-link v-else class="dropbtn" to="/home">Login</router-link>
+      </div>
+      <router-link v-else class="dropbtn" to="/home">Login</router-link>
     </div>
-
-
   </div>
 </template>
 

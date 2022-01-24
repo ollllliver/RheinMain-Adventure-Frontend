@@ -70,9 +70,6 @@ const initScene = () => {
 const initLoader = () => {
     const positionsSkalierungsfaktor = 4;
 
-    // TODO: Level-ID dynamisch bestimmen
-    const { lobbystate } = useLobbyStore()
-
     fetch(`/api/level/${lobbystate.gewaehlteKarte.levelId}/0`, {
         method: 'GET',
     }).then((response) => {
@@ -134,8 +131,8 @@ const initLoader = () => {
         console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
         camera.position.set(startPosition.x, startPosition.y, startPosition.z);
 
-        lobbystate.teilnehmerliste.forEach(function (spieler) {
-            if (spieler.name != userStore.state.benutzername) {
+        lobbystate.teilnehmerliste.forEach(function (mitspieler) {
+            if (mitspieler.name != userStore.state.benutzername) {
                 loader.ladeDatei('/assets/blender/player.gltf').then((spieler3D: any) => {
 
                     const objektInScene = spieler3D.scene;
@@ -145,7 +142,7 @@ const initLoader = () => {
                     objektInScene.position.x = positionsSkalierungsfaktor * startPosition.x;
                     objektInScene.position.z = positionsSkalierungsfaktor * startPosition.z;
 
-                    mitspieler3dObjektListe.set(spieler.name, objektInScene);
+                    mitspieler3dObjektListe.set(mitspieler.name, objektInScene);
                 });
             }
         });
@@ -476,11 +473,11 @@ function verbergeInteraktionText() {
  *
  * @param spieler neu zu Positionierender Mitspieler.
  */
-function setzeMitspielerAufPosition(spieler: Spieler) {
-    const objektInScene = mitspieler3dObjektListe.get(spieler.name);
+function setzeMitspielerAufPosition(mitspieler: Spieler) {
+    const objektInScene = mitspieler3dObjektListe.get(mitspieler.name);
 
-    objektInScene.position.x = 1 * spieler.eigenschaften.position.x;
-    objektInScene.position.z = 1 * spieler.eigenschaften.position.z;
+    objektInScene.position.x = 1 * mitspieler.eigenschaften.position.x;
+    objektInScene.position.z = 1 * mitspieler.eigenschaften.position.z;
 }
 
 /**
@@ -542,12 +539,12 @@ function setzteWarnText() {
     schluesselText.style.display = "block";
 }
 
-function openChat(chat: any, chatButton: any) {
+function openChat(chat: HTMLElement, chatButton: HTMLElement) {
     chat.style.display = "block";
     chatButton.style.display = "none";
 }
 
-function closeChat(chat: any, chatButton: any) {
+function closeChat(chat: HTMLElement, chatButton: HTMLElement) {
     chat.style.display = "none";
     chatButton.style.display = "block";
 }

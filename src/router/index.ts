@@ -1,13 +1,15 @@
-import {createRouter, createWebHashHistory, createWebHistory, RouteRecordRaw} from 'vue-router'
-import Home from '../views/Home.vue'
-import LobbyView from '@/views/LobbyView.vue'
-import Register from "@/views/Register.vue";
+import {createRouter, createWebHashHistory, RouteRecordRaw} from 'vue-router'
+import EditoruebersichtView from '@/views/EditoruebersichtView.vue';
 import LobbyuebersichtView from "@/views/LobbyuebersichtView.vue";
-import Editor from "@/views/Editor.vue";
-import { logout } from '@/requests';
-import AboutView from "@/views/AboutView.vue";
+import SpieleUmgebungView from '@/views/SpieleUmgebungView.vue';
+import RegistrierenView from "@/views/RegistrierenView.vue";
+import LandingpageView from '@/views/LandingpageView.vue';
+import AnleitungView from '@/views/AnleitungView.vue';
+import AboutView from "@/views/UeberUnsView.vue";
+import EditorView from "@/views/EditorView.vue";
+import MenueView from '@/views/MenueView.vue'
+import LobbyView from '@/views/LobbyView.vue'
 import userStore from '@/stores/user'
-import Landingpage from '@views/Landingpage.vue';
 
 // Routen der Anwendung
 
@@ -15,17 +17,17 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/home',
         name: 'Home',
-        component: Home
+        component: MenueView
     },
     {
         path: '/signup',
         name: 'SignUp',
-        component: Register
+        component: RegistrierenView
     },
     {
         path: '/instructions',
-        name: 'Instructions',
-        component: () => import('../views/Instructions.vue'),
+        name: 'AnleitungView',
+        component: AnleitungView,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
                 console.log(from);
@@ -40,7 +42,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/',
         name: 'Landingpage',
-        component: () => import('../views/Landingpage.vue')
+        component: LandingpageView
     },
     
 
@@ -75,7 +77,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/environment',
         name: 'Environment',
-        component: () => import('../views/Environment.vue'),
+        component: SpieleUmgebungView,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
                 console.log(from);
@@ -89,7 +91,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/editor',
         name: 'Editor',
-        component: Editor,
+        component: EditorView,
         beforeEnter: (to, from, next) => {
             if (!userStore.state.istEingeloggt){
                 console.log(from);
@@ -103,7 +105,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: '/editoruebersicht',
         name: 'Editoruebersicht',
-        component: () => import('../views/Editoruebersicht.vue')
+        component: EditoruebersichtView
     },
 
     {
