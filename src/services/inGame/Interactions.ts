@@ -1,6 +1,6 @@
 import user from '@/stores/user';
 import { Client } from '@stomp/stompjs';
-import { Raycaster, Vector3 } from 'three';
+import { Raycaster, Vector3, Mesh, Object3D, PerspectiveCamera } from 'three';
 import { useLobbyStore } from '../lobby/lobbyService';
 import { useGameEngine } from './gameEngine';
 
@@ -10,26 +10,26 @@ import { useGameEngine } from './gameEngine';
 export class Interactions {
 
     domElement: Document
-    cameraCollidable: any
+    cameraCollidable: Mesh
     interaktionsListe: any
     erkannteInteraktion: any
-    rayCaster: any
+    rayCaster: any;
     stompclient: Client
-    lobbyID: any
+    lobbyID: string
     DEST: string
     index: number
     spielername: string
     update: (cameraPosition: any) => void
     keyDisconnect: () => void
 
-    constructor(interaktionsListe: any, cameraCollidable: any, domElement: Document, client: Client) {
+    constructor(interaktionsListe: Array<Object3D>, cameraCollidable: Mesh, domElement: Document, client: Client) {
 
         const { disconnectController } = useGameEngine();
         const { lobbystate } = useLobbyStore()
         const { gamestate } = useGameEngine()
         
         const interaktionReichweite = 2
-        let popupFenster: any;
+        let popupFenster: HTMLElement | null;
 
         this.spielername = user.state.benutzername;
         this.domElement = domElement;
@@ -103,15 +103,18 @@ export class Interactions {
                     this.stompclient.publish({ destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true, });
                     break;
                 case "Ziel":
+                    
                     popupFenster = document.getElementById('ziel');
-                    popupFenster.style.display = "block";
+                    if(popupFenster){
+                        popupFenster.style.display = "block";
+                    }
                     disconnectController("ziel");
                     console.log("popup ist aktiviert");
                     break;
             }
         }
 
-        this.update = (camera: any) => {
+        this.update = (camera: PerspectiveCamera) => {
             const blickRichtung = new Vector3(0, 0, -1).applyQuaternion(camera.quaternion)
             const originPoint = this.cameraCollidable.position.clone()
             const vorneVektor = blickRichtung.clone()

@@ -4,8 +4,8 @@ import editorStore from '@/stores/editor'
  * Das Command interface deklariert eine Methode für das Ausführen eines Befehls (Command)
  */
 interface ICommand {
-    execute(): any; //Befehl ausführen
-    undo(): any; //Befehl rückgängig machen
+    execute(): void; //Befehl ausführen
+    undo(): void; //Befehl rückgängig machen
     //redo(): any; //Befehl wiederholen
     describe(): string;
     getStack(): ICommand[];

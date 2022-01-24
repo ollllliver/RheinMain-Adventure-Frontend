@@ -1,4 +1,4 @@
-import { computed, isProxy, reactive } from 'vue'
+import { computed, reactive } from 'vue'
 import { Karte } from '@/models/Karte';
 
 /**

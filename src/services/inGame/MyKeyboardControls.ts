@@ -1,4 +1,4 @@
-import { Vector3, Raycaster } from 'three';
+import { Vector3, Raycaster, Mesh, Object3D, PerspectiveCamera } from 'three';
 import { SpielerLokal } from '../../models/SpielerLokal';
 
 const direction = new Vector3();
@@ -17,13 +17,13 @@ class MyKeyboardControls {
     // moveDown: boolean;
     // canJump: boolean;
     update: (cameraPosition: any, velocity: any, delta: number) => void;
-    cameraCollidable: any;
-    collidableList: any;
+    cameraCollidable: Mesh;
+    collidableList: Array<Object3D>;
     rayCaster: any;
     connect: () => void;
     disconnect: () => void;
 
-    constructor(collidableList: any, cameraCollidable: any, domElement: Document, spieler: SpielerLokal) {
+    constructor(collidableList: Array<Object3D>, cameraCollidable: Mesh, domElement: Document, spieler: SpielerLokal) {
 
         this.moveForward = false;
         this.domElement = domElement;
@@ -114,7 +114,7 @@ class MyKeyboardControls {
                 this.domElement.removeEventListener('keyup', onKeyUp)
         };
 
-        const collisionDetection = (blickVektor: any, originPoint: any) => {
+        const collisionDetection = (blickVektor: Vector3, originPoint: Vector3) => {
 
             // TODO: Raycasting nur wenn Taste gedrueckt bzw mit Maus umgeschaut wird und in Intervallen checken, nicht jedes Frame (PERFORMANCE)
             // TODO: Springen und crouchen auch testen
@@ -131,7 +131,7 @@ class MyKeyboardControls {
             return false
         }
 
-        this.update = (camera: any, velocity: any, delta: number) => {
+        this.update = (camera: PerspectiveCamera, velocity: Vector3, delta: number) => {
 
             direction.z = Number(this.moveForward) - Number(this.moveBackward);
             direction.x = Number(this.moveRight) - Number(this.moveLeft);

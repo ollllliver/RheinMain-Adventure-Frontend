@@ -436,11 +436,18 @@ const doAnimate = () => {
     //spieler.eigenschaften.position.y = Math.round(camera.position.y * 100) / 100;
 };
 
+/**
+ * Stoppt die Animationsschleife
+ */
 const stopAnimate = () => {
     cancelAnimationFrame(requestID);
     console.log("gameEngine.stopAnimate(): Animation erfolgreich gestoppt.");
 }
 
+/**
+ * Startet die Animationsschleife und speichert die requestID,
+ * die bentigt wird um den Prozess wieder zu stoppen.
+ */
 const startAnimate = () => {
     requestID = requestAnimationFrame(doAnimate);
     doAnimate();

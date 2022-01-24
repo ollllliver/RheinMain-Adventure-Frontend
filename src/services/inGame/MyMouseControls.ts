@@ -1,4 +1,4 @@
-import { Euler, Vector3, EventDispatcher, Camera } from 'three';
+import { Euler, Vector3, EventDispatcher, Camera, PerspectiveCamera } from 'three';
 import { useGameEngine } from './gameEngine';
 
 const _euler = new Euler(0, 0, 0, 'YXZ');
@@ -20,14 +20,14 @@ class MyMouseControls extends EventDispatcher {
 	disconnect: () => void;
 	dispose: () => void;
 	getObject: () => Camera;
-	getDirection: (v: any) => any;
-	moveForward: (distance: any) => void;
-	moveRight: (distance: any) => void;
+	getDirection: (v: Vector3) => Vector3;
+	moveForward: (distance: number) => void;
+	moveRight: (distance: number) => void;
 	lock: () => void;
 	unlock: () => void;
-	update: (velocity: any, delta: number) => void;
+	update: (velocity: Vector3, delta: number) => void;
 
-	constructor(camera: Camera, owner: Document) {
+	constructor(camera: PerspectiveCamera, owner: Document) {
 		super();
 
 		if (owner.body === undefined) {
@@ -107,7 +107,7 @@ class MyMouseControls extends EventDispatcher {
 		this.getDirection = function () {
 			const direction = new Vector3(0, 0, - 1);
 
-			return function (v: any) {
+			return function (v: Vector3) {
 				return v.copy(direction).applyQuaternion(camera.quaternion);
 			};
 		}();
@@ -117,7 +117,7 @@ class MyMouseControls extends EventDispatcher {
 		 * Beweget die Kamera nach vorne
 		 * @param distance Wert wie weit die Kamera sich nach vorne bewegt
 		 */
-		this.moveForward = function (distance:any) {
+		this.moveForward = function (distance: number) {
 			_vector.setFromMatrixColumn(camera.matrix, 0);
 			_vector.crossVectors(camera.up, _vector);
 			camera.position.addScaledVector(_vector, distance);
@@ -128,7 +128,7 @@ class MyMouseControls extends EventDispatcher {
 		 * Beweget die Kamera nach rechts
 		 * @param distance Wert wie weit die Kamera sich nach rechts bewegt
 		 */
-		this.moveRight = function (distance:any) {
+		this.moveRight = function (distance: number) {
 			_vector.setFromMatrixColumn(camera.matrix, 0);
 			camera.position.addScaledVector(_vector, distance);
 		};
@@ -152,7 +152,7 @@ class MyMouseControls extends EventDispatcher {
 		/**
 		 * Aktualisiert die Bewegungen
 		 */
-		this.update = (velocity: any, delta: number) => {
+		this.update = (velocity: Vector3, delta: number) => {
 			this.moveRight(-velocity.x * delta);
 			this.moveForward(-velocity.z * delta);
 			this.getObject().position.y += (velocity.y * delta);
