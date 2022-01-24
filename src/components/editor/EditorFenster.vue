@@ -45,7 +45,7 @@ export default defineComponent({
       CommandStack.getInstance().reset()
       /**
        * durch liste iterieren und grid fuellen wenn bearbeitet
-       * ueber document div elemente aus dem grid identifizieren
+       * über document div elemente aus dem grid identifizieren
        */
       
       let reihe = document.getElementsByClassName("reihe")
@@ -91,7 +91,7 @@ export default defineComponent({
     
     /**
      * bei drop (Drag-and-Drop) Elemnent auf der Karte platzieren
-     * itemdID, y-, x-Koordinaten und element ueber event identifizieren
+     * itemdID, y-, x-Koordinaten und element über event identifizieren
      * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
      */
     const onDrop = (event: any) => {

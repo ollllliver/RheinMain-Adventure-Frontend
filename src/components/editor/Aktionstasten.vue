@@ -46,7 +46,7 @@ export default defineComponent({
           }
           */
           if (editorStore.getters.getSchluessel >= editorStore.getters.getTuer) {
-            editorStore.info("Karte wird eingereicht. Schluessel=" + editorStore.getters.getSchluessel + " Tueren=" + editorStore.getters.getTuer);
+            editorStore.info("Karte wird eingereicht. Schlüssel=" + editorStore.getters.getSchluessel + " Türen=" + editorStore.getters.getTuer);
             const inhalt = editorStore.getters.getGrid.wandleKarteZuInt()
             const pojo = editorStore.getters.getGrid
             console.log(inhalt)
@@ -67,7 +67,7 @@ export default defineComponent({
               router.push("/editoruebersicht")
             });
           } else {
-            editorStore.info("Fuer jede Tuer muss ein Schluessel existieren. Aktuelle Anzahl Tueren=" + editorStore.getters.getTuer + " Schluessel=" + editorStore.getters.getSchluessel);
+            editorStore.info("Für jede Tür muss ein Schlüssel existieren. Aktülle Anzahl Türen=" + editorStore.getters.getTuer + " Schlüssel=" + editorStore.getters.getSchluessel);
           }
         } else {
           editorStore.info("Jede Karte benötigt einen Startpunkt. Bitte markiere einen Startpunkt.");

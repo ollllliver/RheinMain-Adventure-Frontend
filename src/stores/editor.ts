@@ -18,7 +18,7 @@ import { Karte } from '@/models/Karte';
  */
 
 const waehlen = "Bitte wählen (Weg, Start oder Ziel)"
-const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tuer ist horizontal."
+const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tür ist horizontal."
 
 const karte: Karte = new Karte(99999,"","","")
 
