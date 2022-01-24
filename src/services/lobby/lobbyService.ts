@@ -127,9 +127,6 @@ function subscribeToUebersicht() {
  * Bei Misserfolg, steht in der Lobbymessage das istFehler Flag auf true.
  */
 async function tryJoin(lobby_id: string) {
-    console.log("Fetch auf: /api/lobby/join/" + lobby_id);
-
-
     return axios.post('/api/lobby/join/' + lobby_id)
     .then((response) => {
         if (response.status != 200) {
@@ -268,11 +265,8 @@ function subscribeToLobby(lobby_id: string) {
  * @param lobby_id die ID der Lobby
  */
 function getScore(lobby_id: string){
-    fetch('/api/lobby/' + lobby_id + "/score", {
-        method: 'GET'
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
+    axios.get('/api/lobby/' + lobby_id + "/score").then((res)=>{
+        return res.data;
     }).then((response) => {
         if (!response.ok) {
             console.log("error");
@@ -323,9 +317,6 @@ function empfangeLobbyMessageUebersicht(lobbymessage: LobbyMessage) {
  * @param lobby_id ist die ID der neu zu ladenden Lobby
  */
 async function updateLobby(lobby_id: string) {
-    console.log("Fetch auf: /api/lobby/" + lobby_id);
-
-
     axios.get('/api/lobby/' + lobby_id)
     .then((response) => {
         if (response.status != 200) {
@@ -350,8 +341,6 @@ async function updateLobby(lobby_id: string) {
 }
 
 async function joinRandomLobby() {
-    console.log("Fetch auf: /api/lobby/joinRandom");
-
     return axios.post('/api/lobby/joinRandom')
     .then((response) => {
         if (response.status != 200) {
@@ -376,9 +365,6 @@ async function joinRandomLobby() {
 
 // starteSpiel?
 async function starteLobby() {
-
-    console.log("Fetch auf: /api/lobby/{lobbyId}/start")
-
     return axios.post('/api/lobby/'+lobbystate.lobbyID+'/start')
     .then((response) => {
         if (response.status != 200) {
@@ -397,11 +383,8 @@ async function starteLobby() {
 }
 
 async function resetLobbyID() {
-    return fetch('/api/lobby/reset', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        }
+    return axios.post('/api/lobby/reset').then((res)=>{
+        return res.data;
     }).then((response) => {
         if (!response.ok) {
             console.log("error");
@@ -469,14 +452,9 @@ async function leaveLobby(): Promise<boolean> {
  * @returns bei erfolgreichem Fetch die LobbyID der im Backend neu erstellten Lobby
  */
 async function neueLobby() {
-    console.log("Fetch auf: /api/lobby/neu")
-
-    
-
     return axios.post('/api/lobby/neu')
     .then((response) => {
         if (response.status != 200 ) {
-            console.log("Fetch Error /api/lobby/alle");
             return;
         }
         return response.data;
@@ -501,19 +479,13 @@ async function neueLobby() {
  */
 async function alleLobbiesladen() {
     const lobbyliste = new Array<Lobby>();
-    
-
-    console.log("Fetch auf: /api/lobby/alle")
     return axios.get('/api/lobby/alle')
     .then((response) => {
         if (response.status != 200 ) {
-            console.log("Fetch Error /api/lobby/alle");
             return;
         }
-        console.log("Fetchdaten /api/lobby/alle: " + response);
         return response.data;
     }).then((jsondata : Array<Lobby>)=> {
-        console.log("Fetchdaten /api/lobby/alle: " + jsondata);
         // verarbeite jsondata
         jsondata.forEach(element => {
             lobbyliste.push(element);
@@ -533,8 +505,6 @@ async function alleLobbiesladen() {
  * @param neuesLimit 
  */
 function changeLimit(neuesLimit) {
-    console.log('change limit:', neuesLimit);
-
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', neuesLimit)
     .then((response) => {
         if (response.status != 200) {
@@ -553,9 +523,6 @@ function changeLimit(neuesLimit) {
  * @param istPrivat 
  */
 function changePrivacy(istPrivat) {
-    console.log('change privacy:', istPrivat);
-
-
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/privacy', istPrivat)
     .then((response) => {
         if (response.status != 200) {
@@ -577,8 +544,6 @@ function changePrivacy(istPrivat) {
  * @param neuerHost 
  */
 function changeHost(neuerHost) {
-    console.log('change host:', neuerHost);
-
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/host', neuerHost)
     .then((response) => {
         if (response.status != 200) {
@@ -627,24 +592,7 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
  * @param neueKarte 
  */
  function changeKarte(neueKarte) {
-    fetch('/api/lobby/' + lobbystate.lobbyID + '/level', {
-        method: 'PATCH',
-        // ,headers: {
-        //     'Authorization': 'Bearer ' + loginstate.jwttoken
-        // }
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(neueKarte.levelId)
-    }).then((response) => {
-        if (!response.ok) {
-            console.log("error");
-            return;
-        }
-        return response.json();
-    }).catch((e) => {
-        console.log(e);
-    });
+    axios.patch('/api/lobby/' + lobbystate.lobbyID + '/level', neueKarte.levelId);
 }
 
 async function alleKartenLaden() {

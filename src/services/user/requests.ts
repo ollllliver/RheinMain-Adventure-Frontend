@@ -1,3 +1,4 @@
+import router from "@/router";
 import axios, { AxiosPromise } from "axios"
 import user from "../../stores/user"
 
@@ -6,13 +7,14 @@ export type UserList = Array<User & { password: string }>
 
 // GET benutzer/check -> status 200 + User falls vorhanden, 204 falls nicht vorhanden
 export async function getUser(): Promise<boolean> {
-  return axios.get('/api/benutzer/check').then((u) => {
-    console.log("User erkannt", u);
+  return axios.get('/api/benutzer/check').then((res) => {
+    return res.data;
+  }).then((u)=>{
     user.state.benutzername = u.data.benutzername;
     user.state.istEingeloggt = true;
     return true;
   }).catch((e) => {
-    console.log(e, "Kein User erkannt");
+    console.log(e);
     return false;
   });
 }
@@ -35,11 +37,12 @@ export async function signup(benutzername: string, passwort: string): Promise<Ax
 }
 
 export async function logout(benutzername: string): Promise<AxiosPromise> {
-
-
   // logout ist post wenn csrf enabled in backend
   return axios.post('/api/benutzer/logout', {
     benutzername: benutzername,
     passwort: "geheim"
+  }).then((res)=>{
+    router.push("/");
+    return res;
   });
 }

@@ -77,17 +77,8 @@ import { defineComponent } from "vue";
 
 export default defineComponent({
   name: "Teilnehmerliste",
-
-  props: {
-    personenListe:{
-      required: true,
-      type: Array
-    }
-  },
-  setup(props) {
-    return {
-      personen: props.personenListe,
-    };
+  setup() {
+    return {};
   },
 });
 </script>

@@ -1,20 +1,17 @@
 <!-- Home View mit Login/Regestrieren Formular -->
 
 <template>
-  <div class="text-center">
-    <h2>Welcome, {{ userStore.state.benutzername }}</h2>
-    <br>
-    <LabyrinthMenue/>
-  </div>
+  <Login />
 </template>
 
 <script lang="ts">
 import { defineComponent, onMounted} from 'vue';
 import userStore from '@/stores/user'
-import LabyrinthMenue from "@/components/menue/LabyrinthMenue.vue"
+import Login from '@/components/Login.vue'
+
 export default defineComponent({
-  name: 'Home',
-  components: {  LabyrinthMenue },
+  name: 'LoginView',
+  components: { Login },
   setup() {
 
     onMounted(userStore.getUser)

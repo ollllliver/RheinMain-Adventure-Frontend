@@ -10,7 +10,7 @@
           <button class="red-btn w-100" @click="userStore.logout()">Logout</button>
         </div>
       </div>
-      <router-link v-else class="dropbtn" to="/home">Login</router-link>
+      <router-link v-else class="dropbtn" to="/login">Login</router-link>
     </div>
   </div>
 </template>
