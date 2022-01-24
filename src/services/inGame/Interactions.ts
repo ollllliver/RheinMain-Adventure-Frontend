@@ -91,6 +91,7 @@ export class Interactions {
                     this.DEST = "/topic/spiel/" + this.lobbyID +"/"+ interaktion.object.name;
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/key
                     console.log("Spieler " + this.spielername + "will den Schlüssel aufheben")
+                    //Payload mit Koordianten das interagierten OBjs und den names des Spielers der interagiert hat
                     this.stompclient.publish({destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true,});
                     
                     break;
@@ -109,6 +110,7 @@ export class Interactions {
                     console.log("publish: " + interaktion.object.name + "auf /topic/spiel/" + this.lobbyID + '/' + interaktion.object.name);
                     this.DEST = "/topic/spiel/" + this.lobbyID +"/"+ interaktion.object.name;
                     //publisht den objektNamen auf die DEST /topic/spiel/{lobbyID}/tuer
+                    //Payload mit Koordianten das interagierten OBjs und den names des Spielers der interagiert hat
                     this.stompclient.publish({destination: this.DEST, body: `${Math.round(interaktion.point.x).toString()};${Math.round(interaktion.point.z).toString()};${this.spielername}`, skipContentLengthHeader: true,});
                     break;
                 case "Ziel":

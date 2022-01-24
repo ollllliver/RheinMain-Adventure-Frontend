@@ -551,15 +551,17 @@ function setzeMitspielerAufPosition(spieler: Spieler) {
  */
 
 function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
+    // setzten des SchluesselCOunters in der GUI
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
     schluesselText.textContent = "Keys x" + anzSchluessel;
     schluesselText.style.display = "block";
 
+    //interagierter Schluessel wird anhand der koordinaten gefunden und removed...
     const removeObject = interagierbar3dObjektListe.get(koordinaten);
     console.log("DAS OBJECT MUSS WEG:")
     console.log(removeObject);
-
+    //dann  noch aus der interactableList entfernt 
     for (const interagierObj of interactableList ){
         if ( removeObject.id === interagierObj.id){
             console.log("Remove gefunden " + interagierObj)
@@ -592,6 +594,7 @@ function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string){
 */
 
 function oeffneTuer(anzSchluessel: number, koordinaten: string){
+    // setzten des SchluesselCOunters in der GUI
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel )
     schluesselText.textContent = "Keys x" + anzSchluessel;
@@ -601,10 +604,10 @@ function oeffneTuer(anzSchluessel: number, koordinaten: string){
     console.log("DAS OBJECT MUSS AUF GEHEN:")
     console.log(tuer);
 
-
+    //gefudnenes object wird einfach rotiert
     tuer.rotation.x = Math.PI / 2;
-    //collidableList.pop(tuer)
-    //tuer.parent.remove(tuer)
+    
+    //TODO Tür auch für alle aus interaktable
 }
 
 /**
