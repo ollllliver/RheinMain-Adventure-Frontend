@@ -45,7 +45,7 @@ export default defineComponent({
     function refresh(){
       alleLobbiesladen();
     }
-    function redirectToLobby(id){
+    function redirectToLobby(id: string){
       router.push("/lobby/"+ id);
     }
     return {

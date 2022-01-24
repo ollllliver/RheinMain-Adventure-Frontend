@@ -13,9 +13,9 @@ class MyKeyboardControls {
     moveBackward: boolean;
     moveLeft: boolean;
     moveRight: boolean;
-    moveUp: boolean;
-    moveDown: boolean;
-    canJump: boolean;
+    // moveUp: boolean;
+    // moveDown: boolean;
+    // canJump: boolean;
     update: (cameraPosition: any, velocity: any, delta: number) => void;
     cameraCollidable: any;
     collidableList: any;
@@ -30,9 +30,9 @@ class MyKeyboardControls {
         this.moveBackward = false;
         this.moveLeft = false;
         this.moveRight = false;
-        this.moveUp = false;
-        this.moveDown = false;
-        this.canJump = false;
+        // this.moveUp = false;
+        // this.moveDown = false;
+        // this.canJump = false;
         this.cameraCollidable = cameraCollidable;
         this.collidableList = collidableList;
 
@@ -58,12 +58,12 @@ class MyKeyboardControls {
                 case 'KeyD':
                     this.moveRight = true;
                     break;
-                case 'Space':
-                    this.moveUp = true;
-                    break;
-                case 'ShiftLeft':
-                    this.moveDown = true;
-                    break;
+                // case 'Space':
+                //     this.moveUp = true;
+                //     break;
+                // case 'ShiftLeft':
+                //     this.moveDown = true;
+                //     break;
             }
         };
 
@@ -89,12 +89,12 @@ class MyKeyboardControls {
                 case 'KeyD':
                     this.moveRight = false;
                     break;
-                case 'Space':
-                    this.moveUp = false;
-                    break;
-                case 'ShiftLeft':
-                    this.moveDown = false;
-                    break;
+                // case 'Space':
+                //     this.moveUp = false;
+                //     break;
+                // case 'ShiftLeft':
+                //     this.moveDown = false;
+                //     break;
             }
         }
 
@@ -135,7 +135,7 @@ class MyKeyboardControls {
 
             direction.z = Number(this.moveForward) - Number(this.moveBackward);
             direction.x = Number(this.moveRight) - Number(this.moveLeft);
-            direction.y = Number(this.moveDown) - Number(this.moveUp);
+            //direction.y = Number(this.moveDown) - Number(this.moveUp);
             direction.normalize(); // this ensures consistent movements in all directions
 
             const speed = 50.0; //geschwindigkeit der camera
@@ -195,8 +195,9 @@ class MyKeyboardControls {
                 velocity.z -= direction.z * speed * delta;
             if ((this.moveLeft && !linksCollision) || (this.moveRight && !rechtsCollision))
                 velocity.x -= direction.x * speed * delta;
-            if (this.moveUp || this.moveDown)
-                velocity.y -= direction.y * speed * delta;
+            //Wenn man fliegen will    
+            // if (this.moveUp || this.moveDown)
+            //     velocity.y -= direction.y * speed * delta;
 
             // Nicht in Wand haengenbleiben, ist man halt ein Gummi Mensch
             if ((this.moveForward && vorneCollision) || (this.moveBackward && hintenCollision))
@@ -205,7 +206,7 @@ class MyKeyboardControls {
                 velocity.x += direction.x * speed * delta;
 
             //Wenn der Spieler keine Geschwindikeit mehr => er nicht mehr am Laufen ist
-            if (velocity.x != 0 || velocity.z != 0 || velocity.y != 0) {
+            if (velocity.x != 0 || velocity.z != 0) {
                 spieler.updatePosition(spieler.eigenschaften.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
         };

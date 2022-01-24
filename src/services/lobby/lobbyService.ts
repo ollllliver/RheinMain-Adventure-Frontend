@@ -71,7 +71,7 @@ let uebersichtSubscription: StompSubscription;
  *              Scheinbar muss die in callb mitgegebene Function aber keinen Parameter erwarten.
  *              Nicht gerade so, wie man es von typescript kennt. Klingt mehr nach javascript. aber gut...
  */
-async function connectToStomp(callb, param) {
+async function connectToStomp(callb: any, param: any) {
 
     stompclient.onWebSocketError = () => { 
         console.log("AAAAAAAAAAAAAAAAAAAA websocket error")
@@ -504,7 +504,7 @@ async function alleLobbiesladen() {
  * 
  * @param neuesLimit 
  */
-function changeLimit(neuesLimit) {
+function changeLimit(neuesLimit: number) {
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/spielerlimit', neuesLimit)
     .then((response) => {
         if (response.status != 200) {
@@ -522,7 +522,7 @@ function changeLimit(neuesLimit) {
  * 
  * @param istPrivat 
  */
-function changePrivacy(istPrivat) {
+function changePrivacy(istPrivat: boolean) {
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/privacy', istPrivat)
     .then((response) => {
         if (response.status != 200) {
@@ -543,7 +543,7 @@ function changePrivacy(istPrivat) {
  * 
  * @param neuerHost 
  */
-function changeHost(neuerHost) {
+function changeHost(neuerHost: any) {
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/host', neuerHost)
     .then((response) => {
         if (response.status != 200) {
@@ -591,7 +591,7 @@ function spielerEntfernen(zuEntzfernenderSpieler: Spieler) {
  * 
  * @param neueKarte 
  */
- function changeKarte(neueKarte) {
+ function changeKarte(neueKarte: any) {
     axios.patch('/api/lobby/' + lobbystate.lobbyID + '/level', neueKarte.levelId);
 }
 
