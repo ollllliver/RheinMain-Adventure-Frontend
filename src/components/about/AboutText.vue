@@ -126,6 +126,9 @@
       <img src="@/assets/img/screenshots/Screenshot_Game.png" alt="" class="img-fluid" />
     </div>
     <h4>Editor</h4>
+    <div class="text-center">
+      <img src="@/assets/img/screenshots/Screenshot_Editor.png" alt="" class="img-fluid" />
+    </div>
   </div>
 </template>
 
