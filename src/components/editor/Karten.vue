@@ -7,14 +7,16 @@
         type="text"
         placeholder="Levelname"
         class="form-control"
+        id="leVelname"
       />
       <input
         v-model="kbeschreibung"
         type="text"
         placeholder="Kurzbeschreibung"
         class="form-control"
+        id="kbeschreibung"
       />
-      <button @click="ladeKarte(-1)" class="btn btn-warning rounded-0" >neues Level hinzufuegen</button>
+      <button @click="ladeKarte(-1)" class="btn btn-success rounded-8" id="hinzufuegen">neues Level hinzufuegen</button>
     </div>
 
     <!-- Tabelle -->
@@ -65,10 +67,10 @@ export default defineComponent({
   data() {
     
     let karten = []
-    
-
-    // Wenn Komponente erstellt wird ueber aktuellen Nutzername Liste von erstellten Level abfragen
-    // und in Array karten hinzufuegen
+    /**
+     * Wenn Komponente erstellt wird ueber aktuellen Nutzername Liste von erstellten Level abfragen
+     *  und in Array karten hinzufuegen
+     */
     onMounted( () => {
       fetch("/api/benutzer/level/"+userStore.getters.getBenutzername, {
         method: "GET",
@@ -85,7 +87,6 @@ export default defineComponent({
     })
     
     return {
-
       levelname: '',
       bearbeiteterName: null,
       bearbeiteteBeschreibung: null,
@@ -109,7 +110,11 @@ export default defineComponent({
       this.levelname='';
       this.kbeschreibung='';
     },
-    /* Name und Beschreibung löschen */
+    /**
+     * loescht karte mit uergebener id aus dem Backend
+     * und entfernt Sie in der Liste
+     */
+    
     loescheKarte(karte){
       
       fetch("/api/level/"+karte.levelId, {
@@ -131,7 +136,10 @@ export default defineComponent({
       this.bearbeiteteBeschreibung=index;
     },
     
-    
+    /**
+     * laedt karte von uebergebenen Nutzer mit uebergebener id aus dem Backend 
+        und setzt das Ergebnis in den editorStore
+     */
     ladeKarte(levelId){
       fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+levelId+"/0", {
         method: "GET",
@@ -151,23 +159,26 @@ export default defineComponent({
         console.log(err)
       }));
     },
-
-    /* Status ändern */
-    aendereStatus(index){
-      let neuesI=this.statuse.indexOf(this.karten[index].status);
-      if(++neuesI>1)neuesI=0;
-      this.karten[index].status=this.statuse[neuesI];
-    },
   },
-
-  
-  
 })
 
 </script>
 
 <style scoped>
-.pointer {
-  cursor: pointer;
-}
+  .pointer {
+    cursor: pointer;
+  }
+
+  #kbeschreibung {
+    margin: 5px;
+  }
+
+  #leVelname{
+    margin: 5px;
+  }
+
+  #hinzufuegen {
+    margin: 5px;
+  }
+
 </style>

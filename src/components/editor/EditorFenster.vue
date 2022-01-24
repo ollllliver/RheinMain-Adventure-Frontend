@@ -36,16 +36,17 @@ export default defineComponent({
     var liste: any[][];    
     karte = editorStore.getters.getGrid;
 
+    // Proxy aufloesen?? das war zumindest mein Ziel
     const target_copy1 = Object.assign({}, karte);
     liste = Object.assign({}, target_copy1.levelInhalt);
     
-    let neu = true
     onMounted(() => {
       
       CommandStack.getInstance().reset()
-    
-      // aktuelle Liste von db
-      // durch liste iterieren und grid fuellen wenn bearbeitet
+      /**
+       * durch liste iterieren und grid fuellen wenn bearbeitet
+       * ueber document div elemente aus dem grid identifizieren
+       */
       
       let reihe = document.getElementsByClassName("reihe")
 
@@ -57,37 +58,30 @@ export default defineComponent({
           switch (liste[y][x].e) {
             case 1:
               element.style.backgroundColor = "#ffd39bBF"
-              neu = false
               break;
             case 2:
               editorStore.start(true)
               element.style.backgroundColor = "#25bb1fA6"
-              neu = false
               break;
             case 3:
               editorStore.ziel(true)
               element.style.backgroundColor = "#131ec4A6"
-              neu = false
               break;
             case 4:
               editorStore.setzeSchluessel(1)
               element.style.background = "no-repeat center url('../img/schluessel.png') rgba(255,211,155, 0.75)"
-              neu = false
               break;
             case 5:
               editorStore.setzeNpc(1)
               element.style.background = "no-repeat center url('../img/npc.png') rgba(255,211,155, 0.75)"
-              neu = false
               break;
             case 6:
               editorStore.setzeTuer(1)
               element.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)"
-              neu = false
               break;
             case 7: 
               editorStore.setzeTuer(1)
               element.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)"
-              neu = false
               break;
           }
         }
@@ -96,8 +90,8 @@ export default defineComponent({
 
     
     /**
-     * bei drop (Drag-and-Drop) Raum auf der Karte platzieren
-     * wenn Raum auf platzierte Stelle passt
+     * bei drop (Drag-and-Drop) Elemnent auf der Karte platzieren
+     * itemdID, y-, x-Koordinaten und element ueber event identifizieren
      * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
      */
     const onDrop = (event: any) => {
@@ -105,8 +99,8 @@ export default defineComponent({
       const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
       const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
       const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
-
       const ele = {y:y,x:x,e:e}
+
       // wenn an der Stelle ein Weg ist
       if (liste[ele.y][ele.x].e === 1) {
         CommandStack.getInstance().execAndPush(
@@ -169,7 +163,7 @@ export default defineComponent({
     /**
      * Wegpunkt markieren:
      * wenn seine Wegbeschreibung (Weg/Start/Ziel) gesetzt ist
-     * wenn an dieser Stelle noch kein Element platziert wurder
+     * wenn an dieser Stelle noch kein Element platziert wurde
      * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
      */
     const wegPunkt = (event: any) => {
@@ -190,6 +184,7 @@ export default defineComponent({
 
         if (editorStore.getters.getEntfernen) {
           
+          // y-, x-Koordinaten und element ueber event identifizieren
           const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
           const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
           const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
@@ -212,13 +207,13 @@ export default defineComponent({
           }
         }
         if (!editorStore.getters.getEntfernen) {
+          // y-, x-Koordinaten und element ueber event identifizieren
           const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
           const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
           const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
           
           const ele = {y:y,x:x,e:e}
-          console.log(ele)
-          //
+          // Wegpunkt setzen
           if (e === 0) {
             CommandStack.getInstance().execAndPush(
               new ElementHinzufuegenCommand(
@@ -255,8 +250,10 @@ body {
 .drop-zone {
   height: 100%;
   width: 100%;
+  min-width: 800px;
   position: absolute;
   right: 0;
+  left: 0.5px;
   top: 0;
   height: 100%;
   width: 100%;

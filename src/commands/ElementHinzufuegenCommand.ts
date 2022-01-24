@@ -41,8 +41,6 @@ export class ElementHinzufuegenCommand implements ICommand {
    * Befehl ausführen
    */
   execute = () => {
-    console.log(this._karte.liste[this._element.posY][this._element.posX].e)
-    console.log(this._element.e)
     // Braucht man für CommandManager ?
     this._state += 1;
     if (this._karte.liste[this._element.posY][this._element.posX].e !== this._element.e) {
@@ -175,10 +173,10 @@ export class ElementHinzufuegenCommand implements ICommand {
   undo = () => {
     this._state -= 1
     // Element aus der Karte wieder auf 0 setzten (0 = Wand)
-    // Hintergrund des divs auf Wand setzen
+    // Hintergrund des divs auf altes Element setzen
     
     switch (this._element.e) {
-      // bei Weg, Start oder Ziel
+      // bei Weg, Start oder Ziel wieder Wand
       case 1: {
         this._karte.setElement(this._element.posY, this._element.posX, 0, 9);
         this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
@@ -196,6 +194,7 @@ export class ElementHinzufuegenCommand implements ICommand {
         editorStore.ziel(false)
         break;
       }
+      // Bei Schluessel, NPC oder Tuer wieder Weg
       case 4: {
         this._karte.setElement(this._element.posY, this._element.posX, 1);  
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"

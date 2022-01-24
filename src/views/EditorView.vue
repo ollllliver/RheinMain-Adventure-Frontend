@@ -69,7 +69,7 @@ export default defineComponent({
   }
   #karte {
     height: 500px;
-    width: 800px;
+    max-width: 800px;
     border: 2px black solid;
     overflow: hidden;
     position: relative;
@@ -94,6 +94,7 @@ export default defineComponent({
 
   #bausteine {
     width: 70%;
+    max-width: 800px;
     margin-top: 20px;
     margin-right: 50px;
     height: 70px;

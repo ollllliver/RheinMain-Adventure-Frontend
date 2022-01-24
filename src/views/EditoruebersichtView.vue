@@ -5,22 +5,17 @@
 <div class="container">
     
   <div class="row justify-content-md-center">
-    <div class="col-md-auto">
+    <div class="col-md-auto" id="willkommen">
       <h4> Wähle ein Level aus zum bearbeiten </h4>
     </div>
   </div>
 
-  <Karten> </Karten>
+  <Karten/>
   <div class="row">
     <div class="col">
 
     </div>
-    <div class="col-md-auto">
-      <!-- Wechsel zum "Home"-Fenster -->
-      <button class="btn btn-outline-secondary" @click="$router.push('/')">
-        Zurück zum Menü
-      </button>
-    </div>
+   
     
     
   </div>
@@ -38,3 +33,9 @@ export default defineComponent({
 
 
 </script>
+
+<style scoped>
+  #willkommen{
+    margin-top: 50px;
+  }
+</style>

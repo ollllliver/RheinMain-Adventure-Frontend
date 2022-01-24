@@ -140,8 +140,6 @@ export default defineComponent({
 <style scoped>
 button {
   width: 100%;
-  font-size: 15px;
-  font-weight: 400;
   color: black;
 }
 </style>
