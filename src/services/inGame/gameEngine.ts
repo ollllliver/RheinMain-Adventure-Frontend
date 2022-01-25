@@ -118,7 +118,6 @@ const initLoader = () => {
         return response.json();
 
     }).then((RaumMobiliarListe) => {
-        console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.")
         RaumMobiliarListe.forEach(function (raumMobiliar: any) {
             const posX = raumMobiliar.positionX;
             const posY = raumMobiliar.positionY;
@@ -159,7 +158,7 @@ const initLoader = () => {
         });
     }).then(()=>{
 
-        console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
+        console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich platziert.")
         camera.position.set(startPosition.x, startPosition.y, startPosition.z);
 
         lobbystate.teilnehmerliste.forEach(function (mitspieler) {
@@ -309,8 +308,6 @@ const connect = () => {
     if (zielFenster != null) {
         zielFenster.style.display = "none";
     }
-
-    console.log("gameEninge.connect: verbunden")
 }
 
 /**
@@ -337,12 +334,8 @@ const disconnectController = (element?: string) => {
     const zielFenster = document.getElementById('ziel');
 
     if (element != null) {
-        switch (element) {
-            case "ziel":
-                if (zielFenster != null) {
-                    zielFenster.style.display = "";
-                }
-                break;
+        if (element == "ziel" && zielFenster != null) {
+            zielFenster.style.display = "";
         }
     } else {
         if (pauseFenster != null && zielFenster != null) {
@@ -351,8 +344,6 @@ const disconnectController = (element?: string) => {
             }
         }
     }
-
-    console.log("gameEninge.disconnect: getrennt")
 }
 
 
@@ -407,9 +398,7 @@ const initSkybox = () => {
     }
 
     function init() {
-        console.log("Skybox wird initialisiert")
         const materialArray = createMaterialArray(skyboxImage);
-        console.log("Texturen geladen")
 
         skyboxGeo = new Three.BoxGeometry(1000, 1000, 1000);
         skybox = new Three.Mesh(skyboxGeo, materialArray);
@@ -418,7 +407,6 @@ const initSkybox = () => {
         skybox.position.y = 0
         skybox.position.z = 0
         scene.add(skybox);
-        console.log("Skybox der Szene hinzugefügt")
     }
 
     init();
@@ -513,7 +501,6 @@ const doAnimate = () => {
     }
     spieler.eigenschaften.position.x = Math.round(camera.position.x * 100) / 100;
     spieler.eigenschaften.position.z = Math.round(camera.position.z * 100) / 100;
-    //spieler.eigenschaften.position.y = Math.round(camera.position.y * 100) / 100;
 };
 
 /**
@@ -537,7 +524,7 @@ const clearMapContent = () => {
     collidableList = new Array<Three.Object3D>();
     interactableList = new Array<Three.Object3D>();
     mitspieler3dObjektListe = new Map<string, Three.Object3D>();
-    interagierbar3dObjektListe = new Map<any, Three.Object3D>();
+    interagierbar3dObjektListe = new Map<string, Three.Object3D>();
     console.log("Mapstate: cleared");
 }
 

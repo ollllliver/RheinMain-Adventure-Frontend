@@ -9,13 +9,10 @@ if (location.protocol == 'http:') {
     wsurl = `wss://${window.location.hostname}/messagebroker`;
 }
 const stompclient = new Client({brokerURL: wsurl});
-const headerName = "${_csrf.headerName}";
-const token = "${_csrf.token}";
 
 // verwendete StompSubscription
 let chatSubscription: StompSubscription;
 
-let aktLobbyID = "";
 let DEST_CHAT = "";
 
 /**
@@ -32,8 +29,6 @@ export enum ChatTyp {
  * @param typ ChatTyp (LOBBY, INGAME)
  */
 function subscribeChat(lobby_id: string, typ: ChatTyp){
-    aktLobbyID = lobby_id;
-
     switch (typ) {
         case ChatTyp.LOBBY:
             DEST_CHAT = "/topic/lobby/" + lobby_id + "/chat";
@@ -62,8 +57,7 @@ function subscribeChat(lobby_id: string, typ: ChatTyp){
  async function connectChatToStomp(callb: any, param: any) {
     stompclient.onConnect = async (frame) => {
         console.log("Erfolgreich verbunden: " + frame);
-        callb(param)
-        console.log(callb.name + "()");
+        callb(param);
     };
     stompclient.activate();
 }
@@ -89,7 +83,6 @@ function unsubscribeChat(){
     if (chatSubscription){
         chatSubscription.unsubscribe(); 
     }
-    aktLobbyID = "";
     DEST_CHAT = "";
 }
 
@@ -102,7 +95,6 @@ function unsubscribeChat(){
 async function sendeChatNachricht(typ: NachrichtenTyp, inhalt: string, sender: string) {
     const nachricht: ChatNachricht = { typ: typ, inhalt: inhalt, sender: sender };
     stompclient.publish({ destination: DEST_CHAT, body: JSON.stringify(nachricht) });
-    console.log("Gesendete Nachricht: ", nachricht);
 }
 
 /**
@@ -111,7 +103,6 @@ async function sendeChatNachricht(typ: NachrichtenTyp, inhalt: string, sender: s
  * @param nachricht Empfangene Nachricht vom Typ ChatNachricht
  */
 async function empfangeChatNachricht(nachricht: ChatNachricht) {
-    console.log("Empfangene Nachricht: ", nachricht);
     const messageArea = document.getElementById("messageArea");
     const messageElement = document.createElement("li");
 
