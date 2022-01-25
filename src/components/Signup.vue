@@ -1,44 +1,88 @@
+<!-- Regestrieren-Formular Komponente -->
+
 <template>
-  <form @submit.prevent="onSubmit">
-    <div class="form-group my-2">
-      <label>Username</label>
-      <input
-        v-model="form.username"
-        class="form-control"
-        placeholder="Username"
-        required
-      />
+  <h2 id="titel">Jetzt anmelden zu Rhein-Main Adventure!</h2>
+  <section class="container">
+  <div class="row content d-flex justify-content-center">
+    <div class="col-md-12">
+      <div class="box shadow bg-white p-4">
+        <h3 class="mb-4 text-center">Registrieren!</h3>
+        <form @submit.prevent="onSubmit" class="mb-3">
+          <div class="form-floating mb-3">
+            <input v-model="form.benutzername"
+            class="form-control rounded-0"
+            id="floatingInput"
+            placeholder="Benutzername"
+            required>  
+            <label for="floatingInput">Benutzername</label>
+          </div>
+
+          <div class="form-floating mb-3">
+            <input input type="password" v-model="form.passwort"
+            class="form-control rounded-0"
+            id="floatingPasswort"
+            placeholder="Passwort"
+            required>  
+            <label for="floatingPasswort">Passwort</label>
+          </div>
+        
+
+          <div class="form-floating mb-3">
+            <input input type="password" 
+            class="form-control rounded-0"
+            id="confirmPasswort"
+            placeholder="confirmPasswort"
+            required>  
+            <label for="floatingPasswort">Passwort wiederholen</label>
+          </div>
+
+          <div class="d-grid gap-2 mb-6">
+            <div class="col md-6">
+              <button class="btn btn-success btn-lg btn-block rounded-0" type="submit" style="float: right;">Registrieren</button>
+  
+            </div>
+          </div>
+        </form>
+      </div>
     </div>
-    <div class="form-group my-2">
-      <label>Password</label>
-      <input
-        v-model="form.password"
-        class="form-control"
-        type="password"
-        placeholder="Password"
-        required
-      />
-    </div>
-    <div class="text-danger my-2">{{ userStore.state.error }}</div>
-    <button class="btn btn-success btn-block my-2"  @click="$router.push('/')" 
-    type="submit">Sign Up</button>
-  </form>
+  </div>
+</section>
+
+
+  
 </template>
 <script lang="ts">
 import { defineComponent, reactive } from 'vue'
 import userStore from '@/stores/user'
+import router from '@/router'
 export default defineComponent({
   setup() {
     const form = reactive({
-      username: '',
-      password: ''
+      benutzername: '',
+      passwort: ''
     })
     const onSubmit = () => {
-      userStore.signup(form.username, form.password)
-      form.username = ''
-      form.password = ''
+      userStore.signup(form.benutzername, form.passwort).then(()=>{
+        form.benutzername = ''
+        form.passwort = ''
+        router.push('/')
+      }).catch((error)=>{
+        form.benutzername = ''
+        form.passwort = ''
+        console.log(error)
+      })
+      
     }
     return { form, userStore, onSubmit }
   }
 })
 </script>
+
+
+<style scoped>
+#titel{
+  white-space: nowrap;
+  text-align: center;
+}
+
+</style>

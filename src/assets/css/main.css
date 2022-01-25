@@ -1,5 +1,78 @@
 .center {
-    margin: auto;
-    width: 50%;
-    padding: 10px;
-  }
+  margin: auto;
+  width: 50%;
+  padding: 10px;
+}
+
+#messageArea{
+  list-style:none;
+  max-height:200px;
+  margin:10px;
+  overflow:auto;
+  padding:0;
+  text-indent:10px;
+}
+
+.event-message {
+  width: 100%;
+  text-align: center;
+  clear: both;
+}
+
+.chat-message {
+  position: relative;
+}
+
+#interaktionText{
+  position: absolute;
+  color: white;
+  margin: 0;
+  top: 80%;
+  left: 50%;
+  margin-right: -50%;
+  transform: translate(-50%, -50%)
+}
+
+.key{
+  position: absolute;
+  margin: 0;
+  padding: 0;
+  bottom: 0px;
+  left: 90px;
+}
+
+#schluesselText{
+  font-size: x-large;
+  font-weight: bolder;
+  position: absolute;
+  color: white;
+  margin: 0;
+  padding: 0;
+  bottom: 10px;
+  left: 142px;
+  display: block;
+}
+
+.GameChat {
+  position: absolute;
+  max-width:500px;
+  display: block;
+  z-index: 99;
+  left: 0;
+  bottom: 0;
+}
+
+.canvas {
+  position: relative;
+}
+
+#CloseButton {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  color: red;
+  font-size: 15px;
+  border: 2px solid black;
+  top: 0;
+  right: 0;
+}

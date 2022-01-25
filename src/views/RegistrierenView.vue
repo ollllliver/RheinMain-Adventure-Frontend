@@ -1,3 +1,5 @@
+<!-- Register View um sich zu registrieren -->
+
 <template>
   <div class="center">
     <Signup/>
