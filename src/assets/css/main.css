@@ -37,18 +37,19 @@
   position: absolute;
   margin: 0;
   padding: 0;
-  top: 93%;
-  left: 6%;
-  margin-right: -50%;
+  bottom: 0px;
+  left: 90px;
 }
 
 #schluesselText{
+  font-size: x-large;
+  font-weight: bolder;
   position: absolute;
   color: white;
   margin: 0;
   padding: 0;
-  top: 93%;
-  left: 10%;
+  bottom: 10px;
+  left: 142px;
   display: block;
 }
 

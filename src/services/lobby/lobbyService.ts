@@ -249,7 +249,7 @@ function subscribeToLobby(lobby_id: string) {
             unsubscribeChat();
             router.push("/lobby/" + lobbystate.lobbyID);
         }else if(lobbymessage.typ == NachrichtenCode.SCORE){
-            const nachricht: ChatNachricht = { typ: NachrichtenTyp.CHAT, inhalt: lobbymessage.payload, sender: "Server" };
+            const nachricht: ChatNachricht = { typ: NachrichtenTyp.CHAT, inhalt: lobbymessage.payload, sender: "Punkte" };
             console.log(lobbymessage.payload);
             empfangeChatNachricht(nachricht);
         } else {
