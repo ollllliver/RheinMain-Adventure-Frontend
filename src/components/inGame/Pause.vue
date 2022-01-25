@@ -83,7 +83,6 @@ export default defineComponent({
   flex-grow: 1;
   padding: var(--gap) var(--gap) 0 var(--gap);
   font-size: 20px;
-  /* color: #fff; */
 }
 
 .fenster__bottom {

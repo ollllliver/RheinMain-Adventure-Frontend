@@ -17,8 +17,7 @@
         <button class="ok__button" @click="beantworten()">Ok</button>
       </div>
       <div :class="fenster__beende">
-        <button class="beenden__button" @click="beenden">Spiel beenden</button
-        ><br />
+        <button class="beenden__button" @click="beenden">Spiel beenden</button><br />
       </div>
     </div>
   </div>
@@ -60,8 +59,7 @@ export default defineComponent({
     }
 
     getReverseString(byteString);
-    titel =
-      "Welche Zahl befindet sich hinter diesem Binärwert? -> " + byteString;
+    titel = "Welche Zahl befindet sich hinter diesem Binärwert? -> " + byteString;
 
     function aktualisiereFenster() {
       close__button.value = "hidden";
@@ -137,7 +135,6 @@ export default defineComponent({
   flex-grow: 1;
   padding: var(--gap) var(--gap) 0 var(--gap);
   font-size: 20px;
-  /* color: #fff; */
 }
 
 .fenster__inner {
