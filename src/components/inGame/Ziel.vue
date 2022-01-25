@@ -7,11 +7,18 @@
         <span class="helper"></span>
       </div>
       <div :class="fenster__frage">
-        <input id="antwortInput" class="text__input" v-model="eingabe.antwort" required />
+        <input
+          id="antwortInput"
+          class="text__input"
+          v-model="eingabe.antwort"
+          v-on:keyup.enter="beantworten()"
+          required
+        />
         <button class="ok__button" @click="beantworten()">Ok</button>
       </div>
       <div :class="fenster__beende">
-        <button class="beenden__button" @click="beenden">Spiel beenden</button><br />
+        <button class="beenden__button" @click="beenden">Spiel beenden</button
+        ><br />
       </div>
     </div>
   </div>
@@ -41,7 +48,7 @@ export default defineComponent({
     byteString = "";
 
     /**
-     * Hier wird der Binärwert für die Frage 
+     * Hier wird der Binärwert für die Frage
      * mit der dazu gehörigen Dezimalzahl generiert
      */
     for (let i = 1; i <= 8; i = i * 2) {
@@ -53,7 +60,8 @@ export default defineComponent({
     }
 
     getReverseString(byteString);
-    titel = "Welche Zahl befindet sich hinter diesem Binärwert? -> " + byteString;
+    titel =
+      "Welche Zahl befindet sich hinter diesem Binärwert? -> " + byteString;
 
     function aktualisiereFenster() {
       close__button.value = "hidden";
@@ -185,7 +193,8 @@ export default defineComponent({
   margin: 2px;
 }
 
-.beenden__button:hover, .ok__button:hover {
+.beenden__button:hover,
+.ok__button:hover {
   background: #e4e4e4;
 }
 
