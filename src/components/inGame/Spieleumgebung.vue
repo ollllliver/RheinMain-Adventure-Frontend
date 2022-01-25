@@ -3,7 +3,7 @@
     <Ziel id="ziel" />
     <Pause id="pause" />
     <h2 id="interaktionText"></h2>
-    <h2 id="schluesselText">x 0</h2>
+    <p id="schluesselText">x 0</p>
     <div class="GameChat">
       <button type="button" id="ChatButton">Chat</button>
       <Chat :sendeNachricht="sendeChatNachricht" class="row border border-secondary rounded px-4 mt-3" id="Chat" />
