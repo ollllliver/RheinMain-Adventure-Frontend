@@ -7,4 +7,5 @@ export interface Lobby {
     istVoll: boolean;
     istGestartet: boolean;
     spielerlimit: number;
+    istPrivat: boolean;
 }

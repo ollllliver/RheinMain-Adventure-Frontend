@@ -1,6 +1,7 @@
 import { Vector3, Raycaster, Mesh, Object3D, PerspectiveCamera } from 'three';
 import { SpielerLokal } from '../../models/SpielerLokal';
 
+const FLYING = false;
 const direction = new Vector3();
 
 /**
@@ -13,8 +14,8 @@ class MyKeyboardControls {
     moveBackward: boolean;
     moveLeft: boolean;
     moveRight: boolean;
-    // moveUp: boolean;
-    // moveDown: boolean;
+    moveUp: boolean;
+    moveDown: boolean;
     // canJump: boolean;
     update: (cameraPosition: any, velocity: any, delta: number) => void;
     cameraCollidable: Mesh;
@@ -30,8 +31,8 @@ class MyKeyboardControls {
         this.moveBackward = false;
         this.moveLeft = false;
         this.moveRight = false;
-        // this.moveUp = false;
-        // this.moveDown = false;
+        this.moveUp = false;
+        this.moveDown = false;
         // this.canJump = false;
         this.cameraCollidable = cameraCollidable;
         this.collidableList = collidableList;
@@ -58,12 +59,12 @@ class MyKeyboardControls {
                 case 'KeyD':
                     this.moveRight = true;
                     break;
-                // case 'Space':
-                //     this.moveUp = true;
-                //     break;
-                // case 'ShiftLeft':
-                //     this.moveDown = true;
-                //     break;
+                case 'Space':
+                    this.moveUp = true;
+                    break;
+                case 'ShiftLeft':
+                    this.moveDown = true;
+                    break;
             }
         };
 
@@ -89,12 +90,12 @@ class MyKeyboardControls {
                 case 'KeyD':
                     this.moveRight = false;
                     break;
-                // case 'Space':
-                //     this.moveUp = false;
-                //     break;
-                // case 'ShiftLeft':
-                //     this.moveDown = false;
-                //     break;
+                case 'Space':
+                    this.moveUp = false;
+                    break;
+                case 'ShiftLeft':
+                    this.moveDown = false;
+                    break;
             }
         }
 
@@ -137,7 +138,10 @@ class MyKeyboardControls {
 
             direction.z = Number(this.moveForward) - Number(this.moveBackward);
             direction.x = Number(this.moveRight) - Number(this.moveLeft);
-            //direction.y = Number(this.moveDown) - Number(this.moveUp);
+            // Fliegen variabel gemacht. Brauche das noch für einfaches testen und Bilder machen.
+            if(FLYING){
+                direction.y = Number(this.moveDown) - Number(this.moveUp);
+            }
             direction.normalize(); // this ensures consistent movements in all directions
 
             const speed = 50.0; //Geschwindigkeit der Kamera
@@ -188,8 +192,8 @@ class MyKeyboardControls {
             if ((this.moveLeft && !linksCollision) || (this.moveRight && !rechtsCollision))
                 velocity.x -= direction.x * speed * delta;
             //Wenn man fliegen will    
-            // if (this.moveUp || this.moveDown)
-            //     velocity.y -= direction.y * speed * delta;
+            if (this.moveUp || this.moveDown)
+                velocity.y -= direction.y * speed * delta;
 
             // Nicht in Wand haengenbleiben, man bounced leicht ab (speed einfach auf 1 gesetzt)
             if ((this.moveForward && vorneCollision) || (this.moveBackward && hintenCollision))
