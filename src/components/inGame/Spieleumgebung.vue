@@ -14,11 +14,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
-import { useGameEngine } from "@/services/inGame/gameEngine";
+import {defineComponent, onMounted} from "vue";
+import {useGameEngine} from "@/services/inGame/gameEngine";
 import Pause from "./Pause.vue";
 import Chat from "@/components/lobby/Chat.vue";
-import { useChatStore } from "@/services/ChatStore";
+import {useChatStore} from "@/services/ChatStore";
 import Ziel from "./Ziel.vue";
 
 
@@ -31,6 +31,7 @@ export default defineComponent({
       initLoader,
       initCamera,
       initPlane,
+      initSkybox,
       initRaycaster,
       initRenderer,
       initControls,
@@ -53,6 +54,7 @@ export default defineComponent({
       initLoader();
       initCamera();
       initPlane();
+      initSkybox();
       initRaycaster();
       initRenderer();
       initControls();

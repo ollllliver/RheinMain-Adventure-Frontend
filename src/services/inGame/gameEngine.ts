@@ -1,21 +1,26 @@
 import * as Three from "three";
-import { GraphicLoader } from '@/services/inGame/GraphicLoader';
-import { MyMouseControls } from '@/services/inGame/MyMouseControls';
-import { MyKeyboardControls } from '@/services/inGame/MyKeyboardControls';
-import { Interactions } from '@/services/inGame/Interactions';
-import { SpielerLokal } from '@/models/SpielerLokal';
-import { Position, Spieler } from "@/models/Spieler";
-import { useLobbyStore } from "../lobby/lobbyService";
-import { ChatTyp, useChatStore } from "@/services/ChatStore";
-import { gamebrokerStompclient, schluesselStompclient, subscribeToSchluesselUpdater, subscribeToSpielerPositionenUpdater } from "@/services/inGame/spielerPositionierer";
-import { reactive } from "vue";
+import {GraphicLoader} from '@/services/inGame/GraphicLoader';
+import {MyMouseControls} from '@/services/inGame/MyMouseControls';
+import {MyKeyboardControls} from '@/services/inGame/MyKeyboardControls';
+import {Interactions} from '@/services/inGame/Interactions';
+import {SpielerLokal} from '@/models/SpielerLokal';
+import {Position, Spieler} from "@/models/Spieler";
+import {useLobbyStore} from "../lobby/lobbyService";
+import {ChatTyp, useChatStore} from "@/services/ChatStore";
+import {
+    gamebrokerStompclient,
+    schluesselStompclient,
+    subscribeToSchluesselUpdater,
+    subscribeToSpielerPositionenUpdater
+} from "@/services/inGame/spielerPositionierer";
+import {reactive} from "vue";
 import userStore from '@/stores/user'
 import axios from "axios";
 
-const { subscribeChat } = useChatStore();
-const { lobbystate } = useLobbyStore();
+const {subscribeChat} = useChatStore();
+const {lobbystate} = useLobbyStore();
 
-const gamestate = reactive({ anzSchluessel: 0 });
+const gamestate = reactive({anzSchluessel: 0});
 const velocity = new Three.Vector3();
 const loader = new GraphicLoader();
 const developer = false;
@@ -142,13 +147,9 @@ const initLoader = () => {
                 startPosition = new Position(positionsSkalierungsfaktor * posX, spieler.height * 3, positionsSkalierungsfaktor * posY);
             }
 
-            // Idee von Olli:
-            // In nächster Ausbaustufe 3D Modelle nur 1 mal pro Typ abfragen und dann "mehrfach" platziere. Davor müsste man zu begin ein Set des Mobiliars erstellen
-
-            // Jetzt werden nicht mehr alle gltfs runtergeladen, wäre ja unnötig!
+            // Jetzt werden nicht mehr alle gltfs heruntergeladen, wäre ja unnötig!
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
             
-            console.log(mobiliarId);
             let res;
             try {
                 res = gltfFiles.get(mobiliarId).clone();
@@ -157,8 +158,8 @@ const initLoader = () => {
                 res.position.x = positionsSkalierungsfaktor * posX
                 res.position.z = positionsSkalierungsfaktor * posY
                 collidableList.push(res)
-                
-                // Wenn in dem Mobiliartyp SCHLUESSEL, NPC oder TUER steht, ist das Objekt zusätzlich interagierbar
+
+                // Wenn in dem Mobiliartyp SCHLUESSEL, NPC etc steht, ist das Objekt zusätzlich interagierbar
                 if (['SCHLUESSEL', 'NPC', 'TUER', 'AUSGANG'].includes(raumMobiliar.mobiliar.mobiliartyp)) {
                     res.children[0].name = raumMobiliar.mobiliar.name;
                     if (raumMobiliar.mobiliar.mobiliartyp == 'TUER' || raumMobiliar.mobiliar.mobiliartyp == 'SCHLUESSEL') {
@@ -376,12 +377,14 @@ const disconnectController = (element?: string) => {
 
 
 const initPlane = () => {
-    const plane = new Three.PlaneGeometry(100, 100);
-    const material = new Three.MeshBasicMaterial({ color: 0xB4A290, side: Three.DoubleSide });
+    const plane = new Three.PlaneGeometry(80, 120);
+    const material = new Three.MeshBasicMaterial({color: 0xB4A290, side: Three.DoubleSide});
 
     meshPlane = new Three.Mesh(plane, material);
     meshPlane.rotateX(1 / 2 * Math.PI)
-    meshPlane.position.x = 0
+    // Weil unsere Räume ab (0,0) platziert werden, schieben wir den Boden ein wenig passender hin
+    meshPlane.position.x = 20
+    meshPlane.position.z = 40
     scene.add(meshPlane);
 };
 
@@ -390,11 +393,56 @@ const initRaycaster = () => {
 }
 
 const initRenderer = () => {
-    renderer = new Three.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight-75);
+    renderer = new Three.WebGLRenderer({antialias: true});
+    renderer.setSize(window.innerWidth, window.innerHeight - 75);
     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
     container?.appendChild(renderer.domElement);
 };
+
+const initSkybox = () => {
+    // Nach https://codinhood.com/post/create-skybox-with-threejs
+    let skyboxGeo;
+    let skybox;
+    const skyboxImage = 'afterrain';
+
+    function createPathStrings(filename: string) {
+        // Alle Textur-Dateien folgen dem gleichen Aufbau, also können wir den Aufbau der URL in einer Schleife machen
+        const basePath = `https://raw.githubusercontent.com/codypearce/some-skyboxes/master/skyboxes/${filename}/`;
+        const baseFilename = basePath + filename;
+        const fileType = '.jpg';
+        const sides = ['ft', 'bk', 'up', 'dn', 'rt', 'lf'];
+        return sides.map(side => {
+            return baseFilename + '_' + side + fileType;
+        });
+    }
+
+    function createMaterialArray(filename: string) {
+        const skyboxImagepaths = createPathStrings(filename);
+        return skyboxImagepaths.map(image => {
+            // Lade 6 verschiedene Bilder für jede Seite des Würfels
+            const texture = new Three.TextureLoader().load(image);
+
+            return new Three.MeshBasicMaterial({map: texture, side: Three.BackSide});
+        });
+    }
+
+    function init() {
+        console.log("Skybox wird initialisiert")
+        const materialArray = createMaterialArray(skyboxImage);
+        console.log("Texturen geladen")
+
+        skyboxGeo = new Three.BoxGeometry(1000, 1000, 1000);
+        skybox = new Three.Mesh(skyboxGeo, materialArray);
+
+        skybox.position.x = 0
+        skybox.position.y = 0
+        skybox.position.z = 0
+        scene.add(skybox);
+        console.log("Skybox der Szene hinzugefügt")
+    }
+
+    init();
+}
 
 const doAnimate = () => {
     requestAnimationFrame(doAnimate);
@@ -631,6 +679,7 @@ export function useGameEngine() {
         initLoader,
         initCamera,
         initPlane,
+        initSkybox,
         initRaycaster,
         initRenderer,
         initControls,
