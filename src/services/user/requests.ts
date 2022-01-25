@@ -13,8 +13,8 @@ export async function getUser(): Promise<boolean> {
     user.state.benutzername = u.data.benutzername;
     user.state.istEingeloggt = true;
     return true;
-  }).catch(() => {
-    console.log("Kein User gefunden");
+  }).catch((e) => {
+    console.log(e);
     return false;
   });
 }

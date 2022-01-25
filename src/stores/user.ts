@@ -1,6 +1,6 @@
 // User Store für Aktionen mit dem Benutzer
 
-import { computed, reactive, useAttrs } from 'vue'
+import { computed, reactive } from 'vue'
 import * as Request from '@/services/user/requests'
 
 const state = reactive({
@@ -18,9 +18,6 @@ const getters = reactive({
   }),
   getBenutzername: computed(() => {
     return state.benutzername
-  }),
-  getError: computed(() => {
-    return state.error
   })
 })
 
@@ -47,25 +44,23 @@ const actions = {
    * @returns Liefert Promise.resolve/reject
    */
   async login(benutzername: string, passwort: string) {
-    console.log("login")
-    try {
-      const response = await Request.login(benutzername, passwort);
-      if (response.status >= 200 && response.status <= 300) {
-        console.log("Benutzer " + benutzername + " eingeloggt.");
-        
-        // token im session storage oder so speichern
-        state.istEingeloggt = true;
-        state.benutzername = benutzername;
-        // Add a request interceptor (sends bearer token with every axios request)
-  
-        // Mit dem Aktuellen Backend gibts keine Token in den responedata, desshalb auskommentiert.
-        // axios.defaults.headers.common['Authorization'] = "Bearer " + response.data;
-        // sessionStorage.setItem("jwttoken", response.data)
-        state.error ="";
-        return Promise.resolve(response)
-      }
-    } catch (e) {
-      state.error ="Anmeldedaten inkorret. Pruefe deine Eingaben.";
+
+    const response = await Request.login(benutzername, passwort);
+
+    if (response.status >= 200 && response.status <= 300) {
+      console.log("Benutzer " + benutzername + " eingeloggt.");
+
+      // token im session storage oder so speichern
+      state.istEingeloggt = true;
+      state.benutzername = benutzername;
+      // Add a request interceptor (sends bearer token with every axios request)
+
+      // Mit dem Aktuellen Backend gibts keine Token in den responedata, desshalb auskommentiert.
+      // axios.defaults.headers.common['Authorization'] = "Bearer " + response.data;
+      // sessionStorage.setItem("jwttoken", response.data)
+      return Promise.resolve(response)
+    } else {
+      console.log("LOGIN FEHLGESCHLAGEN");
       return Promise.reject("LOGIN FEHLGESCHLAGEN");
     }
   },
@@ -77,15 +72,13 @@ const actions = {
    * @returns Http.status OK mit Benutzerobjekt bei Erfolg, Http.status NO_CONTENT bei scheitern
    */
   async signup(benutzername: string, passwort: string) {
-    try {
-      const response = await Request.signup(benutzername, passwort);
-      if (response.status >= 200 && response.status <= 300) {
-        console.log("Benutzer " + benutzername + " registriert.");
-        state.error ="";
-        return Promise.resolve(response)
-      }
-    } catch(e) {
-      state.error ="Benutzername existiert bereits. Bitte waehle einen anderen";
+    const response = await Request.signup(benutzername, passwort);
+
+    if (response.status >= 200 && response.status <= 300) {
+      console.log("Benutzer " + benutzername + " registriert.");
+      return Promise.resolve(response)
+    } else {
+      console.log("REGISTRIEREN FEHLGESCHLAGEN");
       return Promise.reject("REGISTRIEREN FEHLGESCHLAGEN");
     }
   },
@@ -103,9 +96,6 @@ const actions = {
     // Remove Axios interceptor 
     // delete axios.defaults.headers.common['Authorization'];
     //router.push('/')
-  },
-  async setError(msg: string) {
-    state.error = msg
   }
 }
 

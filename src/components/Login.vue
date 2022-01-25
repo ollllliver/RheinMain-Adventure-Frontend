@@ -53,10 +53,12 @@ export default defineComponent({
     })
     const onSubmit = () => {
       userStore.login(form.benutzername, form.passwort).then(response => {
-        if(response) {
-          router.push('/')
-        }
+        router.push('/')
+        //console.log("Benutzer "+ form.benutzername + " erfolgreich eingeloggt.");
+        
       }).catch(error => {
+        //console.log(error.response)
+        //console.log("Benutzer "+ form.benutzername + " konnte nicht eingeloggt werden.");
         form.benutzername = ''
         form.passwort = ''
       })
