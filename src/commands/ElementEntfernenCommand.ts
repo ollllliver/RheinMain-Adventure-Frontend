@@ -115,7 +115,7 @@ export class ElementEntfernenCommand implements ICommand {
         break;
       }
       case 7: {
-        this._karte.setElement(this._element.posY, this._element.posX, 6);
+        this._karte.setElement(this._element.posY, this._element.posX, 7);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
         this._event.target.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)"
         editorStore.setzeTuer(1)

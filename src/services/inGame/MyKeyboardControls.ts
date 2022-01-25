@@ -202,7 +202,7 @@ class MyKeyboardControls {
                 velocity.x += direction.x * 1 * delta;
 
             //Wenn der Spieler keine Geschwindikeit mehr => er nicht mehr am Laufen ist
-            if (velocity.x != 0 || velocity.z != 0) {
+            if (Math.abs(velocity.x) > 0.1 || Math.abs(velocity.z) > 0.1){
                 spieler.updatePosition(spieler.eigenschaften.position); //schickt via Stomp die Position des lokalen Spielers an das Backend
             }
         };

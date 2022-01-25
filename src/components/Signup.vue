@@ -36,7 +36,7 @@
             <label for="floatingPasswort">Passwort wiederholen</label>
           </div>
 
-          <div class="d-grid gap-2 mb-6">{{ userStore.state.error }}
+          <div class="d-grid gap-2 mb-6">
             <div class="col md-6">
               <button class="btn btn-success btn-lg btn-block rounded-0" type="submit" style="float: right;">Registrieren</button>
   
@@ -67,6 +67,8 @@ export default defineComponent({
         form.passwort = ''
         router.push('/')
       }).catch((error)=>{
+        form.benutzername = ''
+        form.passwort = ''
         console.log(error)
       })
       
