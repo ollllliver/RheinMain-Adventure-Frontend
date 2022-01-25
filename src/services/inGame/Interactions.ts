@@ -64,7 +64,7 @@ export class Interactions {
             this.domElement.removeEventListener('keydown', onKeyDown)
         };
 
-        const interaktionErkennung = (blickVektor: any, originPoint: any) => {
+        const interaktionErkennung = (blickVektor: Vector3, originPoint: Vector3) => {
             this.rayCaster.set(originPoint, blickVektor)
             const collisionResult = this.rayCaster.intersectObjects(interaktionsListe)
 
