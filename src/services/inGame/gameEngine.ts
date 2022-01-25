@@ -360,12 +360,14 @@ const disconnectController = (element?: string) => {
 
 
 const initPlane = () => {
-    const plane = new Three.PlaneGeometry(100, 100);
-    const material = new Three.MeshBasicMaterial({ color: 0xB4A290, side: Three.DoubleSide });
+    const plane = new Three.PlaneGeometry(80, 120);
+    const material = new Three.MeshBasicMaterial({color: 0xB4A290, side: Three.DoubleSide});
 
     meshPlane = new Three.Mesh(plane, material);
     meshPlane.rotateX(1 / 2 * Math.PI)
-    meshPlane.position.x = 0
+    // Weil unsere Räume ab (0,0) platziert werden, schieben wir den Boden ein wenig passender hin
+    meshPlane.position.x = 20
+    meshPlane.position.z = 40
     scene.add(meshPlane);
 };
 
@@ -387,6 +389,7 @@ const initSkybox = () => {
     const skyboxImage = 'afterrain';
 
     function createPathStrings(filename: string) {
+        // Alle Textur-Dateien folgen dem gleichen Aufbau, also können wir den Aufbau der URL in einer Schleife machen
         const basePath = `https://raw.githubusercontent.com/codypearce/some-skyboxes/master/skyboxes/${filename}/`;
         const baseFilename = basePath + filename;
         const fileType = '.jpg';
@@ -399,6 +402,7 @@ const initSkybox = () => {
     function createMaterialArray(filename: string) {
         const skyboxImagepaths = createPathStrings(filename);
         return skyboxImagepaths.map(image => {
+            // Lade 6 verschiedene Bilder für jede Seite des Würfels
             const texture = new Three.TextureLoader().load(image);
 
             return new Three.MeshBasicMaterial({map: texture, side: Three.BackSide});
@@ -416,7 +420,6 @@ const initSkybox = () => {
         skybox.position.x = 0
         skybox.position.y = 0
         skybox.position.z = 0
-        console.log(skybox)
         scene.add(skybox);
         console.log("Skybox der Szene hinzugefügt")
     }
