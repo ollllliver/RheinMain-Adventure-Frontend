@@ -47,10 +47,15 @@ let schluesselText: HTMLElement | null;
 let spieler: SpielerLokal;
 let startPosition: Position;
 let prevTime = performance.now();
-let mitspieler3dObjektListe = new Map<string, Three.Object3D>();
-let interagierbar3dObjektListe = new Map<string, Three.Object3D>();
+const mitspieler3dObjektListe = new Map<string, Three.Object3D>();
+const interagierbar3dObjektListe = new Map<string, Three.Object3D>();
 const gltfFiles = new Map<number, any>();
+
 const GLF_FILE_ID_LIST = [0,1,2,3,4,5,6,7];
+const KARTENHOEHE = 14;
+const KARTENBREITE = 22;
+const positionsSkalierungsfaktor = 4;
+
 
 function setContainer(element: HTMLElement | null) {
     container = element
@@ -86,7 +91,7 @@ async function gltfFilesVorladen(){
                     return loader.ladeDatei(URLPfad.gltfPfad).then((res: any) => {
                         gltfFiles.set(mobiliarId,res.scene)
                     });
-                }
+                }else {console.log("Mobiliar ID",mobiliarId,"hat keinen Pfad für das GLTF File!")}
             }).then(()=>{
                 if (index === array.length -1) resolve(true);
             })
@@ -99,7 +104,8 @@ async function gltfFilesVorladen(){
  * Initialisiert Loader-Klassen (lädt Raum)
  */
 const initLoader = () => {
-    const positionsSkalierungsfaktor = 4;
+    subscribeToSpielerPositionenUpdater(stompClient);
+    subscribeToSchluesselUpdater(stompClient2);
 
     gltfFilesVorladen().then(()=>{
         return fetch(`/api/level/${lobbystate.gewaehlteKarte.levelId}/0`, {
@@ -112,8 +118,21 @@ const initLoader = () => {
         }
         return response.json();
 
-    }).then((RaumMobiliarListe) => {
-        console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.")
+    }).then((RaumMobiliarListe:Array<any>) => {
+        console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.", RaumMobiliarListe);
+
+        // Noch mal nen Rahmen um das Labyrinth hinzufügen:
+        const wand = {"mobiliarId": 0,"name": "Wand","modellURI": "gltf/models_embedded/dirt.gltf","mobiliartyp": null};
+        [-1,KARTENBREITE].forEach(k => {
+            for (let i = 0; i < KARTENHOEHE; i++){
+                RaumMobiliarListe.push({"mobiliar": wand,"positionX": i,"positionY": k})
+            }
+        }); 
+        [-1,KARTENHOEHE].forEach(k => {
+            for (let i = 0; i < KARTENBREITE; i++){
+                RaumMobiliarListe.push({"mobiliar": wand,"positionX": k,"positionY": i})
+            }
+        });
         RaumMobiliarListe.forEach(function (raumMobiliar: any) {
             const posX = raumMobiliar.positionX;
             const posY = raumMobiliar.positionY;
@@ -172,8 +191,8 @@ const initLoader = () => {
 
                     scene.add(objektInScene)
 
-                    objektInScene.position.x = positionsSkalierungsfaktor * startPosition.x;
-                    objektInScene.position.z = positionsSkalierungsfaktor * startPosition.z;
+                    objektInScene.position.x = startPosition.x;
+                    objektInScene.position.z = startPosition.z;
 
                     mitspieler3dObjektListe.set(mitspieler.name, objektInScene);
                 });
@@ -191,10 +210,8 @@ const initLoader = () => {
 const initCamera = () => {
     stompClient.activate();
     spieler = new SpielerLokal(stompClient);
-    subscribeToSpielerPositionenUpdater(stompClient);
 
     stompClient2.activate();
-    subscribeToSchluesselUpdater(stompClient2);
 
     // First Person View inset (camera)
     camera = new Three.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, window.innerHeight);
@@ -489,10 +506,10 @@ const startAnimate = () => {
 }
 
 const clearMapContent = () => {
-    collidableList = new Array<Three.Object3D>();
-    interactableList = new Array<Three.Object3D>();
-    mitspieler3dObjektListe = new Map<string, Three.Object3D>();
-    interagierbar3dObjektListe = new Map<any, Three.Object3D>();
+    collidableList = [];
+    interactableList = [];
+    mitspieler3dObjektListe.clear();
+    interagierbar3dObjektListe.clear();
     console.log("Mapstate: cleared");
 }
 

@@ -1,5 +1,5 @@
 import { Spieler } from '@/models/Spieler';
-import { Client } from '@stomp/stompjs';
+import { Client, StompSubscription } from '@stomp/stompjs';
 import { useLobbyStore } from '@/services/lobby/lobbyService';
 import { useGameEngine } from './gameEngine';
 import userStore from '@/stores/user'
@@ -15,6 +15,8 @@ export const gamebrokerStompclient = new Client({ brokerURL: wsurl });
 export const schluesselStompclient = new Client({ brokerURL: wsurl });
 const { setzeMitspielerAufPosition, setzteSchluesselAnz, oeffneTuer, setzteWarnText } = useGameEngine();
 const { lobbystate } = useLobbyStore();
+let schluesselSubscription: StompSubscription;
+let positionSubscription: StompSubscription;
 
 /**
  * Schribt sich bei STOMP auf das Topic /topic/spiel/{lobbyID} ein
@@ -22,40 +24,58 @@ const { lobbystate } = useLobbyStore();
  * @param stompclient 
  */
 export function subscribeToSpielerPositionenUpdater(stompclient: Client): void{
-    const DEST = "/topic/spiel/" + lobbystate.lobbyID;
-    stompclient.onConnect = async () => {
-        stompclient.subscribe(DEST, (message) => {
-            const spieler: Spieler = JSON.parse(message.body);
-            if (spieler.name!= userStore.state.benutzername){
-                setzeMitspielerAufPosition(spieler)
-            }
-        });
+    if (stompclient.connected){
+        positionSubscription.unsubscribe()
+        spielerSubCallback(stompclient);
+    }else{
+        stompclient.onConnect = async () => {
+            spielerSubCallback(stompclient);
+        }
     }
 }
 
+function spielerSubCallback(stompclient: Client) :void{
+    const DEST = "/topic/spiel/" + lobbystate.lobbyID;
+    positionSubscription = stompclient.subscribe(DEST, (message) => {
+        const spieler: Spieler = JSON.parse(message.body);
+        if (spieler.name!= userStore.state.benutzername){
+            setzeMitspielerAufPosition(spieler)
+        }
+    });
+}
+
 export function subscribeToSchluesselUpdater(stompclient: Client): void{
-    const DEST = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
-    stompclient.onConnect = async () => {
-        stompclient.subscribe(DEST, (message) => {
-            const update: any = JSON.parse(message.body);
-            //Jenachdem wie viele Schluessel eingesammelt wurden:
-            //TODO Abfrage lieber im Backend??
-            switch (update.objectName) {
-                case "Schlüssel":
-                    //Wenn mit Schluessel interagiert wurde dann wird der Zaehler bei allen erhoeht
-                    console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.koordinatenArray + "::::::" + update.objectName)
-                    setzteSchluesselAnz(update.anzSchluessel, update.koordinatenArray); 
-                    break;
-                case "Tür":
-                    //wenn mit Tuer interagiert wurde wird Sie geöffnet 
-                    console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.koordinatenArray + "::::::" + update.objectName)
-                    oeffneTuer(update.anzSchluessel, update.koordinatenArray); 
-                    break;
-                case "Warnung":
-                    console.log("KEINE SCHLÜSSEL");
-                    setzteWarnText();
-                    break;
-            }
-        });
+    if (stompclient.connected){
+        schluesselSubscription.unsubscribe()
+        schluesselSubCallback(stompclient);
+    }else{
+        stompclient.onConnect = async () => {
+            schluesselSubCallback(stompclient);
+        }
     }
+}
+
+function schluesselSubCallback(stompclient: Client): void{
+    const DEST = "/topic/spiel/" + lobbystate.lobbyID + "/schluessel";
+    schluesselSubscription = stompclient.subscribe(DEST, (message) => {
+        const update: any = JSON.parse(message.body);
+        //Jenachdem wie viele Schluessel eingesammelt wurden:
+        //TODO Abfrage lieber im Backend??
+        switch (update.objectName) {
+            case "Schlüssel":
+                //Wenn mit Schluessel interagiert wurde dann wird der Zaehler bei allen erhoeht
+                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.koordinatenArray + "::::::" + update.objectName)
+                setzteSchluesselAnz(update.anzSchluessel, update.koordinatenArray); 
+                break;
+            case "Tür":
+                //wenn mit Tuer interagiert wurde wird Sie geöffnet 
+                console.log("ANTWORT VOM SERVER ANZAHL SCH: " + update.anzSchluessel + "::::::" +  update.koordinatenArray + "::::::" + update.objectName)
+                oeffneTuer(update.anzSchluessel, update.koordinatenArray); 
+                break;
+            case "Warnung":
+                console.log("KEINE SCHLÜSSEL");
+                setzteWarnText();
+                break;
+        }
+    });
 }
