@@ -1,6 +1,9 @@
 <!-- Home View mit Login/Regestrieren Formular -->
 
 <template>
+    <div v-if="userStore.getters.getError != ''" class="alert alert-danger" role="alert">
+      {{userStore.getters.getError}}
+    </div>
   <Login />
 </template>
 
@@ -14,7 +17,9 @@ export default defineComponent({
   components: { Login },
   setup() {
 
-    onMounted(userStore.getUser)
+   onMounted(() => {
+      userStore.setError("")
+    }) 
     return { userStore }
     
   }
