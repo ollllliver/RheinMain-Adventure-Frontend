@@ -131,7 +131,7 @@ const initLoader = () => {
             
             console.log(mobiliarId);
             let res;
-            try {
+            if(gltfFiles.get(mobiliarId)) {
                 res = gltfFiles.get(mobiliarId).clone();
                 
                 // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
@@ -154,10 +154,7 @@ const initLoader = () => {
                 }
                 scene.add(res)
 
-            } catch (error) {
-                console.log(error);                
             }
-
         });
     }).then(()=>{
 
