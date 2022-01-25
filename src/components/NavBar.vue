@@ -1,7 +1,8 @@
 <template>
-  <div class="p-2 border-bottom border-success d-flex align-items-center justify-content-between" style="background-color: #BDD3B9;">
-    <router-link class="mr-auto" to="/home" >
-    <img src="/assets/RMA_Logo.png" height="40" alt="">
+  <div class="p-2 border-bottom border-success d-flex align-items-center justify-content-between"
+       style="background-color: #BDD3B9;">
+    <router-link class="mr-auto" to="/home">
+      <img alt="" height="40" src="/assets/RMA_Logo.png">
     </router-link>
     <div>
       <div v-if="userStore.state.istEingeloggt" class="btn-success dropdown">
@@ -16,7 +17,7 @@
 </template>
 
 <script>
-import { defineComponent } from "vue";
+import {defineComponent} from "vue";
 import {navbar} from "@/stores/navbarStore"
 import router from '@/router';
 import userStore from '@/stores/user'
@@ -25,9 +26,9 @@ export default defineComponent({
   name: "NavBar",
   setup() {
     return {
-        navbar,
-        router,
-        userStore,
+      navbar,
+      router,
+      userStore,
     };
   },
 });
@@ -55,7 +56,7 @@ export default defineComponent({
   right: 0;
   background-color: #f9f9f9;
   min-width: 160px;
-  box-shadow: -2px 8px 16px 0px rgba(0,0,0,0.2);
+  box-shadow: -2px 8px 16px 0px rgba(0, 0, 0, 0.2);
   z-index: 1;
 }
 
@@ -66,15 +67,27 @@ export default defineComponent({
   display: block;
 }
 
-.green-btn:hover {background-color: #1e7900;}
-.red-btn:hover {background-color: #840000;}
-.grey-btn:hover {background-color: #aacca4;}
-.dropdown:hover .dropdown-content {display: block;}
-.dropbtn:hover{
+.green-btn:hover {
+  background-color: #1e7900;
+}
+
+.red-btn:hover {
+  background-color: #840000;
+}
+
+.grey-btn:hover {
+  background-color: #aacca4;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+.dropbtn:hover {
   background-color: #4f7a46;
   color: white;
   text-decoration: none;
-  }
+}
 
 .red-btn {
   background-color: #aa0404;

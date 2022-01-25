@@ -1,9 +1,9 @@
 <template>
   <div class="container">
     <div class="d-flex flex-wrap">
-      <div :person="person" v-for="person in personen" :key="person" class="teilnehmer" >
-        <div v-html="generateProfilbild(person)" class="d-flex justify-content-center" ></div>
-        <b class="d-flex justify-content-center" style="text-align: center;">{{ person }}</b>
+      <div v-for="person in personen" :key="person" :person="person" class="teilnehmer">
+        <div class="d-flex justify-content-center" v-html="generateProfilbild(person)"></div>
+        <strong class="d-flex justify-content-center" style="text-align: center;">{{ person }}</strong>
       </div>
     </div>
   </div>
@@ -11,14 +11,14 @@
 
 
 <script lang="ts">
-import { defineComponent } from "vue";
-import { toSvg } from "jdenticon";
+import {defineComponent} from "vue";
+import {toSvg} from "jdenticon";
 
 export default defineComponent({
   name: "Dozenten",
 
   props: {
-    personenListe:{
+    personenListe: {
       required: true,
       type: Array
     }
@@ -27,7 +27,7 @@ export default defineComponent({
     function generateProfilbild(user: string) {
       return toSvg(user, 100);
     }
-    
+
     return {
       personen: props.personenListe, generateProfilbild,
     };
@@ -37,8 +37,8 @@ export default defineComponent({
 
 <style>
 
-  .teilnehmer{
-    width: 150px;
-    height: 150px;
-  }
+.teilnehmer {
+  width: 150px;
+  height: 150px;
+}
 </style>

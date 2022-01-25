@@ -1,5 +1,5 @@
-import { Karte } from "../models/Karte";
-import { ICommand } from "./CommandManager";
+import {Karte} from "../models/Karte";
+import {ICommand} from "./CommandManager";
 import editorStore from '@/stores/editor';
 
 export class ElementEntfernenCommand implements ICommand {
@@ -10,7 +10,7 @@ export class ElementEntfernenCommand implements ICommand {
   private _element: { posX: number, posY: number, e: number };
 
   /**
-   * 
+   *
    * @param karte Karte welche bearbeitet wird
    * @param element element, dass entfernt werden soll
    * @param event event, auf dem das Entfernen durchgeführt wird.
@@ -20,9 +20,9 @@ export class ElementEntfernenCommand implements ICommand {
     this._karte = karte;
     this._event = event;
     if (xPos !== undefined && yPos !== undefined) {
-      this._element = { posY: yPos, posX: xPos, e: element};
-    } else{
-      this._element = { posY: 0, posX: 0, e: 0};
+      this._element = {posY: yPos, posX: xPos, e: element};
+    } else {
+      this._element = {posY: 0, posX: 0, e: 0};
     }
   }
 
@@ -64,7 +64,7 @@ export class ElementEntfernenCommand implements ICommand {
         editorStore.setzeNpc(-1)
         break;
       }
-      case 6: 
+      case 6:
       case 7: {
         this._karte.setElement(this._element.posY, this._element.posX, 1);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"

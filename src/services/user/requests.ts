@@ -1,5 +1,5 @@
 import router from "@/router";
-import axios, { AxiosPromise } from "axios"
+import axios, {AxiosPromise} from "axios"
 import user from "../../stores/user"
 
 export type User = { username: string }
@@ -9,7 +9,7 @@ export type UserList = Array<User & { password: string }>
 export async function getUser(): Promise<boolean> {
   return axios.get('/api/benutzer/check').then((res) => {
     return res.data;
-  }).then((u)=>{
+  }).then((u) => {
     user.state.benutzername = u.data.benutzername;
     user.state.istEingeloggt = true;
     return true;
@@ -19,8 +19,7 @@ export async function getUser(): Promise<boolean> {
   });
 }
 
-// TODO ALLE REQUEST EINFACH SO
-// POST benutzer/login -> User wird überprüft in DB und eingeloggt falls erfolgreich 
+// POST benutzer/login -> User wird überprüft in DB und eingeloggt falls erfolgreich
 export function login(benutzername: string, passwort: string): Promise<AxiosPromise> {
   return axios.post('/api/benutzer/login', {
     benutzername: benutzername,
@@ -41,7 +40,7 @@ export async function logout(benutzername: string): Promise<AxiosPromise> {
   return axios.post('/api/benutzer/logout', {
     benutzername: benutzername,
     passwort: "geheim"
-  }).then((res)=>{
+  }).then((res) => {
     router.push("/");
     return res;
   });

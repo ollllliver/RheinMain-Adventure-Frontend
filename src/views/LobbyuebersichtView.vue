@@ -2,7 +2,7 @@
   <div>
     <!-- Eorror Balken, wenn errormessage vorliegt-->
     <div v-if="alleLobbiesState.errormessage != ''" class="alert alert-danger" role="alert">
-      {{alleLobbiesState.errormessage}}
+      {{ alleLobbiesState.errormessage }}
     </div>
     <LobbyuebersichtMenue/>
     <Lobbyliste/>
@@ -12,15 +12,15 @@
 <script lang="ts">
 import Lobbyliste from "@/components/lobbyuebersicht/Lobbyliste.vue"
 import LobbyuebersichtMenue from "@/components/lobbyuebersicht/LobbyuebersichtMenue.vue"
-import { defineComponent, onMounted} from "vue";
-import { useLobbyStore } from "@/services/lobby/lobbyService";
+import {defineComponent, onMounted} from "vue";
+import {useLobbyStore} from "@/services/lobby/lobbyService";
 
 export default defineComponent({
   name: "LobbyuebersichtView",
   components: {Lobbyliste, LobbyuebersichtMenue},
-  
+
   setup() {
-    const { alleLobbiesState, neueLobby, joinRandomLobby, alleLobbiesladen, connectToUebersicht } = useLobbyStore();
+    const {alleLobbiesState, neueLobby, joinRandomLobby, alleLobbiesladen, connectToUebersicht} = useLobbyStore();
 
     onMounted(() => {
       connectToUebersicht();

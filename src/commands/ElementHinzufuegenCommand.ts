@@ -1,5 +1,5 @@
-import { ICommand } from "./CommandManager";
-import { Karte } from '../models/Karte'
+import {ICommand} from "./CommandManager";
+import {Karte} from '../models/Karte'
 import editorStore from '@/stores/editor'
 
 /*
@@ -12,12 +12,11 @@ import editorStore from '@/stores/editor'
  */
 export class ElementHinzufuegenCommand implements ICommand {
 
+  public _ausrichtung: number;
   private _state: number;
   private _karte: Karte;
   private _event: any;
   private _element: { posX: number, posY: number, e: number };
-
-  public _ausrichtung: number;
 
   /**
    * @param karte  Karte auf der bearbeitet wird
@@ -29,7 +28,7 @@ export class ElementHinzufuegenCommand implements ICommand {
     this._state = state;
     this._karte = karte;
     this._event = event;
-    this._element = { posY: ele.y, posX: ele.x, e: element};
+    this._element = {posY: ele.y, posX: ele.x, e: element};
     if (ausrichtung !== undefined) {
       this._ausrichtung = ausrichtung
     } else {
@@ -45,7 +44,7 @@ export class ElementHinzufuegenCommand implements ICommand {
     this._state += 1;
     if (this._karte.liste[this._element.posY][this._element.posX].e !== this._element.e) {
       switch (this._element.e) {
-        // Wenn Element Wegpunkt ist
+          // Wenn Element Wegpunkt ist
         case 1: {
           // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
           this._karte.setElement(this._element.posY, this._element.posX, this._element.e);
@@ -54,7 +53,7 @@ export class ElementHinzufuegenCommand implements ICommand {
           editorStore.info("Wegpunkt platziert.")
           break;
         }
-        // Wenn Element Start ist
+          // Wenn Element Start ist
         case 2: {
           // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
           this._karte.setElement(this._element.posY, this._element.posX, this._element.e);
@@ -64,7 +63,7 @@ export class ElementHinzufuegenCommand implements ICommand {
           editorStore.start(true)
           break;
         }
-        // wenn Element Ziel ist
+          // wenn Element Ziel ist
         case 3: {
           // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
           this._karte.setElement(this._element.posY, this._element.posX, this._element.e);
@@ -94,7 +93,7 @@ export class ElementHinzufuegenCommand implements ICommand {
         }
         case 6: {
           // Tür in Karte einfügen falls noch kein Element an dieser Stelle ist
-          
+
           // Tür je nach Ausrichtung im Div platzieren
           if (this._ausrichtung === 0) {
             this._event.target.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)"
@@ -104,67 +103,66 @@ export class ElementHinzufuegenCommand implements ICommand {
             this._event.target.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)"
             this._karte.setElement(this._element.posY, this._element.posX, 7);
           }
-          //this._event.dataTransfer.getData("src")
-          //this._event.target.style = "background-image url('../assets/tuer.png'); background-size:auto;"
           editorStore.info("Tür platziert.")
           editorStore.setzeTuer(1)
           break;
         }
 
-        /* Raumplatzierung vorerst aufgeschoben
+          /* Raumplatzierung vorerst aufgeschoben
 
-        // Wenn Element ein Raum ist
-        case 4:
-        case 5:
-        case 6:
-        case 7:
-        case 8: {
-            // Wenn horizontale Ausrichtung
-            // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
-            if(this._ausrichtung === 0) {
-                this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY, this._element.posX-1, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY, this._element.posX+1, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY-1, this._element.posX, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY-1, this._element.posX-1, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY-1, this._element.posX+1, this._element.e, this._ausrichtung)
-                // Hintergrund des Divs auf Farbe des Elements ändern
-                this._event.target.style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[1].__vnode.children[0].children[this._element.posX+1].el.style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[2].children[this._element.posY-1].children[this._element.posX+1].style = "background-color: rgba(238,59,59, 0.75);"
-                editorStore.info("Raum platziert.")
-                editorStore.setzeRaum(1);
-                this._ausrichtung = 0;
+          // Wenn Element ein Raum ist
+          case 4:
+          case 5:
+          case 6:
+          case 7:
+          case 8: {
+              // Wenn horizontale Ausrichtung
+              // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
+              if(this._ausrichtung === 0) {
+                  this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY, this._element.posX-1, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY, this._element.posX+1, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY-1, this._element.posX, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY-1, this._element.posX-1, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY-1, this._element.posX+1, this._element.e, this._ausrichtung)
+                  // Hintergrund des Divs auf Farbe des Elements ändern
+                  this._event.target.style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[1].__vnode.children[0].children[this._element.posX+1].el.style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[2].children[this._element.posY-1].children[this._element.posX+1].style = "background-color: rgba(238,59,59, 0.75);"
+                  editorStore.info("Raum platziert.")
+                  editorStore.setzeRaum(1);
+                  this._ausrichtung = 0;
 
-            // Wenn vertikale Ausrichtung
-            // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
-            } else if (this._ausrichtung === 1) {
-                this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY, this._element.posX-1, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY-1, this._element.posX, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY-1, this._element.posX-1, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY+1, this._element.posX, this._element.e, this._ausrichtung)
-                this._karte.setElement(this._element.posY+1, this._element.posX-1, this._element.e, this._ausrichtung)
-                // Hintergrund des Divs auf Farbe des Elements ändern
-                this._event.target.style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[2].children[this._element.posY+1].children[this._element.posX].style = "background-color: rgba(238,59,59, 0.75);"
-                this._event.path[2].children[this._element.posY+1].children[this._element.posX-1].style = "background-color: rgba(238,59,59, 0.75);"
-                editorStore.info("Raum platziert.")
-                editorStore.setzeRaum(1);
-                this._ausrichtung = 1
-            }
-            break;
-        }
-        */
+              // Wenn vertikale Ausrichtung
+              // Elemente in Karte einfügen falls noch kein Element an dieser Stelle ist
+              } else if (this._ausrichtung === 1) {
+                  this._karte.setElement(this._element.posY, this._element.posX, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY, this._element.posX-1, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY-1, this._element.posX, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY-1, this._element.posX-1, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY+1, this._element.posX, this._element.e, this._ausrichtung)
+                  this._karte.setElement(this._element.posY+1, this._element.posX-1, this._element.e, this._ausrichtung)
+                  // Hintergrund des Divs auf Farbe des Elements ändern
+                  this._event.target.style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[2].children[this._element.posY+1].children[this._element.posX].style = "background-color: rgba(238,59,59, 0.75);"
+                  this._event.path[2].children[this._element.posY+1].children[this._element.posX-1].style = "background-color: rgba(238,59,59, 0.75);"
+                  editorStore.info("Raum platziert.")
+                  editorStore.setzeRaum(1);
+                  this._ausrichtung = 1
+              }
+              break;
+          }
+          */
       }
+    } else {
+      editorStore.info("Bitte eine freie Stelle wählen!")
     }
-    else {editorStore.info("Bitte eine freie Stelle wählen!")}
   }
 
   /**
@@ -174,9 +172,9 @@ export class ElementHinzufuegenCommand implements ICommand {
     this._state -= 1
     // Element aus der Karte wieder auf 0 setzten (0 = Wand)
     // Hintergrund des divs auf altes Element setzen
-    
+
     switch (this._element.e) {
-      // bei Weg, Start oder Ziel wieder Wand
+        // bei Weg, Start oder Ziel wieder Wand
       case 1: {
         this._karte.setElement(this._element.posY, this._element.posX, 0, 9);
         this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
@@ -194,72 +192,72 @@ export class ElementHinzufuegenCommand implements ICommand {
         editorStore.ziel(false)
         break;
       }
-      // Bei Schluessel, NPC oder Tuer wieder Weg
+        // Bei Schluessel, NPC oder Tuer wieder Weg
       case 4: {
-        this._karte.setElement(this._element.posY, this._element.posX, 1);  
+        this._karte.setElement(this._element.posY, this._element.posX, 1);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
         editorStore.setzeSchluessel(-1)
         break;
       }
       case 5: {
-        this._karte.setElement(this._element.posY, this._element.posX, 1);  
+        this._karte.setElement(this._element.posY, this._element.posX, 1);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
         editorStore.setzeNpc(-1)
         break;
       }
       case 6: {
-        this._karte.setElement(this._element.posY, this._element.posX, 1);  
+        this._karte.setElement(this._element.posY, this._element.posX, 1);
         this._event.target.style = "background-color: rgba(255,211,155, 0.75);"
         editorStore.setzeTuer(-1)
         break;
       }
 
-      /*
-      // Bei Raum ===== voerst verschoben
-      case 4:
-      case 5:
-      case 6:
-      case 7:
-      case 8: {
-        // wenn horizontrale Ausrichtung
-        if(this._ausrichtung === 0) {
-          // Wand an der Stelle einfügen an der Element gesetzt wurde
-          this._karte.setElement(this._element.posY, this._element.posX, 0, 9)
-          this._karte.setElement(this._element.posY, this._element.posX-1, 0, 9)
-          this._karte.setElement(this._element.posY, this._element.posX+1, 0, 9)
-          this._karte.setElement(this._element.posY-1, this._element.posX, 0, 9)
-          this._karte.setElement(this._element.posY-1, this._element.posX-1, 0, 9)
-          this._karte.setElement(this._element.posY-1, this._element.posX+1, 0, 9)
-          // Hintergrund des Divs auf Wand Farbe ändern
-          this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[1].__vnode.children[0].children[this._element.posX+1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[2].children[this._element.posY-1].children[this._element.posX+1].style = "background-color: rgba(92, 92, 92, 0.658);"
-          editorStore.setzeRaum(-1)
-        // Wenn vertikale Ausrichtung
-        } else {
-          // Wand an der Stelle einfügen an der Element gesetzt wurde
-          this._karte.setElement(this._element.posY, this._element.posX, 0, 9)
-          this._karte.setElement(this._element.posY-1, this._element.posX, 0, 9)
-          this._karte.setElement(this._element.posY-1, this._element.posX+1, 0, 9)
-          this._karte.setElement(this._element.posY-1, this._element.posX-1, 0, 9)
-          this._karte.setElement(this._element.posY, this._element.posX+1, 0, 9)
-          this._karte.setElement(this._element.posY, this._element.posX-1, 0, 9)
-          // Hintergrund des Divs auf Wand Farbe ändern
-          this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[2].children[this._element.posY+1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
-          this._event.path[2].children[this._element.posY+1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
-          editorStore.info("Raum platziert.")
-          editorStore.setzeRaum(-1)
+        /*
+        // Bei Raum ===== voerst verschoben
+        case 4:
+        case 5:
+        case 6:
+        case 7:
+        case 8: {
+          // wenn horizontrale Ausrichtung
+          if(this._ausrichtung === 0) {
+            // Wand an der Stelle einfügen an der Element gesetzt wurde
+            this._karte.setElement(this._element.posY, this._element.posX, 0, 9)
+            this._karte.setElement(this._element.posY, this._element.posX-1, 0, 9)
+            this._karte.setElement(this._element.posY, this._element.posX+1, 0, 9)
+            this._karte.setElement(this._element.posY-1, this._element.posX, 0, 9)
+            this._karte.setElement(this._element.posY-1, this._element.posX-1, 0, 9)
+            this._karte.setElement(this._element.posY-1, this._element.posX+1, 0, 9)
+            // Hintergrund des Divs auf Wand Farbe ändern
+            this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[1].__vnode.children[0].children[this._element.posX+1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[2].children[this._element.posY-1].children[this._element.posX+1].style = "background-color: rgba(92, 92, 92, 0.658);"
+            editorStore.setzeRaum(-1)
+          // Wenn vertikale Ausrichtung
+          } else {
+            // Wand an der Stelle einfügen an der Element gesetzt wurde
+            this._karte.setElement(this._element.posY, this._element.posX, 0, 9)
+            this._karte.setElement(this._element.posY-1, this._element.posX, 0, 9)
+            this._karte.setElement(this._element.posY-1, this._element.posX+1, 0, 9)
+            this._karte.setElement(this._element.posY-1, this._element.posX-1, 0, 9)
+            this._karte.setElement(this._element.posY, this._element.posX+1, 0, 9)
+            this._karte.setElement(this._element.posY, this._element.posX-1, 0, 9)
+            // Hintergrund des Divs auf Wand Farbe ändern
+            this._event.target.style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[1].__vnode.children[0].children[this._element.posX-1].el.style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[2].children[this._element.posY-1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[2].children[this._element.posY-1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[2].children[this._element.posY+1].children[this._element.posX].style = "background-color: rgba(92, 92, 92, 0.658);"
+            this._event.path[2].children[this._element.posY+1].children[this._element.posX-1].style = "background-color: rgba(92, 92, 92, 0.658);"
+            editorStore.info("Raum platziert.")
+            editorStore.setzeRaum(-1)
+          }
+          break;
         }
-        break;
-      }
-      */
+        */
     }
     editorStore.info("letzten Schritt rückgängig gemacht")
   }

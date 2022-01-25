@@ -1,5 +1,5 @@
-import { computed, reactive } from 'vue'
-import { Karte } from '@/models/Karte';
+import {computed, reactive} from 'vue'
+import {Karte} from '@/models/Karte';
 
 /**
  * State des Editors
@@ -20,7 +20,7 @@ import { Karte } from '@/models/Karte';
 const waehlen = "Bitte wählen (Weg, Start oder Ziel)"
 const willkommen = "Willkommen beim Leveleditor.  Mit W, S und Z: Weg, Start oder Zielsetzung. Alle weiteren Elemente sind platzierbare Räume. Standardausrichtung der Tür ist horizontal."
 
-const karte: Karte = new Karte(99999,"","","")
+const karte: Karte = new Karte(99999, "", "", "")
 
 const state = reactive({
   wegbeschreibung: 0,
@@ -178,19 +178,19 @@ const actions = {
   },
   async default() {
     state.wegbeschreibung = 0,
-    state.aktiv = false,
-    state.info = willkommen,
-    state.start = false,
-    state.ziel = false,
-    state.raeume = 0,
-    state.ausrichtung = 0,
-    state.schluessel = 0,
-    state.tuer = 0,
-    state.npc = 0
-    state.stackindex = 0
+        state.aktiv = false,
+        state.info = willkommen,
+        state.start = false,
+        state.ziel = false,
+        state.raeume = 0,
+        state.ausrichtung = 0,
+        state.schluessel = 0,
+        state.tuer = 0,
+        state.npc = 0,
+        state.stackindex = 0
   },
   async setzeLevel(erwartet: any) {
-    const aktKarte = new Karte(erwartet.levelID,erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung)
+    const aktKarte = new Karte(erwartet.levelID, erwartet.benutzername, erwartet.levelName, erwartet.levelBeschreibung)
     karte.setLevelId(aktKarte._levelID)
     karte.setBenutzername(aktKarte._benutzername)
     karte.setLevelName(aktKarte._levelName)
@@ -200,4 +200,4 @@ const actions = {
   }
 }
 
-export default { state, getters, ...actions }
+export default {state, getters, ...actions}

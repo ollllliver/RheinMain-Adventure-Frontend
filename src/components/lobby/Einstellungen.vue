@@ -8,31 +8,31 @@
       <!-- AUSWAHL - Karte -->
       <div>
         <label class="h3">Karte:&nbsp;</label>
-        <select class="h4" v-model="gewaehlteKarte" @change="changeKarte">
+        <select v-model="gewaehlteKarte" class="h4" @change="changeKarte">
           <option
-            :text="karte.name"
-            :value="karte"
-            v-for="karte in kartenArray"
-            :key="karte"
+              v-for="karte in kartenArray"
+              :key="karte"
+              :text="karte.name"
+              :value="karte"
           ></option>
         </select>
       </div>
       <!-- AUSWAHL - Spielerlimit -->
       <div>
         <label class="h3">Spielerlimit:&nbsp;</label>
-        <select class="h4" v-model="spielerlimit" @change="changeLimit">
+        <select v-model="spielerlimit" class="h4" @change="changeLimit">
           <option
-            :text="zahl"
-            :value="zahl"
-            v-for="zahl in limitArray"
-            :key="zahl"
+              v-for="zahl in limitArray"
+              :key="zahl"
+              :text="zahl"
+              :value="zahl"
           ></option>
         </select>
       </div>
       <!-- AUSWAHL - Privatsphäre -->
       <div>
         <label class="h3">Lobby&nbsp;</label>
-        <select class="h4" v-model="istPrivat" @change="changePrivacy">
+        <select v-model="istPrivat" class="h4" @change="changePrivacy">
           <option value="true">privat</option>
           <option value="false">öffentlich</option>
         </select>
@@ -40,17 +40,18 @@
       <!-- AUSWAHL - Host -->
       <div>
         <label class="h3">Host:&nbsp;</label>
-        <select class="h4" v-model="host" @change="changeHost">
+        <select v-model="host" class="h4" @change="changeHost">
           <option
-            :text="teilnehmer.name"
-            v-for="teilnehmer in lobbystate.teilnehmerliste"
-            :key="teilnehmer.id"
+              v-for="teilnehmer in lobbystate.teilnehmerliste"
+              :key="teilnehmer.id"
+              :text="teilnehmer.name"
           ></option>
         </select>
       </div>
       <div class="row">
         <!-- START BUTTON -->
-        <button class="m-4 col btn btn-success" v-on:click="starten" :disabled="startbuttonUnsichtbar">SPIEL STARTEN</button>
+        <button :disabled="startbuttonUnsichtbar" class="m-4 col btn btn-success" v-on:click="starten">SPIEL STARTEN
+        </button>
         <h1 v-if="lobbystate.istGestartet" class="m-4 col">{{ lobbystate.countdown }}</h1>
       </div>
     </div>
@@ -67,9 +68,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, watchEffect, ref, computed, onMounted } from "vue";
-import { useLobbyStore } from "@/services/lobby/lobbyService";
+import {computed, defineComponent, onMounted, ref, watchEffect} from "vue";
+import {useLobbyStore} from "@/services/lobby/lobbyService";
 import userStore from "@/stores/user";
+
 export default defineComponent({
   name: "Einstellungen",
   setup() {
@@ -86,7 +88,7 @@ export default defineComponent({
     } = useLobbyStore();
 
     // Setzt das Spielerlimit immer auf das neuste lobbystate.spielerlimit
-    const limitArray = ref(Array.from({ length: 9 }, (_, i) => (i+1) + 1));
+    const limitArray = ref(Array.from({length: 9}, (_, i) => (i + 1) + 1));
 
     const kartenArray = computed(() => {
       return alleKartenState.karten;
@@ -108,26 +110,28 @@ export default defineComponent({
     function changeKarte() {
       einstellungsfunktionen["changeKarte"](gewaehlteKarte.value);
     }
+
     function changeLimit() {
       einstellungsfunktionen["changeLimit"](spielerlimit.value);
     }
+
     function changePrivacy() {
       einstellungsfunktionen["changePrivacy"](istPrivat.value);
     }
+
     function changeHost() {
       einstellungsfunktionen["changeHost"](host.value);
     }
 
     function starten() {
-      // startbutton.setAttribute("disabled", "disabled");
       startbuttonUnsichtbar.value = true;
       starteLobby()
-        .then((response) => {
-          console.log(response);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((err) => {
+            console.log(err);
+          });
     }
 
     return {

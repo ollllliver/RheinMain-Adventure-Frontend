@@ -1,7 +1,7 @@
 <template>
   <!-- Aktionstasten: Buttons zum Auslösen verschiedener Aktionen (speichern/löschen/redo/undo/...) -->
   <div>
-    <button class="btn btn-outline-secondary" @click="zurPruefung()" name="pruef">zur Prüfung einreichen</button>
+    <button class="btn btn-outline-secondary" name="pruef" @click="zurPruefung()">zur Prüfung einreichen</button>
     <button class="btn btn-outline-secondary" @click="spaeterBeenden()">später beenden</button>
     <button class="btn btn-outline-secondary" @click="allesEntfernen()">alles entfernen</button>
     <button class="btn btn-outline-secondary" @click="entfernen()">löschen: An/Aus</button>
@@ -15,7 +15,8 @@ import {defineComponent} from "vue";
 import {CommandStack} from "../../commands/CommandManager";
 import editorStore from "@/stores/editor";
 import userStore from "@/stores/user";
-import router from  "@/router/index"
+import router from "@/router/index"
+
 export default defineComponent({
   name: "Aktionstasten",
   methods: {
@@ -30,8 +31,8 @@ export default defineComponent({
   },
 
   setup() {
-    
-    
+
+
     // Karte nach Prüfung ob Start/Ziel und Raum/Schluessel/Tuer richtig platziert wurde 
     // an Backend senden und speichern body = {name: levelName, karte: [][]any} 
     const zurPruefung = () => {
@@ -50,17 +51,18 @@ export default defineComponent({
             const inhalt = editorStore.getters.getGrid.wandleKarteZuInt()
             const pojo = editorStore.getters.getGrid
             console.log(inhalt)
-            fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+editorStore.getters.getGrid._levelID+"/0", {
+            fetch("/api/level/einfach/" + userStore.getters.getBenutzername + "/" + editorStore.getters.getGrid._levelID + "/0", {
               method: "PUT",
               headers: {
                 Accept: "application/json",
                 "Content-Type": "application/json",
-              },      
+              },
               body: JSON.stringify(
-                { levelID: pojo._levelID, benutzername: pojo._benutzername, 
-                  levelName: pojo._levelName, levelBeschreibung: pojo._levelBeschreibung,
-                  levelInhalt: inhalt, istFreigegeben: true
-                }),
+                  {
+                    levelID: pojo._levelID, benutzername: pojo._benutzername,
+                    levelName: pojo._levelName, levelBeschreibung: pojo._levelBeschreibung,
+                    levelInhalt: inhalt, istFreigegeben: true
+                  }),
             }).then(function (res) {
               console.log("LEVEL GESPEICHERT");
               editorStore.default()
@@ -80,7 +82,7 @@ export default defineComponent({
     const allesEntfernen = () => {
 
       const stack = CommandStack.getInstance().getStack().length
-      for(let i = 0; i < stack; i++) {
+      for (let i = 0; i < stack; i++) {
         CommandStack.getInstance().undo()
         CommandStack.getInstance().getStack().pop()
       }
@@ -104,21 +106,22 @@ export default defineComponent({
       }
     };
 
-    const spaeterBeenden  = () => {
+    const spaeterBeenden = () => {
       const inhalt = editorStore.getters.getGrid.wandleKarteZuInt()
       const pojo = editorStore.getters.getGrid
 
-      fetch("/api/level/einfach/"+ userStore.getters.getBenutzername+"/"+editorStore.getters.getGrid._levelID+"/0", {
+      fetch("/api/level/einfach/" + userStore.getters.getBenutzername + "/" + editorStore.getters.getGrid._levelID + "/0", {
         method: "PUT",
         headers: {
           Accept: "application/json",
           "Content-Type": "application/json",
-        },      
+        },
         body: JSON.stringify(
-          { levelID: pojo._levelID, benutzername: pojo._benutzername, 
-            levelName: pojo._levelName, levelBeschreibung: pojo._levelBeschreibung,
-            levelInhalt: inhalt, istFreigegeben: false
-          }),
+            {
+              levelID: pojo._levelID, benutzername: pojo._benutzername,
+              levelName: pojo._levelName, levelBeschreibung: pojo._levelBeschreibung,
+              levelInhalt: inhalt, istFreigegeben: false
+            }),
       }).then(function (res) {
         console.log("LEVEL GESPEICHERT");
         editorStore.default()

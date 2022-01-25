@@ -17,119 +17,119 @@ import userStore from '@/stores/user'
 let zielLobby = "";
 
 const routes: Array<RouteRecordRaw> = [
-    {
-        path: '/',
-        name: 'Landingpage',
-        component: LandingpageView,
-        beforeEnter: (to, from, next) => {
-            if (zielLobby!=""){
-                next(zielLobby);
-                zielLobby="";
-            }else{
-                next();
-            }
-        }
-    },
-    {
-        path: '/home',
-        name: 'MenueView',
-        component: MenueView,
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                zielLobby = to.path;
-                next('/login');
-            }else{
-                next();
-            }
-        }
-    },
-    {
-        path: '/lobby/:lobby_id',
-        name: 'LobbyView',
-        component: LobbyView,
-        props: true,
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                zielLobby = to.path;
-                next('/login');
-            }else{
-                next();
-            }
-        }
-    },
-    {
-        path: '/uebersicht',
-        name: 'Lobbyuebersicht',
-        component: LobbyuebersichtView,
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                next('/');
-            }else{
-                next();
-            }
-        }
-    },
-    {
-        path: '/editoruebersicht',
-        name: 'Editoruebersicht',
-        component: EditoruebersichtView,
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                next('/');
-            }else{
-                next();
-            }
-        }
-    },
-    {
-        path: '/editor',
-        name: 'Editor',
-        component: EditorView,
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                next('/');
-            }else{
-                next();
-            }
-        }
-    },
-    {
-        path: '/environment',
-        name: 'Environment',
-        component: SpieleUmgebungView,
-        beforeEnter: (to, from, next) => {
-            if (!userStore.state.istEingeloggt){
-                next('/');
-            }else{
-                next();
-            }
-        }
-    },
-    {
-        path: '/login',
-        name: 'Login',
-        component: LoginView
-    },
-    {
-        path: '/signup',
-        name: 'SignUp',
-        component: RegistrierenView
-    },
-    {
-        path: '/anleitung',
-        name: 'AnleitungView',
-        component: AnleitungView
-    },
-    {
-        path: '/about',
-        name: 'About',
-        component: AboutView
-    },
+  {
+    path: '/',
+    name: 'Landingpage',
+    component: LandingpageView,
+    beforeEnter: (to, from, next) => {
+      if (zielLobby != "") {
+        next(zielLobby);
+        zielLobby = "";
+      } else {
+        next();
+      }
+    }
+  },
+  {
+    path: '/home',
+    name: 'MenueView',
+    component: MenueView,
+    beforeEnter: (to, from, next) => {
+      if (!userStore.state.istEingeloggt) {
+        zielLobby = to.path;
+        next('/login');
+      } else {
+        next();
+      }
+    }
+  },
+  {
+    path: '/lobby/:lobby_id',
+    name: 'LobbyView',
+    component: LobbyView,
+    props: true,
+    beforeEnter: (to, from, next) => {
+      if (!userStore.state.istEingeloggt) {
+        zielLobby = to.path;
+        next('/login');
+      } else {
+        next();
+      }
+    }
+  },
+  {
+    path: '/uebersicht',
+    name: 'Lobbyuebersicht',
+    component: LobbyuebersichtView,
+    beforeEnter: (to, from, next) => {
+      if (!userStore.state.istEingeloggt) {
+        next('/');
+      } else {
+        next();
+      }
+    }
+  },
+  {
+    path: '/editoruebersicht',
+    name: 'Editoruebersicht',
+    component: EditoruebersichtView,
+    beforeEnter: (to, from, next) => {
+      if (!userStore.state.istEingeloggt) {
+        next('/');
+      } else {
+        next();
+      }
+    }
+  },
+  {
+    path: '/editor',
+    name: 'Editor',
+    component: EditorView,
+    beforeEnter: (to, from, next) => {
+      if (!userStore.state.istEingeloggt) {
+        next('/');
+      } else {
+        next();
+      }
+    }
+  },
+  {
+    path: '/environment',
+    name: 'Environment',
+    component: SpieleUmgebungView,
+    beforeEnter: (to, from, next) => {
+      if (!userStore.state.istEingeloggt) {
+        next('/');
+      } else {
+        next();
+      }
+    }
+  },
+  {
+    path: '/login',
+    name: 'Login',
+    component: LoginView
+  },
+  {
+    path: '/signup',
+    name: 'SignUp',
+    component: RegistrierenView
+  },
+  {
+    path: '/anleitung',
+    name: 'AnleitungView',
+    component: AnleitungView
+  },
+  {
+    path: '/about',
+    name: 'About',
+    component: AboutView
+  },
 ]
 
 const router = createRouter({
-    history: createWebHashHistory(),
-    routes
+  history: createWebHashHistory(),
+  routes
 })
 
 export default router

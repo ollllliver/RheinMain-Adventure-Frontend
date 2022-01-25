@@ -9,17 +9,18 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted} from 'vue';
+import {defineComponent, onMounted} from 'vue';
 import userStore from '@/stores/user'
 import LabyrinthMenue from "@/components/menue/LabyrinthMenue.vue"
+
 export default defineComponent({
   name: 'Home',
-  components: {  LabyrinthMenue },
+  components: {LabyrinthMenue},
   setup() {
 
     onMounted(userStore.getUser)
-    return { userStore }
-    
+    return {userStore}
+
   }
 });
 </script>

@@ -1,11 +1,11 @@
-import { Spieler } from "@/models/Spieler";
+import {Spieler} from "@/models/Spieler";
 
 export interface Lobby {
-    lobbyID: string;
-    teilnehmerliste: Array<Spieler>;
-    host: Spieler;
-    istVoll: boolean;
-    istGestartet: boolean;
-    spielerlimit: number;
-    istPrivat: boolean;
+  lobbyID: string;
+  teilnehmerliste: Array<Spieler>;
+  host: Spieler;
+  istVoll: boolean;
+  istGestartet: boolean;
+  spielerlimit: number;
+  istPrivat: boolean;
 }

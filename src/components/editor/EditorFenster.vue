@@ -7,23 +7,24 @@
   <div class="drop-zone" @drop="onDrop($event)" @dragenter.prevent @dragover.prevent>
     <div v-for="(row, index) in liste" :key="index" class="reihe" draggable="false">
       <div
-        v-for="col in row"
-        :key="col"
-        v-bind:id="col.id"
-        class="element"
-        v-on:click="wegPunkt"
-        draggable="false"
-        
-      > {{col}}</div>
+          v-for="col in row"
+          v-bind:id="col.id"
+          :key="col"
+          class="element"
+          draggable="false"
+          v-on:click="wegPunkt"
+
+      > {{ col }}
+      </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted } from "vue";
-import { CommandStack } from "../../commands/CommandManager";
-import { ElementHinzufuegenCommand } from "../../commands/ElementHinzufuegenCommand";
-import { ElementEntfernenCommand } from "../../commands/ElementEntfernenCommand";
+import {defineComponent, onMounted} from "vue";
+import {CommandStack} from "../../commands/CommandManager";
+import {ElementHinzufuegenCommand} from "../../commands/ElementHinzufuegenCommand";
+import {ElementEntfernenCommand} from "../../commands/ElementEntfernenCommand";
 import editorStore from "@/stores/editor";
 
 export default defineComponent({
@@ -33,25 +34,25 @@ export default defineComponent({
 
     // Kartenklasse mit liste als Array aus editorStore
     var karte: any;
-    var liste: any[][];    
+    var liste: any[][];
     karte = editorStore.getters.getGrid;
 
     // Proxy aufloesen?? das war zumindest mein Ziel
     const target_copy1 = Object.assign({}, karte);
     liste = Object.assign({}, target_copy1.levelInhalt);
-    
+
     onMounted(() => {
-      
+
       CommandStack.getInstance().reset()
       /**
        * durch liste iterieren und grid fuellen wenn bearbeitet
        * über document div elemente aus dem grid identifizieren
        */
-      
+
       let reihe = document.getElementsByClassName("reihe")
 
-      for (let y = 0 ; y < 14; y++) {
-        for(let x = 0; x < 22; x++) {
+      for (let y = 0; y < 14; y++) {
+        for (let x = 0; x < 22; x++) {
           let spalte = reihe[y].getElementsByClassName("element")
           let element = spalte[x] as HTMLDivElement
 
@@ -79,7 +80,7 @@ export default defineComponent({
               editorStore.setzeTuer(1)
               element.style.background = "no-repeat center url('../img/tuer-h.png') rgba(255,211,155, 0.75)"
               break;
-            case 7: 
+            case 7:
               editorStore.setzeTuer(1)
               element.style.background = "no-repeat center url('../img/tuer-v.png') rgba(255,211,155, 0.75)"
               break;
@@ -88,7 +89,7 @@ export default defineComponent({
       }
     });
 
-    
+
     /**
      * bei drop (Drag-and-Drop) Elemnent auf der Karte platzieren
      * itemdID, y-, x-Koordinaten und element über event identifizieren
@@ -96,25 +97,24 @@ export default defineComponent({
      */
     const onDrop = (event: any) => {
       const itemID = parseInt(event.dataTransfer.getData("itemID"));
-      const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
-      const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
-      const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
-      const ele = {y:y,x:x,e:e}
+      const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[0].split(":", 2)[1])
+      const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[1].split(":", 2)[1])
+      const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[2].split(":", 2)[1].split("}", 1)[0])
+      const ele = {y: y, x: x, e: e}
 
       // wenn an der Stelle ein Weg ist
       if (liste[ele.y][ele.x].e === 1) {
         CommandStack.getInstance().execAndPush(
-          new ElementHinzufuegenCommand(
-            karte,
-            itemID,
-            editorStore.getters.getStackindex,
-            event,
-            ele,
-            editorStore.getters.getAusrichtung
-          )
+            new ElementHinzufuegenCommand(
+                karte,
+                itemID,
+                editorStore.getters.getStackindex,
+                event,
+                ele,
+                editorStore.getters.getAusrichtung
+            )
         );
         editorStore.setze(0);
-        return;
       } else {
         editorStore.info("Um dieses Element platzieren zu können muss vorher ein Wegpunkt an der Stelle sein.");
       }
@@ -158,7 +158,7 @@ export default defineComponent({
       }
       */
     };
-    
+
 
     /**
      * Wegpunkt markieren:
@@ -167,7 +167,7 @@ export default defineComponent({
      * über Command auf der Karte platzieren -> Platzierung in Command-Klasse
      */
     const wegPunkt = (event: any) => {
-      
+
       if (editorStore.getters.istAktiv) {
         if (editorStore.getters.getElement === 2) {
           if (editorStore.getters.getStart) {
@@ -183,24 +183,23 @@ export default defineComponent({
         }
 
         if (editorStore.getters.getEntfernen) {
-          
+
           // y-, x-Koordinaten und element ueber event identifizieren
-          const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
-          const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
-          const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
-          
-          const ele = {y:y,x:x,e:e}
-          if (liste[y][x]!== 0) {
+          const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[0].split(":", 2)[1])
+          const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[1].split(":", 2)[1])
+          const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[2].split(":", 2)[1].split("}", 1)[0])
+
+          const ele = {y: y, x: x, e: e}
+          if (liste[y][x] !== 0) {
             CommandStack.getInstance().execAndPush(
-              new ElementEntfernenCommand(
-                karte,
-                e,
-                editorStore.getters.getStackindex,
-                event,
-                ele.x,
-                ele.y
-                
-              )
+                new ElementEntfernenCommand(
+                    karte,
+                    e,
+                    editorStore.getters.getStackindex,
+                    event,
+                    ele.x,
+                    ele.y
+                )
             );
           } else {
             editorStore.info("Stelle ist bereits leer!");
@@ -208,21 +207,21 @@ export default defineComponent({
         }
         if (!editorStore.getters.getEntfernen) {
           // y-, x-Koordinaten und element ueber event identifizieren
-          const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[0].split(":",2)[1])
-          const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[1].split(":",2)[1])
-          const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",",3)[2].split(":",2)[1].split("}",1)[0])
-          
-          const ele = {y:y,x:x,e:e}
+          const y = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[0].split(":", 2)[1])
+          const x = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[1].split(":", 2)[1])
+          const e = parseInt(event.target.innerText.replace(/\s/g, "").split(",", 3)[2].split(":", 2)[1].split("}", 1)[0])
+
+          const ele = {y: y, x: x, e: e}
           // Wegpunkt setzen
           if (e === 0) {
             CommandStack.getInstance().execAndPush(
-              new ElementHinzufuegenCommand(
-                karte,
-                editorStore.getters.getElement,
-                editorStore.getters.getStackindex,
-                event,
-                ele
-              )
+                new ElementHinzufuegenCommand(
+                    karte,
+                    editorStore.getters.getElement,
+                    editorStore.getters.getStackindex,
+                    event,
+                    ele
+                )
             );
           } else {
             editorStore.info("Stelle ist bereits belegt!");
@@ -259,12 +258,14 @@ body {
   width: 100%;
   margin: 0;
 }
+
 .reihe {
   width: 100%;
   height: auto;
   float: left;
   box-sizing: border-box;
 }
+
 .element {
   float: left;
   box-sizing: border-box;

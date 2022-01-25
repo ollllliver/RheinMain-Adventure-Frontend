@@ -1,64 +1,61 @@
 <template>
-  <div id="fenster">    
+  <div id="fenster">
     <div class="fenster__inner">
       <div class="fenster__top">
         <h1 class="title">Spiel unterbrochen</h1>
       </div>
       <div class="fenster__bottom">
-        <button class="button" @click="weiter">Weiter</button><br>
-        <button class="button" @click="verlassen">Verlassen</button><br>
-        <!-- <button class="button" @click="einstellungen">Einstellungen</button> -->
+        <button class="button" @click="weiter">Weiter</button>
+        <br>
+        <button class="button" @click="verlassen">Verlassen</button>
+        <br>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
-import { useGameEngine } from "@/services/inGame/gameEngine";
-import { useLobbyStore } from "@/services/lobby/lobbyService"
-import { useChatStore } from "@/services/ChatStore"
+import {defineComponent} from "vue";
+import {useGameEngine} from "@/services/inGame/gameEngine";
+import {useLobbyStore} from "@/services/lobby/lobbyService"
+import {useChatStore} from "@/services/ChatStore"
 import router from "@/router";
 
 
-// anleitung.style.display = "none";
-// blocker.style.display = "none";
-
 export default defineComponent({
-    setup(){
-        const fenster = document.getElementById("fenster");
-        const { disconnect, connect } = useGameEngine();
-        const { unsubscribeChat } = useChatStore();
-        return {fenster, connect, disconnect, unsubscribeChat}
+  setup() {
+    const fenster = document.getElementById("fenster");
+    const {disconnect, connect} = useGameEngine();
+    const {unsubscribeChat} = useChatStore();
+    return {fenster, connect, disconnect, unsubscribeChat}
+  },
+  methods: {
+    /**
+     * Die Spielsteuerung wird hinzugefügt
+     */
+    weiter() {
+      this.connect();
+      console.log("Pause.weiter: Spiel geht weiter");
     },
-    methods: {
-        /**
-         * Die Spielsteuerung wird hinzugefügt
-         */
-        weiter() {
-            this.connect();
-            console.log("Pause.weiter: Spiel geht weiter");
-            // this.fenster = document.getElementById('fenster');
-            // if (this.fenster != null){ this.fenster.style.display = "";}
-        },
-        /**
-         * Schickt einen zurück zur Lobby-Übersicht
-         */
-        verlassen() {
-            console.log("Pause.abbrechen: Spiel wurde verlassen");
-            this.unsubscribeChat();
-            this.disconnect();
-            router.push(`/lobby/${useLobbyStore().lobbystate.lobbyID}`);
-        },
-        /**
-         * TODO Einstellungen
-         */
-        einstellungen() {
-            console.log("Pause.einstellungen: noch nicht implementiert")
-            return ""; //TODO
-        }
-    }});
-        
+    /**
+     * Schickt einen zurück zur Lobby-Übersicht
+     */
+    verlassen() {
+      console.log("Pause.abbrechen: Spiel wurde verlassen");
+      this.unsubscribeChat();
+      this.disconnect();
+      router.push(`/lobby/${useLobbyStore().lobbystate.lobbyID}`);
+    },
+    /**
+     * TODO Einstellungen
+     */
+    einstellungen() {
+      console.log("Pause.einstellungen: noch nicht implementiert")
+      return "";
+    }
+  }
+});
+
 </script>
 
 <style>
@@ -68,7 +65,7 @@ export default defineComponent({
   max-width: 800px;
   overflow: hidden;
   border-radius: 4px;
-  
+
 }
 
 .fenster__top {
@@ -90,7 +87,7 @@ export default defineComponent({
   padding: var(--gap) var(--gap) var(--gap) var(--gap);
 }
 
-.button {  
+.button {
   display: inline-block;
   padding: 6px 12px;
   background: #ffffff;

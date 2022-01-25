@@ -1,7 +1,7 @@
-import { NachrichtenCode } from "@/messaging/NachrichtenCode";
+import {NachrichtenCode} from "@/messaging/NachrichtenCode";
 
-export interface LobbyMessage{
-    typ: NachrichtenCode;
-    istFehler: boolean;
-    payload: string;
+export interface LobbyMessage {
+  typ: NachrichtenCode;
+  istFehler: boolean;
+  payload: string;
 }

@@ -1,15 +1,16 @@
 <template>
   <div class="canvas">
-    <Spieleumgebung />
+    <Spieleumgebung/>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import {defineComponent} from "vue";
 import Spieleumgebung from "@/components/inGame/Spieleumgebung.vue";
+
 export default defineComponent({
   name: "Environment",
-  components: { Spieleumgebung }
+  components: {Spieleumgebung}
 });
 </script>
 

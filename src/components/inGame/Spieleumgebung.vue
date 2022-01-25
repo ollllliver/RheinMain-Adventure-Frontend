@@ -1,14 +1,14 @@
 <template>
   <div>
-    <Ziel id="ziel" />
-    <Pause id="pause" />
+    <Ziel id="ziel"/>
+    <Pause id="pause"/>
     <h2 id="interaktionText"></h2>
     <p id="schluesselText">x 0</p>
     <div class="GameChat">
-      <button type="button" id="ChatButton">Chat</button>
-      <Chat :sendeNachricht="sendeChatNachricht" class="row border border-secondary rounded px-4 mt-3" id="Chat" />
+      <button id="ChatButton" type="button">Chat</button>
+      <Chat id="Chat" :sendeNachricht="sendeChatNachricht" class="row border border-secondary rounded px-4 mt-3"/>
     </div>
-    <img src="@/assets/img/key.png" class="key" alt="" width="50" height="50"/>
+    <img alt="" class="key" height="50" src="@/assets/img/key.png" width="50"/>
     <div id="container" class="m-0 p-0"/>
   </div>
 </template>
@@ -45,8 +45,8 @@ export default defineComponent({
       setContainer,
     } = useGameEngine();
 
-    const { sendeChatNachricht, empfangeChatNachricht} = useChatStore();
-    
+    const {sendeChatNachricht, empfangeChatNachricht} = useChatStore();
+
 
     onMounted(() => {
       setContainer(document.getElementById("container"));
@@ -74,7 +74,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-#pause, #ziel{
+#pause, #ziel {
   --gap: 15px;
 
   position: fixed;

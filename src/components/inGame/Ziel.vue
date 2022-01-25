@@ -8,32 +8,33 @@
       </div>
       <div :class="fenster__frage">
         <input
-          id="antwortInput"
-          class="text__input"
-          v-model="eingabe.antwort"
-          v-on:keyup.enter="beantworten()"
-          required
+            id="antwortInput"
+            v-model="eingabe.antwort"
+            class="text__input"
+            required
+            v-on:keyup.enter="beantworten()"
         />
         <button class="ok__button" @click="beantworten()">Ok</button>
       </div>
       <div :class="fenster__beende">
-        <button class="beenden__button" @click="beenden">Spiel beenden</button><br />
+        <button class="beenden__button" @click="beenden">Spiel beenden</button>
+        <br/>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, ref } from "vue";
-import { useGameEngine } from "@/services/inGame/gameEngine";
-import { useLobbyStore } from "@/services/lobby/lobbyService";
+import {defineComponent, reactive, ref} from "vue";
+import {useGameEngine} from "@/services/inGame/gameEngine";
+import {useLobbyStore} from "@/services/lobby/lobbyService";
 
 export default defineComponent({
   setup() {
-    const { beendeSpiel } = useLobbyStore();
-    const { connect, disconnect } = useGameEngine();
+    const {beendeSpiel} = useLobbyStore();
+    const {connect, disconnect} = useGameEngine();
 
-    const eingabe = reactive({ antwort: "" });
+    const eingabe = reactive({antwort: ""});
     const close__button = ref("close__button");
     const fenster__inner = ref("fenster__inner");
     const fenster__frage = ref("fenster__frage");

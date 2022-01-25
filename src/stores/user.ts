@@ -1,6 +1,6 @@
 // User Store für Aktionen mit dem Benutzer
 
-import { computed, reactive } from 'vue'
+import {computed, reactive} from 'vue'
 import * as Request from '@/services/user/requests'
 
 const state = reactive({
@@ -28,7 +28,7 @@ const actions = {
    * Setzt state.istEingeloggt fuer Routing auf true/false je nachdem ob ein Benutzer eingeloggt ist oder nicht
    */
   async getUser() {
-    Request.getUser().then(()=>{
+    Request.getUser().then(() => {
       if (!state.benutzername) {
         state.istEingeloggt = false
       } else {
@@ -38,9 +38,9 @@ const actions = {
   },
   /**
    * Loggt Benutzer ein, bekommt JWTToken aus Backend und speichert diesen im Header jeder
-   * Anfrage ans Backend mit Axios.get/post... 
-   * @param benutzername 
-   * @param passwort 
+   * Anfrage ans Backend mit Axios.get/post...
+   * @param benutzername
+   * @param passwort
    * @returns Liefert Promise.resolve/reject
    */
   async login(benutzername: string, passwort: string) {
@@ -67,8 +67,8 @@ const actions = {
 
   /**
    * Registriert Benutzer in Backend Datenbank
-   * @param benutzername 
-   * @param passwort 
+   * @param benutzername
+   * @param passwort
    * @returns Http.status OK mit Benutzerobjekt bei Erfolg, Http.status NO_CONTENT bei scheitern
    */
   async signup(benutzername: string, passwort: string) {
@@ -99,4 +99,4 @@ const actions = {
   }
 }
 
-export default { state, getters, ...actions }
+export default {state, getters, ...actions}

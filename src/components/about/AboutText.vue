@@ -3,7 +3,7 @@
     <h2>Über dieses Projekt</h2>
 
     <div class="d-flex flex-wrap">
-      <img src="@/assets/img/logos/hsrm.png" alt="" class="logo" />
+      <img alt="" class="logo" src="@/assets/img/logos/hsrm.png"/>
       <h3 class="p-2 m-0">Hochschule Rheinmain - Softwaretechnik Projekt 2021/22</h3>
     </div>
     <p>
@@ -32,12 +32,13 @@
     <h2>Verwendete Technologien</h2>
 
     <div class="d-flex flex-wrap">
-      <img src="@/assets/img/logos/Taiga.png" alt="" class="logo" />
+      <img alt="" class="logo" src="@/assets/img/logos/Taiga.png"/>
       <h3 class="p-2 m-0">Projekt Management</h3>
     </div>
     <p>
       Zur Planung und Dokumentation unserer Arbeit verwendeten wir
-      <a href="https://www.taiga.io/" class="link-success">Taiga</a>. Taiga ist ein kostenloses Open-Source-Projektmanagementsystem
+      <a class="link-success" href="https://www.taiga.io/">Taiga</a>. Taiga ist ein kostenloses
+      Open-Source-Projektmanagementsystem
       TODO:
       Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy
       eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
@@ -47,12 +48,12 @@
     </p>
 
     <div class="d-flex flex-wrap">
-      <img src="@/assets/img/logos/Vue.png" alt="" class="logo" />
+      <img alt="" class="logo" src="@/assets/img/logos/Vue.png"/>
       <h3 class="p-2 m-0">Frontend</h3>
     </div>
     <p>
       Für die Frontendentwicklung verwenden wir das JavaScript Framework
-      <a href="https://vuejs.org/" class="link-success">Vue.js</a>. TODO: Lorem
+      <a class="link-success" href="https://vuejs.org/">Vue.js</a>. TODO: Lorem
       ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod
       tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
       voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet
@@ -61,13 +62,13 @@
     </p>
 
     <div class="d-flex flex-wrap">
-      <img src="@/assets/img/logos/Spring.png" alt="" class="logo" />
+      <img alt="" class="logo" src="@/assets/img/logos/Spring.png"/>
       <h3 class="p-2 m-0">Backend</h3>
     </div>
     <p>
       Für die Backendentwicklung verwenden wir das Java-Framework
-      <a href="https://spring.io/projects/spring-boot" class="link-success"
-        >Spring Boot</a
+      <a class="link-success" href="https://spring.io/projects/spring-boot"
+      >Spring Boot</a
       >
       von Spring. TODO: Lorem ipsum dolor sit amet, consetetur sadipscing elitr,
       sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam
@@ -104,7 +105,7 @@
       <strong>Daylies</strong>
       haben wir uns gegenseitig mitgeteilt, was wir erreicht haben und was wir
       weiterhin bis zum nächsten Treffen errreichen wollen.
-      <br />
+      <br/>
       Nach zwei Wochen neigt sich der Springt dann dem Ende und wir trafen uns
       zu unserem <strong>Sprint Review</strong>, in dem wir uns gegenseitig dann das
       Erreichte vorstellten und uns die Workitems im bessten Falle von dem
@@ -119,22 +120,22 @@
     </p>
     <h4>Lobby</h4>
     <div class="text-center">
-      <img src="@/assets/img/screenshots/Screenshot_Lobby.png" alt="" class="img-fluid" />
+      <img alt="" class="img-fluid" src="@/assets/img/screenshots/Screenshot_Lobby.png"/>
     </div>
     <h4>Game</h4>
     <div class="text-center">
-      <img src="@/assets/img/screenshots/Screenshot_Game.png" alt="" class="img-fluid" />
+      <img alt="" class="img-fluid" src="@/assets/img/screenshots/Screenshot_Game.png"/>
     </div>
     <h4>Editor</h4>
     <div class="text-center">
-      <img src="@/assets/img/screenshots/Screenshot_Editor.png" alt="" class="img-fluid" />
+      <img alt="" class="img-fluid" src="@/assets/img/screenshots/Screenshot_Editor.png"/>
     </div>
   </div>
 </template>
 
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import {defineComponent} from "vue";
 
 export default defineComponent({
   name: "Teilnehmerliste",
