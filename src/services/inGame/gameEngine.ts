@@ -245,7 +245,7 @@ window.addEventListener('resize', () => {
     camera.aspect = window.innerWidth / window.innerHeight
     camera.updateProjectionMatrix()
 
-    renderer.setSize(window.innerWidth, window.innerHeight)
+    renderer.setSize(window.innerWidth, window.innerHeight-75);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 })
 
@@ -374,7 +374,7 @@ const initRaycaster = () => {
 
 const initRenderer = () => {
     renderer = new Three.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight-75);
     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
     container?.appendChild(renderer.domElement);
 };
@@ -534,7 +534,7 @@ function setzteSchluesselAnz(anzSchluessel: number, koordinaten: string) {
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel)
     if(schluesselText){
-        schluesselText.textContent = "Keys x" + anzSchluessel;
+        schluesselText.textContent = " x " + anzSchluessel;
         schluesselText.style.display = "block";
     }
 
@@ -572,7 +572,7 @@ function oeffneTuer(anzSchluessel: number, koordinaten: string) {
     gamestate.anzSchluessel = anzSchluessel;
     console.log("GAMESTATE ANZ: " + gamestate.anzSchluessel)
     if(schluesselText){
-        schluesselText.textContent = "Keys x" + anzSchluessel;
+        schluesselText.textContent = " x " + anzSchluessel;
         schluesselText.style.display = "block";
     }
 

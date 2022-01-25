@@ -18,7 +18,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr :lobby="lobby" v-for="lobby in alleLobbiesState.lobbies" :key="lobby.lobbyID">
+          <tr :lobby="lobby" v-for="lobby in alleLobbiesState.lobbies.filter(lobby => !lobby.istPrivat)" :key="lobby.lobbyID">
             <th>{{ lobby.gewaehlteKarte.name }}</th>
             <th>{{ lobby.host.name }}</th>
             <th>{{ lobby.teilnehmerliste.length }}/{{ lobby.spielerlimit }}</th>
