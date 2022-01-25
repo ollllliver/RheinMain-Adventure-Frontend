@@ -69,7 +69,6 @@ export default defineComponent({
     this.stopAnimate();
     this.clearMapContent();
     this.disconnect();
-    console.log("unmounted");
   },
 });
 </script>

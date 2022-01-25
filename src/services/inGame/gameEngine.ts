@@ -124,8 +124,6 @@ const initLoader = () => {
         return response.json();
 
     }).then((RaumMobiliarListe:Array<any>) => {
-        console.log("RaumMobiliar aus Level wird jetzt vom Backend geladen.", RaumMobiliarListe);
-
         // Noch mal nen Rahmen um das Labyrinth hinzufügen:
         const wand = {"mobiliarId": 0,"name": "Wand","modellURI": "gltf/models_embedded/dirt.gltf","mobiliartyp": null};
         [-1,KARTENBREITE].forEach(k => {
@@ -151,7 +149,7 @@ const initLoader = () => {
             const mobiliarId: number = raumMobiliar.mobiliar.mobiliarId;
             
             let res;
-            try {
+            if(gltfFiles.get(mobiliarId)) {
                 res = gltfFiles.get(mobiliarId).clone();
                 
                 // Da die 3D-Objekte recht groß sind, werden sie mit mehr Abstand zueinander platziert.
@@ -174,14 +172,11 @@ const initLoader = () => {
                 }
                 scene.add(res)
 
-            } catch (error) {
-                console.log(error);                
             }
-
         });
     }).then(()=>{
 
-        console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich heruntergeladen und platziert.")
+        console.log("Das gesamte Mobiliar des Raumes wurde erfolgreich platziert.")
         camera.position.set(startPosition.x, startPosition.y, startPosition.z);
 
         lobbystate.teilnehmerliste.forEach(function (mitspieler) {
@@ -329,8 +324,6 @@ const connect = () => {
     if (zielFenster != null) {
         zielFenster.style.display = "none";
     }
-
-    console.log("gameEninge.connect: verbunden")
 }
 
 /**
@@ -357,12 +350,8 @@ const disconnectController = (element?: string) => {
     const zielFenster = document.getElementById('ziel');
 
     if (element != null) {
-        switch (element) {
-            case "ziel":
-                if (zielFenster != null) {
-                    zielFenster.style.display = "";
-                }
-                break;
+        if (element == "ziel" && zielFenster != null) {
+            zielFenster.style.display = "";
         }
     } else {
         if (pauseFenster != null && zielFenster != null) {
@@ -371,8 +360,6 @@ const disconnectController = (element?: string) => {
             }
         }
     }
-
-    console.log("gameEninge.disconnect: getrennt")
 }
 
 
@@ -427,9 +414,7 @@ const initSkybox = () => {
     }
 
     function init() {
-        console.log("Skybox wird initialisiert")
         const materialArray = createMaterialArray(skyboxImage);
-        console.log("Texturen geladen")
 
         skyboxGeo = new Three.BoxGeometry(1000, 1000, 1000);
         skybox = new Three.Mesh(skyboxGeo, materialArray);
@@ -438,7 +423,6 @@ const initSkybox = () => {
         skybox.position.y = 0
         skybox.position.z = 0
         scene.add(skybox);
-        console.log("Skybox der Szene hinzugefügt")
     }
 
     init();
@@ -533,7 +517,6 @@ const doAnimate = () => {
     }
     spieler.eigenschaften.position.x = Math.round(camera.position.x * 100) / 100;
     spieler.eigenschaften.position.z = Math.round(camera.position.z * 100) / 100;
-    //spieler.eigenschaften.position.y = Math.round(camera.position.y * 100) / 100;
 };
 
 /**

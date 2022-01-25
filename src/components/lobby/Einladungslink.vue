@@ -27,7 +27,6 @@ export default defineComponent({
         copyInviteLink(){
             try {
                 navigator.clipboard.writeText(this.link)
-                console.log("Link (" + this.link + ") wurde kopiert")
             } catch (err) {
                 console.error("Link konnte nicht kopiert werden")
             }
