@@ -360,12 +360,14 @@ const disconnectController = (element?: string) => {
 
 
 const initPlane = () => {
-    const plane = new Three.PlaneGeometry(100, 100);
-    const material = new Three.MeshBasicMaterial({ color: 0xB4A290, side: Three.DoubleSide });
+    const plane = new Three.PlaneGeometry(80, 120);
+    const material = new Three.MeshBasicMaterial({color: 0xB4A290, side: Three.DoubleSide});
 
     meshPlane = new Three.Mesh(plane, material);
     meshPlane.rotateX(1 / 2 * Math.PI)
-    meshPlane.position.x = 0
+    // Weil unsere Räume ab (0,0) platziert werden, schieben wir den Boden ein wenig passender hin
+    meshPlane.position.x = 20
+    meshPlane.position.z = 40
     scene.add(meshPlane);
 };
 
