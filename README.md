@@ -7,7 +7,7 @@ Ziel des Softwaretechnik-Projekts ist einerseits die Entwicklung in einem realis
 
 Dabei wurde Wert gelegt auf einen gleichmäßigen Projektfortschritt und planvolles und systematisches Vorgehen. Eine solide, erweiterbare und verständliche Architektur, die schrittweise weiterentwickelt wird und eine immer aktuelle Dokumentation darf natürlich auch nicht fehlen. Während der Entwicklung wurde auf gute Testabdeckung der Implementationen geachtet, sowie Fehler systematisch mit einem Ticketsystem erfasst und bearbeitet. Jedes Mitglied trägt eine aktiv Verantwortung für das Projekt.
 
-## How to
+## How to setup
 
 ### Project setup
 
@@ -33,6 +33,10 @@ muss der "serve" Befehl in der package.json folgendermaßen aussehen:
 ## Backend Source
 
 [RheinMain-Adventure-Backend](https://github.com/ollllliver/RheinMain-Adventure-Backend)
+
+## Demo Video
+
+[Demo Video](https://www.youtube.com/watch?v=JE3jSLQEKBY) auf YouTube.
 
 ## Screenshots
 
